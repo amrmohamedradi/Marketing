@@ -8,18 +8,20 @@ import ServicesSection from "@/components/ServicesSection";
 import PriceSection from "@/components/PriceSection";
 import PreviewModal from "@/components/PreviewModal";
 import Starfield from "@/components/Starfield";
+import type { LucideIcon } from "lucide-react";
 
 interface SubService {
   id: string;
   name: string;
   description: string;
+  isCustom?: boolean;
 }
 
 interface Service {
   id: string;
   name: string;
   description: string;
-  icon: any;
+  icon: LucideIcon;
   subServices: SubService[];
   suggestedItems: { name: string; description: string }[];
 }
@@ -89,7 +91,7 @@ const Index = () => {
     );
   };
 
-  const { t, toggle, lang } = useI18n();
+  const { t } = useI18n();
 
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
@@ -109,9 +111,6 @@ const Index = () => {
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">ServiceSpec</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={toggle}>
-              {lang === 'ar' ? t('switch_to_en') : t('switch_to_ar')}
-            </Button>
             <Button
               onClick={() => setIsPreviewOpen(true)}
               disabled={!canPreview()}

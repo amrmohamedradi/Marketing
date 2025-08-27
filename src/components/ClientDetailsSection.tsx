@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { User, Building, Mail, Phone } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface ClientDetailsProps {
   clientDetails: {
@@ -13,10 +14,18 @@ interface ClientDetailsProps {
     phone: string;
     description: string;
   };
-  onUpdate: (details: any) => void;
+  onUpdate: (details: {
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    description: string;
+  }) => void;
 }
 
 const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) => {
+  const { t } = useI18n();
+  
   const handleChange = (field: string, value: string) => {
     onUpdate({ ...clientDetails, [field]: value });
   };
@@ -26,7 +35,7 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <User className="w-5 h-5 text-primary" />
-          <span>Client Details</span>
+          <span>{t('client_details')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -34,11 +43,11 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
           <div className="space-y-2">
             <Label htmlFor="clientName" className="flex items-center space-x-1">
               <User className="w-4 h-4" />
-              <span>Client Name</span>
+              <span>{t('client_name')}</span>
             </Label>
             <Input
               id="clientName"
-              placeholder="Enter client's full name"
+              placeholder={t('client_name_placeholder')}
               value={clientDetails.name}
               onChange={(e) => handleChange("name", e.target.value)}
               className="input-enhanced"
@@ -47,11 +56,11 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
           <div className="space-y-2">
             <Label htmlFor="company" className="flex items-center space-x-1">
               <Building className="w-4 h-4" />
-              <span>Company</span>
+              <span>{t('company')}</span>
             </Label>
             <Input
               id="company"
-              placeholder="Company or organization name"
+              placeholder={t('company_placeholder')}
               value={clientDetails.company}
               onChange={(e) => handleChange("company", e.target.value)}
               className="input-enhanced"
@@ -60,12 +69,12 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
           <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center space-x-1">
               <Mail className="w-4 h-4" />
-              <span>Email</span>
+              <span>{t('email')}</span>
             </Label>
             <Input
               id="email"
               type="email"
-              placeholder="client@company.com"
+              placeholder={t('email_placeholder')}
               value={clientDetails.email}
               onChange={(e) => handleChange("email", e.target.value)}
               className="input-enhanced"
@@ -74,11 +83,11 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
           <div className="space-y-2">
             <Label htmlFor="phone" className="flex items-center space-x-1">
               <Phone className="w-4 h-4" />
-              <span>Phone</span>
+              <span>{t('phone')}</span>
             </Label>
             <Input
               id="phone"
-              placeholder="+1 (555) 123-4567"
+              placeholder={t('phone_placeholder')}
               value={clientDetails.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
               className="input-enhanced"
@@ -86,10 +95,10 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="description">Project Description</Label>
+          <Label htmlFor="description">{t('project_description')}</Label>
           <Textarea
             id="description"
-            placeholder="Brief description of the project or requirements..."
+            placeholder={t('project_description_placeholder')}
             value={clientDetails.description}
             onChange={(e) => handleChange("description", e.target.value)}
             className="input-enhanced min-h-[100px]"

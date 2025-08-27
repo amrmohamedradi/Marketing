@@ -3,13 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn, Sparkles } from "lucide-react";
+import { Sparkles, LogIn, Loader2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface LoginFormProps {
   onLogin: () => void;
 }
 
 const LoginForm = ({ onLogin }: LoginFormProps) => {
+  const { t } = useI18n();
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -20,7 +22,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login delay
+    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
       onLogin();
@@ -28,91 +30,85 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8 fade-in">
-        {/* Header */}
-        <div className="text-center space-y-6">
-          <div className="flex justify-center">
-            <div className="flex items-center space-x-2 text-primary">
-              <Sparkles className="h-8 w-8" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                ServiceSpec
-              </span>
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center mb-4">
+            <Sparkles className="h-8 w-8 text-white" />
           </div>
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-foreground">Welcome back</h1>
-            <p className="text-muted-foreground">
-              Sign in to create beautiful service specifications for your clients
-            </p>
-          </div>
+          <h2 className="text-3xl font-bold text-foreground">
+            {t('welcome_back')}
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            {t('sign_in_desc')}
+          </p>
         </div>
-
-        {/* Login Form */}
-        <Card className="card-gradient scale-in">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl">Sign In</CardTitle>
-            <CardDescription>
-              Use any credentials to access the demo
+        
+        <Card className="card-gradient">
+          <CardHeader>
+            <CardTitle className="text-center text-foreground">
+              {t('sign_in')}
+            </CardTitle>
+            <CardDescription className="text-center text-muted-foreground">
+              {t('sign_in_desc_card')}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-foreground">
+                  {t('email')}
+                </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="demo@servicespec.com"
+                  placeholder={t('email_placeholder')}
                   value={credentials.email}
-                  onChange={(e) =>
-                    setCredentials({ ...credentials, email: e.target.value })
-                  }
+                  onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
                   className="input-enhanced"
                   required
                 />
               </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-foreground">
+                  {t('password')}
+                </Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter any password"
+                  placeholder={t('password_placeholder')}
                   value={credentials.password}
-                  onChange={(e) =>
-                    setCredentials({ ...credentials, password: e.target.value })
-                  }
+                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                   className="input-enhanced"
                   required
                 />
               </div>
+              
               <Button
                 type="submit"
                 className="w-full btn-gradient"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Signing in...</span>
-                  </div>
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('signing_in')}
+                  </>
                 ) : (
-                  <div className="flex items-center space-x-2">
-                    <LogIn className="w-4 h-4" />
-                    <span>Sign In</span>
-                  </div>
+                  <>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    {t('sign_in')}
+                  </>
                 )}
               </Button>
             </form>
+            
+            <p className="text-xs text-center text-muted-foreground">
+              {t('demo_notice')}
+            </p>
           </CardContent>
         </Card>
-
-        {/* Demo Notice */}
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
-            This is a demo app. Use any email and password to continue.
-          </p>
-        </div>
       </div>
     </div>
   );

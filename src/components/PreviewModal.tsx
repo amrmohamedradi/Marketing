@@ -14,16 +14,57 @@ import {
   Share,
   X
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
+
+interface SubService {
+  id: string;
+  name: string;
+  description: string;
+  isCustom?: boolean;
+}
+
+interface Service {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  subServices: SubService[];
+  suggestedItems: { name: string; description: string }[];
+}
+
+interface ClientDetails {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  description: string;
+}
+
+interface PriceItem {
+  id: string;
+  description: string;
+  amount: number;
+}
+
+interface PriceData {
+  basePrice: number;
+  currency: string;
+  additionalItems: PriceItem[];
+  notes: string;
+}
 
 interface PreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  clientDetails: any;
-  services: any[];
-  priceData: any;
+  clientDetails: ClientDetails;
+  services: Service[];
+  priceData: PriceData;
 }
 
 const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: PreviewModalProps) => {
+  const { t } = useI18n();
+
   const selectedCurrency = [
     { value: "USD", symbol: "$" },
     { value: "EUR", symbol: "€" },

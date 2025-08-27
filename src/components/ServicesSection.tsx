@@ -51,43 +51,43 @@ interface ServicesSectionProps {
 // Generate simple suggestions based on service name
 const generateSuggestions = (serviceName: string): { name: string; description: string }[] => {
   const n = serviceName.toLowerCase();
-  if (n.includes("market")) {
+  if (n.includes("market") || n.includes("تسويق")) {
     return [
-      { name: "Instagram Posts", description: "Monthly content plan" },
-      { name: "10 Reels", description: "Short-form video edits" },
-      { name: "Facebook Ads", description: "Setup and optimization" },
-      { name: "Reports", description: "Monthly performance report" },
+      { name: "منشورات انستغرام", description: "خطة محتوى شهرية" },
+      { name: "10 ريلز", description: "تعديلات فيديو قصيرة" },
+      { name: "إعلانات فيسبوك", description: "إعداد وتحسين" },
+      { name: "تقارير", description: "تقرير الأداء الشهري" },
     ];
   }
-  if (n.includes("photo") || n.includes("edit")) {
+  if (n.includes("photo") || n.includes("edit") || n.includes("تصوير") || n.includes("تحرير")) {
     return [
-      { name: "Product Shots", description: "Lighting and retouching" },
-      { name: "Portrait Edits", description: "Skin and color grading" },
-      { name: "Video Highlights", description: "60–90s edits" },
-      { name: "Delivery", description: "Web-ready exports" },
+      { name: "صور المنتجات", description: "إضاءة وتعديل" },
+      { name: "تعديل الصور الشخصية", description: "تدرج البشرة والألوان" },
+      { name: "مقاطع فيديو مميزة", description: "تعديلات 60-90 ثانية" },
+      { name: "تسليم", description: "تصدير جاهز للويب" },
     ];
   }
-  if (n.includes("program") || n.includes("dev") || n.includes("app") || n.includes("web")) {
+  if (n.includes("program") || n.includes("dev") || n.includes("app") || n.includes("web") || n.includes("برمجة")) {
     return [
-      { name: "Frontend UI", description: "Responsive React screens" },
-      { name: "API Endpoints", description: "REST/GraphQL" },
-      { name: "Database Schema", description: "Design and migrations" },
-      { name: "Docs", description: "Setup and usage notes" },
+      { name: "واجهة المستخدم الأمامية", description: "شاشات React متجاوبة" },
+      { name: "نقاط نهاية API", description: "REST/GraphQL" },
+      { name: "مخطط قاعدة البيانات", description: "تصميم وترحيل" },
+      { name: "وثائق", description: "ملاحظات الإعداد والاستخدام" },
     ];
   }
   return [
-    { name: "Discovery", description: "Goals and requirements" },
-    { name: "Implementation", description: "Core delivery" },
-    { name: "QA", description: "Testing & fixes" },
+    { name: "اكتشاف", description: "الأهداف والمتطلبات" },
+    { name: "تنفيذ", description: "التسليم الأساسي" },
+    { name: "ضمان الجودة", description: "اختبار وإصلاحات" },
   ];
 };
 
 // Build three default services with suggestions
 const buildDefaultServices = (): Service[] => {
   const base: Array<{ id: string; name: string; description: string; icon: LucideIcon }> = [
-    { id: "programming", name: "Programming", description: "", icon: Code },
-    { id: "marketing", name: "Marketing", description: "", icon: TrendingUp },
-    { id: "photo-shoot", name: "Photo & Editing", description: "", icon: Camera }
+    { id: "programming", name: "البرمجة", description: "", icon: Code },
+    { id: "marketing", name: "التسويق", description: "", icon: TrendingUp },
+    { id: "photo-shoot", name: "التصوير والتحرير", description: "", icon: Camera }
   ];
   return base.map((s) => ({
     id: s.id,
@@ -102,33 +102,33 @@ const buildDefaultServices = (): Service[] => {
 const SUPPORT_ITEMS = [
   {
     icon: Headphones,
-    title: "24/7 Support",
-    description: "Round-the-clock assistance whenever you need help"
+    title: "دعم 24/7",
+    description: "مساعدة مستمرة طوال الوقت عندما تحتاج المساعدة"
   },
   {
     icon: Award,
-    title: "Quality Guarantee",
-    description: "100% satisfaction guarantee on all deliverables"
+    title: "ضمان الجودة",
+    description: "ضمان رضا 100% على جميع التسليمات"
   },
   {
     icon: Clock,
-    title: "On-Time Delivery",
-    description: "Punctual delivery according to agreed timelines"
+    title: "التسليم في الوقت المحدد",
+    description: "التسليم الدقيق حسب الموعد المتفق عليه"
   },
   {
     icon: Users,
-    title: "Dedicated Team",
-    description: "Experienced professionals assigned to your project"
+    title: "فريق مخصص",
+    description: "فريق من المتخصصين المعتمدين لمشروعك"
   },
   {
     icon: Shield,
-    title: "Secure Process",
-    description: "Enterprise-grade security and confidentiality"
+    title: "عملية آمنة",
+    description: "أمان وسرية على مستوى المؤسسات"
   },
   {
     icon: Zap,
-    title: "Fast Turnaround",
-    description: "Quick iterations and responsive communication"
+    title: "استجابة سريعة",
+    description: "تكرارات سريعة وتواصل متجاوب"
   }
 ];
 
@@ -589,8 +589,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                 <Plus className="w-3 h-3 mr-1" />
                                 {t('add')}
                               </Button>
+                            </div>
                           </div>
-                        </div>
 
                         {/* Save Pending */}
                         <div className="flex justify-end">

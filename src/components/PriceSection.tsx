@@ -11,8 +11,10 @@ import {
   Plus, 
   Trash2, 
   Calculator,
-  PiggyBank
+  PiggyBank,
+  X
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface PriceItem {
   id: string;
@@ -32,16 +34,17 @@ interface PriceSectionProps {
   onUpdate: (priceData: PriceData) => void;
 }
 
-const currencies = [
-  { value: "USD", label: "USD ($)", symbol: "$" },
-  { value: "EUR", label: "EUR (€)", symbol: "€" },
-  { value: "GBP", label: "GBP (£)", symbol: "£" },
-  { value: "CAD", label: "CAD (C$)", symbol: "C$" },
-  { value: "AUD", label: "AUD (A$)", symbol: "A$" },
-];
-
 const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
   const [newItem, setNewItem] = useState({ description: "", amount: 0 });
+  const { t } = useI18n();
+
+  const currencies = [
+    { value: "USD", label: t('usd_label'), symbol: "$" },
+    { value: "EUR", label: t('eur_label'), symbol: "€" },
+    { value: "GBP", label: t('gbp_label'), symbol: "£" },
+    { value: "CAD", label: t('cad_label'), symbol: "C$" },
+    { value: "AUD", label: t('aud_label'), symbol: "A$" },
+  ];
 
   const selectedCurrency = currencies.find(c => c.value === priceData.currency) || currencies[0];
 
@@ -97,14 +100,14 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <DollarSign className="w-5 h-5 text-primary" />
-          <span>Pricing</span>
+          <span>{t('pricing')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Base Price and Currency */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="basePrice">Base Price</Label>
+            <Label htmlFor="basePrice">{t('base_price')}</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                 {selectedCurrency.symbol}
@@ -122,7 +125,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
+            <Label htmlFor="currency">{t('currency')}</Label>
             <Select value={priceData.currency} onValueChange={updateCurrency}>
               <SelectTrigger className="input-enhanced">
                 <SelectValue placeholder="Select currency" />
@@ -140,26 +143,26 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
 
         {/* Additional Price Items */}
         <div className="space-y-4">
-          <h4 className="font-medium flex items-center space-x-2">
-            <Plus className="w-4 h-4" />
-            <span>Additional Items</span>
-          </h4>
+                     <h4 className="font-medium flex items-center space-x-2">
+             <Plus className="w-4 h-4" />
+             <span>{t('additional_items')}</span>
+           </h4>
           
           {/* Add New Item */}
           <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border/50">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2 space-y-2">
-                <Label htmlFor="itemDescription">Description</Label>
-                <Input
-                  id="itemDescription"
-                  placeholder="e.g., Additional revisions, Premium support"
-                  value={newItem.description}
-                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                  className="input-enhanced"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="itemAmount">Amount</Label>
+                             <div className="md:col-span-2 space-y-2">
+                 <Label htmlFor="itemDescription">{t('item_description')}</Label>
+                 <Input
+                   id="itemDescription"
+                   placeholder={t('item_description_placeholder')}
+                   value={newItem.description}
+                   onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                   className="input-enhanced"
+                 />
+               </div>
+               <div className="space-y-2">
+                 <Label htmlFor="itemAmount">{t('amount')}</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                     {selectedCurrency.symbol}
@@ -177,10 +180,10 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
                 </div>
               </div>
             </div>
-            <Button onClick={addPriceItem} className="btn-gradient">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
+                         <Button onClick={addPriceItem} className="btn-gradient">
+               <Plus className="w-4 h-4 mr-2" />
+               {t('add_item')}
+             </Button>
           </div>
 
           {/* Price Items List */}
