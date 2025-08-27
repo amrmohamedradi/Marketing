@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Eye, LogOut } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 import LoginForm from "@/components/LoginForm";
 import ClientDetailsSection from "@/components/ClientDetailsSection";
 import ServicesSection from "@/components/ServicesSection";
@@ -88,6 +89,8 @@ const Index = () => {
     );
   };
 
+  const { t, toggle, lang } = useI18n();
+
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
   }
@@ -103,18 +106,19 @@ const Index = () => {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center space-x-2">
             <Sparkles className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              ServiceSpec
-            </span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">ServiceSpec</span>
           </div>
           <div className="flex items-center space-x-4">
+            <Button variant="outline" onClick={toggle}>
+              {lang === 'ar' ? t('switch_to_en') : t('switch_to_ar')}
+            </Button>
             <Button
               onClick={() => setIsPreviewOpen(true)}
               disabled={!canPreview()}
               className="btn-gradient"
             >
               <Eye className="w-4 h-4 mr-2" />
-              Preview
+              {t('preview')}
             </Button>
             <Button
               variant="ghost"
@@ -122,7 +126,7 @@ const Index = () => {
               className="text-muted-foreground hover:text-foreground"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              {t('logout')}
             </Button>
           </div>
         </div>
@@ -132,10 +136,10 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 space-y-8 fade-in">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Create Professional Service Specifications
+            {t('heading_main')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Build beautiful, detailed proposals for your clients with our intuitive service specification builder.
+            {t('heading_desc')}
           </p>
         </div>
 
@@ -163,15 +167,13 @@ const Index = () => {
               className="btn-gradient px-8 py-3 text-lg"
             >
               <Eye className="w-5 h-5 mr-2" />
-              Preview Specification
+              {t('preview_spec')}
             </Button>
           </div>
 
           {!canPreview() && (
             <div className="text-center text-muted-foreground">
-              <p className="text-sm">
-                Complete client details, add services, and set pricing to enable preview
-              </p>
+              <p className="text-sm">{t('complete_steps_hint')}</p>
             </div>
           )}
         </div>

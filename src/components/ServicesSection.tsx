@@ -1,4 +1,5 @@
 import { useEffect, useState, memo, useCallback } from "react";
+import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import {
   Heart
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface SubService {
   id: string;
@@ -83,9 +85,9 @@ const generateSuggestions = (serviceName: string): { name: string; description: 
 // Build three default services with suggestions
 const buildDefaultServices = (): Service[] => {
   const base: Array<{ id: string; name: string; description: string; icon: LucideIcon }> = [
-    { id: "programming", name: "Programming", description: "Custom app and API development", icon: Code },
-    { id: "marketing", name: "Marketing", description: "Growth campaigns and content operations", icon: TrendingUp },
-    { id: "photo-shoot", name: "Photo Shoot", description: "Photography and videography production", icon: Camera }
+    { id: "programming", name: "Programming", description: "", icon: Code },
+    { id: "marketing", name: "Marketing", description: "", icon: TrendingUp },
+    { id: "photo-shoot", name: "Photo & Editing", description: "", icon: Camera }
   ];
   return base.map((s) => ({
     id: s.id,
@@ -192,6 +194,7 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
 SubServiceRow.displayName = 'SubServiceRow';
 
 const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
+  const { t } = useI18n();
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
   const [editingSubService, setEditingSubService] = useState<string | null>(null);
   const [customSubService, setCustomSubService] = useState({ name: "", description: "" });
@@ -347,7 +350,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Settings className="w-5 h-5 text-primary" />
-            <span>Our Services</span>
+            <span>{t('our_services')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -427,7 +430,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Current Sub-services (render only when expanded) */}
                         {isExpanded && service.subServices.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">INCLUDED SERVICES</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground">{t('included_services')}</h4>
                             {service.subServices.map((subService) => (
                               <div key={subService.id} className="flex items-center justify-between p-3 bg-muted/20 rounded border border-border/30">
                                 <div className="flex-1">
@@ -534,7 +537,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Suggested Items (select to stage) */}
                         {isExpanded && service.suggestedItems.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">SUGGESTED</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground">{t('suggested')}</h4>
                             <div className="space-y-2">
                               {service.suggestedItems.map((item) => {
                                 const p = pendingForService;
@@ -568,31 +571,31 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Add Sub-service (always visible, simple) */}
                         <div className="space-y-2 p-3 bg-muted/10 rounded border border-border/30">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <Input
-                              placeholder="Sub-service name"
-                              value={customSubService.name}
-                              onChange={(e) => setCustomSubService({ ...customSubService, name: e.target.value })}
+                              <Input
+                              placeholder={t('subservice_name_ph')}
+                                value={customSubService.name}
+                                onChange={(e) => setCustomSubService({ ...customSubService, name: e.target.value })}
                               className="text-sm"
-                            />
-                            <Input
-                              placeholder="Description (optional)"
-                              value={customSubService.description}
-                              onChange={(e) => setCustomSubService({ ...customSubService, description: e.target.value })}
+                              />
+                              <Input
+                                placeholder={t('subservice_desc_ph')}
+                                value={customSubService.description}
+                                onChange={(e) => setCustomSubService({ ...customSubService, description: e.target.value })}
                               className="text-sm"
-                            />
-                          </div>
+                              />
+                            </div>
                           <div>
                             <Button size="sm" onClick={() => stageCustomSubService(service.id)}>
-                              <Plus className="w-3 h-3 mr-1" />
-                              Add
-                            </Button>
+                                <Plus className="w-3 h-3 mr-1" />
+                                {t('add')}
+                              </Button>
                           </div>
                         </div>
 
                         {/* Save Pending */}
                         <div className="flex justify-end">
                           <Button size="sm" onClick={() => savePending(service.id)} disabled={(pendingForService.customDrafts.length === 0 && !(pendingForService.selectedSuggested && pendingForService.selectedSuggested.size > 0))}>
-                            Save
+                            {t('save')}
                           </Button>
                         </div>
                       </CardContent>
