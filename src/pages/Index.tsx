@@ -108,7 +108,7 @@ const Index = () => {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center space-x-2">
             <img src="/logo.webp" alt="Marketing Corner Logo" className="h-8 w-8 rounded-full" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-white p-2">ماركتنج كورنر</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-white p-2">{t('marketing_corner_logo_text')}</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button 
