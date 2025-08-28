@@ -124,7 +124,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
                   placeholder="0.00"
                   value={priceData.basePrice || ""}
                   onChange={(e) => updateBasePrice(parseFloat(e.target.value) || 0)}
-                  className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 pl-8"
+                  className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 pl-8 [appearance:textfield]"
                   min="0"
                   step="0.01"
                 />
@@ -179,7 +179,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
                     placeholder="0.00"
                     value={newItem.amount || ""}
                     onChange={(e) => setNewItem({ ...newItem, amount: parseFloat(e.target.value) || 0 })}
-                    className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 pl-8"
+                    className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 pl-8 [appearance:textfield]"
                     min="0"
                     step="0.01"
                   />

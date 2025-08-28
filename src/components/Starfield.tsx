@@ -48,6 +48,9 @@ interface StarfieldProps {
 	maxStarSize?: number; // maximum base radius
 	parallaxStrength?: number; // how much stars shift with mouse (0..1)
 	speed?: number; // base speed factor for subtle drift
+	moonSizeFactor?: number; // Factor to multiply moon radius by
+	moonColor?: string; // Color of the moon
+	mouseParallaxStarsFraction?: number; // Fraction of stars that respond to mouse movement
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -58,6 +61,9 @@ const Starfield = ({
 	maxStarSize = 2.2,
 	parallaxStrength = 0.08,
 	speed = 0.03,
+	moonSizeFactor = 1,
+	moonColor = "rgba(200, 200, 220, 0.7)",
+	mouseParallaxStarsFraction = 1,
 }: StarfieldProps) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const starsRef = useRef<Star[]>([]);
@@ -93,7 +99,7 @@ const Starfield = ({
 				x: Math.random(),
 				y: Math.random(),
 				z: Math.random(),
-				size: Math.random() * maxStarSize + 0.2,
+				size: Math.pow(Math.random(), 2) * maxStarSize + 0.2, // Use power to bias smaller stars, but allow large
 				twinkleSpeed: 1 + Math.random() * 2,
 				twinklePhase: Math.random() * Math.PI * 2,
 			};
@@ -141,12 +147,12 @@ const Starfield = ({
 			};
 		};
 
-		shootingStarsRef.current = Array.from({ length: 3 }, makeShootingStar);
+		shootingStarsRef.current = Array.from({ length: 8 }, makeShootingStar); // Increased number of shooting stars
 
 		const makeMoon = (): Moon => ({
 			x: Math.random() * 0.8 + 0.1, // Start somewhere in the middle 80%
 			y: Math.random() * 0.8 + 0.1,
-			radius: 20 + Math.random() * 30, // 20-50px radius
+			radius: (20 + Math.random() * 30) * moonSizeFactor, // Apply moonSizeFactor here
 			phase: Math.random() * Math.PI * 2,
 			speedX: (Math.random() - 0.5) * 0.005, // very slow drift
 			speedY: (Math.random() - 0.5) * 0.005,
@@ -208,7 +214,7 @@ const Starfield = ({
 			};
 		};
 
-		dottedShapesRef.current = [makeDottedCube()]; // Start with one cube
+		dottedShapesRef.current = Array.from({ length: 3 }, makeDottedCube); // Start with three cubes
 
 		const onMouseMove = (e: MouseEvent) => {
 			const rect = canvas.getBoundingClientRect();
@@ -247,14 +253,17 @@ const Starfield = ({
 			ctx.fillRect(0, 0, width, height);
 
 			// Draw stars
-			for (const star of starsRef.current) {
+			for (let i = 0; i < starsRef.current.length; i++) {
+				const star = starsRef.current[i];
+
 				// subtle drift by z (depth)
 				star.x += (0.02 + star.z * 0.06) * speed * dt; // drift to right
 				if (star.x > 1) star.x -= 1; // wrap around
 
-				// World position with parallax
-				const px = (star.x - mx * (0.5 + star.z)) * width;
-				const py = (star.y - my * (0.5 + star.z)) * height;
+				// World position with parallax - apply only to a fraction of stars
+				const effectiveParallaxStrength = i < starCount * mouseParallaxStarsFraction ? parallaxStrength : 0;
+				const px = (star.x - mx * (0.5 + star.z) * effectiveParallaxStrength) * width;
+				const py = (star.y - my * (0.5 + star.z) * effectiveParallaxStrength) * height;
 
 				// Twinkle alpha oscillation (0.4..1)
 				const alpha = 0.4 + 0.6 * Math.max(0, Math.sin(star.twinklePhase + ts * 0.001 * star.twinkleSpeed));
@@ -311,10 +320,10 @@ const Starfield = ({
 
 				const moonPx = moon.x * width;
 				const moonPy = moon.y * height;
-				const moonRadius = moon.radius;
+				const moonRadius = moon.radius * moonSizeFactor;
 
 				const moonGrad = ctx.createRadialGradient(moonPx, moonPy, moonRadius * 0.7, moonPx, moonPy, moonRadius);
-				moonGrad.addColorStop(0, "rgba(200, 200, 220, 0.7)");
+				moonGrad.addColorStop(0, moonColor);
 				moonGrad.addColorStop(1, "rgba(150, 150, 170, 0.5)");
 
 				ctx.globalAlpha = 1;
@@ -386,7 +395,7 @@ const Starfield = ({
 			window.removeEventListener("mousemove", onMouseMove);
 			window.removeEventListener("resize", onResize);
 		};
-	}, [starCount, maxStarSize, parallaxStrength, speed]);
+	}, [starCount, maxStarSize, parallaxStrength, speed, moonSizeFactor, moonColor, mouseParallaxStarsFraction]);
 
 	return (
 		<canvas

@@ -71,7 +71,14 @@ const Index = () => {
     >
       {/* Background Starfield */}
       <div className="absolute inset-0 -z-10">
-        <Starfield starCount={300} parallaxStrength={0.12} />
+        <Starfield
+          starCount={500} // Increased star count for more stars
+          maxStarSize={3} // Increased max star size for variety (from 2.2)
+          parallaxStrength={0.15} // Slightly increased parallax effect
+          moonSizeFactor={0} // Removing the moon by setting its size factor to 0
+          moonColor="rgba(255, 255, 200, 0.8)" // Slightly yellowish hue
+          mouseParallaxStarsFraction={0.3} // Only 30% of stars respond to mouse
+        />
       </div>
 
       {/* Main Content */}
