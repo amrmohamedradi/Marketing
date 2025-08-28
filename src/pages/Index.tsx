@@ -107,8 +107,8 @@ const Index = () => {
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">ServiceSpec</span>
+            <img src="/src/assets/logo.webp" alt="ركن التسويق Logo" className="h-8 w-8 rounded-full" />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-white p-2">ركن التسويق</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button
