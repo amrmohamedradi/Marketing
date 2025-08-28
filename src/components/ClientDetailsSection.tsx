@@ -6,27 +6,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { User, Building, Mail, Phone } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
+interface ClientDetails {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  description: string;
+}
+
 interface ClientDetailsProps {
-  clientDetails: {
-    name: string;
-    company: string;
-    email: string;
-    phone: string;
-    description: string;
-  };
-  onUpdate: (details: {
-    name: string;
-    company: string;
-    email: string;
-    phone: string;
-    description: string;
-  }) => void;
+  clientDetails: ClientDetails;
+  onUpdate: (details: ClientDetails) => void;
 }
 
 const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) => {
   const { t } = useI18n();
   
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: keyof ClientDetails, value: string) => {
     onUpdate({ ...clientDetails, [field]: value });
   };
 

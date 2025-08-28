@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import * as LucideIcons from "lucide-react"; // Import all Lucide icons
 
 interface SubService {
   id: string;
@@ -38,7 +39,7 @@ interface Service {
   id: string;
   name: string;
   description: string;
-  icon: LucideIcon;
+  icon: string; // Change from LucideIcon to string
   subServices: SubService[];
   suggestedItems: { name: string; description: string }[];
   isDefault?: boolean; // Add this line
@@ -86,10 +87,10 @@ const generateSuggestions = (serviceName: string, t: (key: string) => string): {
 
 // Build three default services with suggestions
 const buildDefaultServices = (t: (key: string) => string): Service[] => {
-  const base: Array<{ id: string; nameKey: string; description: string; icon: LucideIcon }> = [
-    { id: "programming", nameKey: "programming", description: "", icon: Code },
-    { id: "marketing", nameKey: "marketing", description: "", icon: TrendingUp },
-    { id: "photo-shoot", nameKey: "photo_editing", description: "", icon: Camera }
+  const base: Array<{ id: string; nameKey: string; description: string; icon: string }> = [
+    { id: "programming", nameKey: "programming", description: "", icon: "Code" },
+    { id: "marketing", nameKey: "marketing", description: "", icon: "TrendingUp" },
+    { id: "photo-shoot", nameKey: "photo_editing", description: "", icon: "Camera" }
   ];
   return base.map((s) => ({
     id: s.id,
@@ -359,7 +360,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       id,
       name,
       description: newService.description,
-      icon: Settings,
+      icon: "Settings", // Store icon name as a string
       subServices: [],
       suggestedItems: []
     };
@@ -403,7 +404,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           {/* Services - full width stacked panels */}
           <div className="grid grid-cols-1 gap-4">
             {services.map((service) => {
-              const Icon = service.icon;
+              const Icon = LucideIcons[service.icon as keyof typeof LucideIcons] || Settings; // Dynamically get icon component
               const isExpanded = expandedServices.has(service.id);
               const pendingForService = pending[service.id] ?? { customDrafts: [] };
               

@@ -6,43 +6,26 @@ import LoginForm from "@/components/LoginForm";
 import ClientDetailsSection from "@/components/ClientDetailsSection";
 import ServicesSection from "@/components/ServicesSection";
 import PriceSection from "@/components/PriceSection";
-import PreviewModal from "@/components/PreviewModal";
+// import PreviewModal from "@/components/PreviewModal"; // Removed
 import Starfield from "@/components/Starfield";
 import type { LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppContext } from "@/lib/AppContext"; // Import useAppContext
 
-interface SubService {
-  id: string;
-  name: string;
-  description: string;
-  isCustom?: boolean;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  icon: LucideIcon;
-  subServices: SubService[];
-  suggestedItems: { name: string; description: string }[];
-}
-
-interface PriceItem {
-  id: string;
-  description: string;
-  amount: number;
-}
-
-interface PriceData {
-  basePrice: number;
-  currency: string;
-  additionalItems: PriceItem[];
-  notes: string;
-}
+// Remove these interfaces, as they are now defined in AppContext.tsx
+// interface SubService { /* ... */ }
+// interface Service { /* ... */ }
+// interface PriceItem { /* ... */ }
+// interface PriceData { /* ... */ }
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  // const [isPreviewOpen, setIsPreviewOpen] = useState(false); // Removed
   
+  const { clientDetails, setClientDetails, services, setServices, priceData, setPriceData, clearAllData } = useAppContext(); // Use useAppContext
+
+  // Remove local state for clientDetails, services, priceData
+  /*
   const [clientDetails, setClientDetails] = useState({
     name: "",
     company: "",
@@ -59,6 +42,7 @@ const Index = () => {
     additionalItems: [],
     notes: "",
   });
+  */
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -66,21 +50,7 @@ const Index = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    // Reset all data
-    setClientDetails({
-      name: "",
-      company: "",
-      email: "",
-      phone: "",
-      description: "",
-    });
-    setServices([]);
-    setPriceData({
-      basePrice: 0,
-      currency: "USD",
-      additionalItems: [],
-      notes: "",
-    });
+    clearAllData(); // Use clearAllData from context
   };
 
   const canPreview = () => {
@@ -92,6 +62,8 @@ const Index = () => {
   };
 
   const { t, changeLanguage, currentLanguage } = useI18n();
+  const navigate = useNavigate();
+  // const { setPreviewData } = usePreviewData(); // Removed
 
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
@@ -161,7 +133,7 @@ const Index = () => {
           {/* Action Buttons */}
           <div className="flex justify-center space-x-4 pt-8">
             <Button
-              onClick={() => setIsPreviewOpen(true)}
+              onClick={() => navigate('/preview')}
               disabled={!canPreview()}
               className="btn-gradient px-8 py-3 text-lg"
             >
@@ -179,13 +151,13 @@ const Index = () => {
       </main>
 
       {/* Preview Modal */}
-      <PreviewModal
+      {/* <PreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         clientDetails={clientDetails}
         services={services}
         priceData={priceData}
-      />
+      /> */}
     </div>
   );
 };

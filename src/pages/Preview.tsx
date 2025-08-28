@@ -1,21 +1,12 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  User, 
-  Building, 
-  Mail, 
-  Phone, 
-  CheckCircle, 
-  DollarSign,
-  FileText,
-  Download,
-  Share,
-  X
-} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
+import { useNavigate } from "react-router-dom"; // Removed useLocation
+import React from 'react';
+import * as LucideIcons from "lucide-react";
+import { useAppContext } from "@/lib/AppContext"; // Import useAppContext
 
 interface SubService {
   id: string;
@@ -28,7 +19,7 @@ interface Service {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: string; // Change from React.ComponentType<{ className?: string }> to string
   subServices: SubService[];
   suggestedItems: { name: string; description: string }[];
 }
@@ -54,16 +45,20 @@ interface PriceData {
   notes: string;
 }
 
-interface PreviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  clientDetails: ClientDetails;
-  services: Service[];
-  priceData: PriceData;
-}
-
-const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: PreviewModalProps) => {
+const PreviewPage = () => {
   const { t, currentLanguage } = useI18n();
+  const navigate = useNavigate();
+  const { clientDetails, services, priceData } = useAppContext(); // Get data from useAppContext
+
+  // Redirect if essential data is missing
+  if (!clientDetails || !clientDetails.name || services.length === 0 || !priceData || priceData.basePrice === 0) {
+    React.useEffect(() => {
+      navigate('/');
+    }, [navigate]);
+    return null; // Or a loading spinner
+  }
+
+  console.log("PreviewPage mounted with state:", { clientDetails, services, priceData });
 
   const selectedCurrency = [
     { value: "USD", symbol: "$" },
@@ -78,38 +73,41 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
   };
 
   const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(currentLanguage === 'ar' ? 'ar-EG' : 'en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount);
   };
 
+  const handleClose = () => {
+    navigate(-1); // Go back to the previous page
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="max-w-4xl max-h-[90vh] sm:max-w-xl sm:max-h-[95vh] overflow-y-auto"
-        dir={currentLanguage === 'en' ? 'ltr' : 'rtl'}
-      >
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 sm:pb-2">
-          <DialogTitle className="text-2xl font-bold flex items-center space-x-2 sm:text-xl">
-            <FileText className="w-6 h-6 text-primary" />
+    <div
+      className="min-h-screen p-4 bg-background text-foreground"
+      dir={currentLanguage === 'en' ? 'ltr' : 'rtl'}
+    >
+      <div className="max-w-4xl mx-auto space-y-8 sm:space-y-4 bg-surface-elevated rounded-lg p-6 sm:p-4 shadow-lg border border-border/50">
+        <div className="flex flex-row items-center justify-between space-y-0 pb-4 sm:pb-2">
+          <div className="text-2xl font-bold flex items-center space-x-2 sm:text-xl">
+            <LucideIcons.FileText className="w-6 h-6 text-primary" />
             <span>{t('service_specification')}</span>
-          </DialogTitle>
+          </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm" className="btn-ghost-primary m-5 sm:m-2">
-              <Share className="w-4 h-4 mr-2 " />
+              <LucideIcons.Share className="w-4 h-4 mr-2 " />
               {t('share')}
             </Button>
             <Button variant="outline" size="sm" className="btn-ghost-primary ">
-              <Download className="w-4 h-4 mr-2" />
+              <LucideIcons.Download className="w-4 h-4 mr-2" />
               {t('export')}
             </Button>
-            <Button variant="ghost" size="sm" onClick={onClose} className="sm:p-2">
-              <X className="w-4 h-4" />
+            <Button variant="ghost" size="sm" onClick={handleClose} className="sm:p-2">
+              <LucideIcons.X className="w-4 h-4" />
             </Button>
           </div>
-        </DialogHeader>
+        </div>
 
         <div className="space-y-8 sm:space-y-4">
           {/* Header Section */}
@@ -129,13 +127,13 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
           {(clientDetails.name || clientDetails.company || clientDetails.email || clientDetails.phone) && (
             <div className="space-y-4 sm:space-y-2">
               <h2 className="text-xl font-semibold flex items-center space-x-2 sm:text-lg">
-                <User className="w-5 h-5 text-primary sm:w-4 sm:h-4" />
+                <LucideIcons.User className="w-5 h-5 text-primary sm:w-4 sm:h-4" />
                 <span>{t('client_information')}</span>
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-surface-elevated rounded-lg border border-border/30 sm:p-3 sm:gap-2">
                 {clientDetails.name && (
                   <div className="flex items-center space-x-3">
-                    <User className="w-4 h-4 text-muted-foreground" />
+                    <LucideIcons.User className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground sm:text-xs">{t('name')}</p>
                       <p className="font-medium sm:text-sm">{clientDetails.name}</p>
@@ -144,7 +142,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                 )}
                 {clientDetails.company && (
                   <div className="flex items-center space-x-3">
-                    <Building className="w-4 h-4 text-muted-foreground" />
+                    <LucideIcons.Building className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground sm:text-xs">{t('company')}</p>
                       <p className="font-medium sm:text-sm">{clientDetails.company}</p>
@@ -153,7 +151,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                 )}
                 {clientDetails.email && (
                   <div className="flex items-center space-x-3">
-                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <LucideIcons.Mail className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground sm:text-xs">{t('email')}</p>
                       <p className="font-medium sm:text-sm">{clientDetails.email}</p>
@@ -162,7 +160,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                 )}
                 {clientDetails.phone && (
                   <div className="flex items-center space-x-3">
-                    <Phone className="w-4 h-4 text-muted-foreground" />
+                    <LucideIcons.Phone className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground sm:text-xs">{t('phone')}</p>
                       <p className="font-medium sm:text-sm">{clientDetails.phone}</p>
@@ -184,44 +182,50 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
             <div className="space-y-4 sm:space-y-2">
               <h2 className="text-xl font-semibold sm:text-lg">{t('services_included')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {services.map((service, index) => (
-                  <div key={service.id} className="p-4 bg-surface-elevated rounded-lg border border-border/30 sm:p-3">
-                    <div className="space-y-3 sm:space-y-2">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-semibold text-lg sm:text-base">{service.name}</h3>
-                          {service.description && (
-                            <p className="text-muted-foreground mt-1 sm:text-sm">{service.description}</p>
-                          )}
-                        </div>
-                        <Badge variant="secondary" className="sm:text-xs">
-                          {t('service')} {index + 1}
-                        </Badge>
-                      </div>
-                      
-                      {service.subServices.length > 0 && (
-                        <div className="space-y-2 sm:space-y-1">
-                          <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide sm:text-xs">
-                            {t('included_items')}
-                          </h4>
-                          <div className="grid grid-cols-1 gap-2 sm:gap-1">
-                            {service.subServices.map((subService: SubService) => (
-                              <div key={subService.id} className="flex items-start space-x-3 p-2 bg-muted/20 rounded sm:p-1">
-                                <CheckCircle className="w-4 h-4 text-success mt-0.5 flex-shrink-0 sm:w-3 sm:h-3" />
-                                <div>
-                                  <p className="font-medium text-sm sm:text-xs">{subService.name}</p>
-                                  {subService.description && (
-                                    <p className="text-xs text-muted-foreground sm:text-xxs">{subService.description}</p>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
+                {services.map((service, index) => {
+                  const Icon = LucideIcons[service.icon as keyof typeof LucideIcons] || LucideIcons.FileText;
+                  return (
+                    <div key={service.id} className="p-4 bg-surface-elevated rounded-lg border border-border/30 sm:p-3">
+                      <div className="space-y-3 sm:space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Icon className="w-5 h-5 text-primary" />
+                            <div>
+                              <h3 className="font-semibold text-lg sm:text-base">{service.name}</h3>
+                              {service.description && (
+                                <p className="text-muted-foreground mt-1 sm:text-sm">{service.description}</p>
+                              )}
+                            </div>
                           </div>
+                          <Badge variant="secondary" className="sm:text-xs">
+                            {t('service')} {index + 1}
+                          </Badge>
                         </div>
-                      )}
+
+                        {service.subServices.length > 0 && (
+                          <div className="space-y-2 sm:space-y-1">
+                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide sm:text-xs">
+                              {t('included_items')}
+                            </h4>
+                            <div className="grid grid-cols-1 gap-2 sm:gap-1">
+                              {service.subServices.map((subService: SubService) => (
+                                <div key={subService.id} className="flex items-start space-x-3 p-2 bg-muted/20 rounded sm:p-1">
+                                  <LucideIcons.CheckCircle className="w-4 h-4 text-success mt-0.5 flex-shrink-0 sm:w-3 sm:h-3" />
+                                  <div>
+                                    <p className="font-medium text-sm sm:text-xs">{subService.name}</p>
+                                    {subService.description && (
+                                      <p className="text-xs text-muted-foreground sm:text-xxs">{subService.description}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -229,7 +233,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
           {/* Pricing Section */}
           <div className="space-y-4 sm:space-y-2">
             <h2 className="text-xl font-semibold flex items-center space-x-2 sm:text-lg">
-              <DollarSign className="w-5 h-5 text-primary sm:w-4 sm:h-4" />
+              <LucideIcons.DollarSign className="w-5 h-5 text-primary sm:w-4 sm:h-4" />
               <span>{t('investment')}</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -299,9 +303,9 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
             </p>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
-export default PreviewModal;
+export default PreviewPage;
