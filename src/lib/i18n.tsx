@@ -107,10 +107,12 @@ const translations = {
   export: 'تصدير',
   service_proposal: 'عرض الخدمة',
   prepared_for: 'أُعد لـ',
+  your_client: 'عميلك',
   generated_on: 'تم إنشاؤه في',
   client_information: 'معلومات العميل',
   name: 'الاسم',
   services_included: 'الخدمات المدرجة',
+  service: 'خدمة',
   investment: 'الاستثمار',
   total_investment: 'إجمالي الاستثمار',
   all_prices_in: 'جميع الأسعار بـ',
@@ -124,6 +126,7 @@ const translations = {
   gbp_label: 'جنيه إسترليني (£)',
   cad_label: 'دولار كندي (C$)',
   aud_label: 'دولار أسترالي (A$)',
+  
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {

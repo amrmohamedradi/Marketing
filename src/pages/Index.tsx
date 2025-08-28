@@ -112,14 +112,6 @@ const Index = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Button
-              onClick={() => setIsPreviewOpen(true)}
-              disabled={!canPreview()}
-              className="btn-gradient"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              {t('preview')}
-            </Button>
-            <Button
               variant="ghost"
               onClick={handleLogout}
               className="text-muted-foreground hover:text-foreground"

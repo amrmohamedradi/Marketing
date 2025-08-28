@@ -90,16 +90,16 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <DialogTitle className="text-2xl font-bold flex items-center space-x-2">
             <FileText className="w-6 h-6 text-primary" />
-            <span>Service Specification</span>
+            <span>{t('service_specification')}</span>
           </DialogTitle>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm" className="btn-ghost-primary">
               <Share className="w-4 h-4 mr-2" />
-              Share
+              {t('share')}
             </Button>
             <Button variant="outline" size="sm" className="btn-ghost-primary">
               <Download className="w-4 h-4 mr-2" />
-              Export
+              {t('export')}
             </Button>
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="w-4 h-4" />
@@ -111,13 +111,13 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
           {/* Header Section */}
           <div className="text-center space-y-4 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Service Proposal
+              {t('service_proposal')}
             </h1>
             <p className="text-muted-foreground">
-              Prepared for {clientDetails.name || "Your Client"}
+              {t('prepared_for')} {clientDetails.name || t('your_client')}
             </p>
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
-              Generated on {new Date().toLocaleDateString()}
+              {t('generated_on')} {new Date().toLocaleDateString('ar-EG')}
             </Badge>
           </div>
 
@@ -126,14 +126,14 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
             <div className="space-y-4">
               <h2 className="text-xl font-semibold flex items-center space-x-2">
                 <User className="w-5 h-5 text-primary" />
-                <span>Client Information</span>
+                <span>{t('client_information')}</span>
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-surface-elevated rounded-lg border border-border/30">
                 {clientDetails.name && (
                   <div className="flex items-center space-x-3">
                     <User className="w-4 h-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Name</p>
+                      <p className="text-sm text-muted-foreground">{t('name')}</p>
                       <p className="font-medium">{clientDetails.name}</p>
                     </div>
                   </div>
@@ -142,7 +142,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                   <div className="flex items-center space-x-3">
                     <Building className="w-4 h-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Company</p>
+                      <p className="text-sm text-muted-foreground">{t('company')}</p>
                       <p className="font-medium">{clientDetails.company}</p>
                     </div>
                   </div>
@@ -151,7 +151,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                   <div className="flex items-center space-x-3">
                     <Mail className="w-4 h-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Email</p>
+                      <p className="text-sm text-muted-foreground">{t('email')}</p>
                       <p className="font-medium">{clientDetails.email}</p>
                     </div>
                   </div>
@@ -160,7 +160,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                   <div className="flex items-center space-x-3">
                     <Phone className="w-4 h-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Phone</p>
+                      <p className="text-sm text-muted-foreground">{t('phone')}</p>
                       <p className="font-medium">{clientDetails.phone}</p>
                     </div>
                   </div>
@@ -168,7 +168,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
               </div>
               {clientDetails.description && (
                 <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
-                  <h4 className="font-medium mb-2">Project Description</h4>
+                  <h4 className="font-medium mb-2">{t('project_description')}</h4>
                   <p className="text-muted-foreground">{clientDetails.description}</p>
                 </div>
               )}
@@ -178,7 +178,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
           {/* Services Section */}
           {services.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Services Included</h2>
+              <h2 className="text-xl font-semibold">{t('services_included')}</h2>
               <div className="space-y-4">
                 {services.map((service, index) => (
                   <div key={service.id} className="p-4 bg-surface-elevated rounded-lg border border-border/30">
@@ -191,14 +191,14 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                           )}
                         </div>
                         <Badge variant="secondary">
-                          Service {index + 1}
+                          {t('service')} {index + 1}
                         </Badge>
                       </div>
                       
                       {service.subServices.length > 0 && (
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                            Included Items
+                            {t('included_items')}
                           </h4>
                           <div className="grid grid-cols-1 gap-2">
                             {service.subServices.map((subService: any) => (
@@ -226,13 +226,13 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center space-x-2">
               <DollarSign className="w-5 h-5 text-primary" />
-              <span>Investment</span>
+              <span>{t('investment')}</span>
             </h2>
             <div className="p-6 bg-surface-elevated rounded-lg border border-border/30">
               <div className="space-y-4">
                 {/* Base Price */}
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Base Price</span>
+                  <span className="font-medium">{t('base_price')}</span>
                   <span className="font-semibold text-lg">
                     {selectedCurrency.symbol}{formatPrice(priceData.basePrice)}
                   </span>
@@ -244,7 +244,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                     <Separator />
                     <div className="space-y-2">
                       <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                        Additional Items
+                        {t('additional_items')}
                       </h4>
                       {priceData.additionalItems.map((item: any) => (
                         <div key={item.id} className="flex items-center justify-between">
@@ -261,7 +261,7 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
                 {/* Total */}
                 <Separator />
                 <div className="flex items-center justify-between text-lg">
-                  <span className="font-bold">Total Investment</span>
+                  <span className="font-bold">{t('total_investment')}</span>
                   <span className="font-bold text-primary text-xl">
                     {selectedCurrency.symbol}{formatPrice(getTotalPrice())}
                   </span>
@@ -269,13 +269,13 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
 
                 {/* Currency Note */}
                 <p className="text-sm text-muted-foreground text-center">
-                  All prices are in {priceData.currency}
+                  {t('all_prices_in')} {priceData.currency}
                 </p>
 
                 {/* Price Notes */}
                 {priceData.notes && (
                   <div className="mt-4 p-3 bg-muted/30 rounded border border-border/50">
-                    <h4 className="font-medium text-sm mb-2">Terms & Conditions</h4>
+                    <h4 className="font-medium text-sm mb-2">{t('terms_conditions')}</h4>
                     <p className="text-sm text-muted-foreground">{priceData.notes}</p>
                   </div>
                 )}
@@ -286,10 +286,10 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
           {/* Footer */}
           <div className="text-center py-6 border-t border-border">
             <p className="text-sm text-muted-foreground">
-              This proposal is valid for 30 days from the date of generation.
+              {t('proposal_valid')}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Generated with ServiceSpec - Professional Service Proposals
+              {t('generated_with')}
             </p>
           </div>
         </div>
