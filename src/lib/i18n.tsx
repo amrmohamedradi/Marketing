@@ -118,7 +118,7 @@ const translations = {
   all_prices_in: 'جميع الأسعار بـ',
   terms_conditions: 'الشروط والأحكام',
   proposal_valid: 'هذا العرض صالح لمدة 30 يوماً من تاريخ الإنشاء.',
-  generated_with: 'تم إنشاؤه بواسطة ServiceSpec - عروض الخدمات المهنية',
+  generated_with: 'MarketingCorner - ركن التسويق',
   
   // Currency Labels
   usd_label: 'دولار أمريكي ($)',

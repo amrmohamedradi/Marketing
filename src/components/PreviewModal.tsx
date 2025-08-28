@@ -93,11 +93,11 @@ const PreviewModal = ({ isOpen, onClose, clientDetails, services, priceData }: P
             <span>{t('service_specification')}</span>
           </DialogTitle>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" className="btn-ghost-primary">
-              <Share className="w-4 h-4 mr-2" />
+            <Button variant="outline" size="sm" className="btn-ghost-primary m-5">
+              <Share className="w-4 h-4 mr-2 " />
               {t('share')}
             </Button>
-            <Button variant="outline" size="sm" className="btn-ghost-primary">
+            <Button variant="outline" size="sm" className="btn-ghost-primary ">
               <Download className="w-4 h-4 mr-2" />
               {t('export')}
             </Button>
