@@ -392,11 +392,11 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                           <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
                             <Icon className="w-6 h-6 text-primary" />
                           </div>
-                          <div className="text-center sm:text-left">
+                          <div className="flex flex-col items-center sm:items-start">
                             <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
                               {service.name}
                             </h3>
-                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-3 py-1">
+                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-3 py-1 mx-auto sm:mx-0">
                               {service.subServices.length} {t('items')}
                             </Badge>
                           </div>

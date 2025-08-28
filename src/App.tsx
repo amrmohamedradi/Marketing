@@ -18,7 +18,7 @@ const AppContent = () => {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen w-full h-full bg-background text-foreground">
         {isLoggedIn && <Header />}
         <main className="container mx-auto py-8">
           <Routes>
