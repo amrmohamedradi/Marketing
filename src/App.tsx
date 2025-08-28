@@ -2,7 +2,6 @@ import { LanguageProvider } from "@/lib/i18n";
 import NotFound from "./pages/NotFound";
 import PreviewPage from "./pages/Preview";
 import { AppProvider } from "@/lib/AppContext"; // Import AppProvider
-import { PreviewDataProvider } from "@/lib/PreviewDataContext"; // Import PreviewDataProvider
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster"; // For shadcn/ui toasts

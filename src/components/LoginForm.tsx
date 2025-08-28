@@ -61,6 +61,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
                   variant="outline" 
                   size="sm" 
                   className="btn-ghost-primary"
+                  type="button" // Add this line to prevent it from submitting the form
                   onClick={() => changeLanguage(currentLanguage === 'ar' ? 'en' : 'ar')}
                 >
                   {currentLanguage === 'ar' ? 'English' : 'العربية'}
