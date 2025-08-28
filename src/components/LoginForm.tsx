@@ -34,7 +34,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center mb-4">
-            <Sparkles className="h-8 w-8 text-white" />
+            <img src="/src/assets/logo.webp" className="h-14 w-14 rounded-full" />
           </div>
           <h2 className="text-3xl font-bold text-foreground">
             {t('welcome_back')}
