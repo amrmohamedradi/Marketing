@@ -11,7 +11,7 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ onLogin }: LoginFormProps) => {
-  const { t } = useI18n();
+  const { t, changeLanguage, currentLanguage } = useI18n();
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -30,7 +30,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4" dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           {/* <div className="mx-auto h-12 w-12 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center mb-4">
@@ -55,6 +55,18 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Language Toggle Button */}
+              <div className="flex justify-end mb-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="btn-ghost-primary"
+                  onClick={() => changeLanguage(currentLanguage === 'ar' ? 'en' : 'ar')}
+                >
+                  {currentLanguage === 'ar' ? 'English' : 'العربية'}
+                </Button>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">
                   {t('email')}
