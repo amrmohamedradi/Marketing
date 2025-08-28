@@ -91,14 +91,14 @@ const Index = () => {
     );
   };
 
-  const { t } = useI18n();
+  const { t, changeLanguage, currentLanguage } = useI18n();
 
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
   }
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background" dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
       {/* Background Starfield */}
       <div className="absolute inset-0 -z-10">
         <Starfield starCount={300} parallaxStrength={0.12} />
@@ -107,10 +107,18 @@ const Index = () => {
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center space-x-2">
-            <img src="/logo.webp" alt="ركن التسويق Logo" className="h-8 w-8 rounded-full" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-white p-2">ركن التسويق</span>
+            <img src="/logo.webp" alt="Marketing Corner Logo" className="h-8 w-8 rounded-full" />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-white p-2">ماركتنج كورنر</span>
           </div>
           <div className="flex items-center space-x-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="btn-ghost-primary sm:order-last"
+              onClick={() => changeLanguage(currentLanguage === 'ar' ? 'en' : 'ar')}
+            >
+              {currentLanguage === 'ar' ? 'English' : 'العربية'}
+            </Button>
             <Button
               variant="ghost"
               onClick={handleLogout}

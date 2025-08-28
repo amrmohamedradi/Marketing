@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, useCallback } from "react";
+import { useEffect, useState, memo, useCallback, useRef } from "react";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,8 @@ interface Service {
   icon: LucideIcon;
   subServices: SubService[];
   suggestedItems: { name: string; description: string }[];
+  isDefault?: boolean; // Add this line
+  originalId?: string; // Add this line
 }
 
 interface ServicesSectionProps {
@@ -49,88 +51,57 @@ interface ServicesSectionProps {
 }
 
 // Generate simple suggestions based on service name
-const generateSuggestions = (serviceName: string): { name: string; description: string }[] => {
+const generateSuggestions = (serviceName: string, t: (key: string) => string): { name: string; description: string }[] => {
   const n = serviceName.toLowerCase();
-  if (n.includes("market") || n.includes("تسويق")) {
+  if (n.includes("market") || n.includes(t("marketing").toLowerCase())) {
     return [
-      { name: "منشورات انستغرام", description: "خطة محتوى شهرية" },
-      { name: "10 ريلز", description: "تعديلات فيديو قصيرة" },
-      { name: "إعلانات فيسبوك", description: "إعداد وتحسين" },
-      { name: "تقارير", description: "تقرير الأداء الشهري" },
+      { name: t("instagram_posts"), description: t("monthly_content_plan") },
+      { name: t("reels_10"), description: t("short_video_edits") },
+      { name: t("facebook_ads"), description: t("setup_optimization") },
+      { name: t("reports"), description: t("monthly_performance_report") },
     ];
   }
-  if (n.includes("photo") || n.includes("edit") || n.includes("تصوير") || n.includes("تحرير")) {
+  if (n.includes("photo") || n.includes("edit") || n.includes(t("photo_editing").toLowerCase())) {
     return [
-      { name: "صور المنتجات", description: "إضاءة وتعديل" },
-      { name: "تعديل الصور الشخصية", description: "تدرج البشرة والألوان" },
-      { name: "مقاطع فيديو مميزة", description: "تعديلات 60-90 ثانية" },
-      { name: "تسليم", description: "تصدير جاهز للويب" },
+      { name: t("product_photos"), description: t("lighting_editing") },
+      { name: t("portrait_editing"), description: t("skin_color_grading") },
+      { name: t("feature_videos"), description: t("sixty_ninety_sec_edits") },
+      { name: t("delivery"), description: t("web_ready_export") },
     ];
   }
-  if (n.includes("program") || n.includes("dev") || n.includes("app") || n.includes("web") || n.includes("برمجة")) {
+  if (n.includes("program") || n.includes("dev") || n.includes("app") || n.includes("web") || n.includes(t("programming").toLowerCase())) {
     return [
-      { name: "واجهة المستخدم الأمامية", description: "شاشات React متجاوبة" },
-      { name: "نقاط نهاية API", description: "REST/GraphQL" },
-      { name: "مخطط قاعدة البيانات", description: "تصميم وترحيل" },
-      { name: "وثائق", description: "ملاحظات الإعداد والاستخدام" },
+      { name: t("frontend_ui"), description: t("responsive_react_screens") },
+      { name: t("api_endpoints"), description: t("rest_graphql") },
+      { name: t("database_schema"), description: t("design_migration") },
+      { name: t("documentation"), description: t("setup_usage_notes") },
     ];
   }
   return [
-    { name: "اكتشاف", description: "الأهداف والمتطلبات" },
-    { name: "تنفيذ", description: "التسليم الأساسي" },
-    { name: "ضمان الجودة", description: "اختبار وإصلاحات" },
+    { name: t("discovery"), description: t("goals_requirements") },
+    { name: t("implementation"), description: t("core_deliverable") },
+    { name: t("quality_assurance"), description: t("testing_fixes") },
   ];
 };
 
 // Build three default services with suggestions
-const buildDefaultServices = (): Service[] => {
-  const base: Array<{ id: string; name: string; description: string; icon: LucideIcon }> = [
-    { id: "programming", name: "البرمجة", description: "", icon: Code },
-    { id: "marketing", name: "التسويق", description: "", icon: TrendingUp },
-    { id: "photo-shoot", name: "التصوير والتحرير", description: "", icon: Camera }
+const buildDefaultServices = (t: (key: string) => string): Service[] => {
+  const base: Array<{ id: string; nameKey: string; description: string; icon: LucideIcon }> = [
+    { id: "programming", nameKey: "programming", description: "", icon: Code },
+    { id: "marketing", nameKey: "marketing", description: "", icon: TrendingUp },
+    { id: "photo-shoot", nameKey: "photo_editing", description: "", icon: Camera }
   ];
   return base.map((s) => ({
     id: s.id,
-    name: s.name,
+    name: t(s.nameKey),
     description: s.description,
     icon: s.icon,
     subServices: [],
-    suggestedItems: generateSuggestions(s.name)
+    suggestedItems: generateSuggestions(t(s.nameKey), t),
+    isDefault: true, // Mark as default service
+    originalId: s.nameKey, // Store original key
   }));
 };
-
-const SUPPORT_ITEMS = [
-  {
-    icon: Headphones,
-    title: "دعم 24/7",
-    description: "مساعدة مستمرة طوال الوقت عندما تحتاج المساعدة"
-  },
-  {
-    icon: Award,
-    title: "ضمان الجودة",
-    description: "ضمان رضا 100% على جميع التسليمات"
-  },
-  {
-    icon: Clock,
-    title: "التسليم في الوقت المحدد",
-    description: "التسليم الدقيق حسب الموعد المتفق عليه"
-  },
-  {
-    icon: Users,
-    title: "فريق مخصص",
-    description: "فريق من المتخصصين المعتمدين لمشروعك"
-  },
-  {
-    icon: Shield,
-    title: "عملية آمنة",
-    description: "أمان وسرية على مستوى المؤسسات"
-  },
-  {
-    icon: Zap,
-    title: "استجابة سريعة",
-    description: "تكرارات سريعة وتواصل متجاوب"
-  }
-];
 
 type SubServiceRowProps = {
   subService: SubService;
@@ -195,7 +166,7 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
 SubServiceRow.displayName = 'SubServiceRow';
 
 const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
   const [editingSubService, setEditingSubService] = useState<string | null>(null);
   const [customSubService, setCustomSubService] = useState({ name: "", description: "" });
@@ -211,14 +182,66 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
     deletedSuggested?: Set<string>;
   }>>({});
 
-  // Initialize with three predefined services if none are provided
-  // Seed three predefined services on first mount if empty
-  useEffect(() => {
-    if (!services || services.length === 0) {
-      onUpdate(buildDefaultServices());
+  const SUPPORT_ITEMS = [
+    {
+      icon: Headphones,
+      title: t("support_24_7_title"),
+      description: t("support_24_7_description")
+    },
+    {
+      icon: Award,
+      title: t("quality_guarantee_title"),
+      description: t("quality_guarantee_description")
+    },
+    {
+      icon: Clock,
+      title: t("on_time_delivery_title"),
+      description: t("on_time_delivery_description")
+    },
+    {
+      icon: Users,
+      title: t("dedicated_team_title"),
+      description: t("dedicated_team_description")
+    },
+    {
+      icon: Shield,
+      title: t("secure_process_title"),
+      description: t("secure_process_description")
+    },
+    {
+      icon: Zap,
+      title: t("fast_turnaround_title"),
+      description: t("fast_turnaround_description")
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  ];
+
+  // Seed three predefined services on first mount if empty, or re-translate if language changes
+  useEffect(() => {
+    // If services array is empty, initialize with default services
+    if (!services || services.length === 0) {
+      onUpdate(buildDefaultServices(t));
+    }
+    // If language has changed and there are default services, re-translate them
+    else if (prevLanguageRef.current !== currentLanguage) {
+      const updatedServices = services.map(service => {
+        if (service.isDefault && service.originalId) {
+          const newName = t(service.originalId);
+          return {
+            ...service,
+            name: newName,
+            suggestedItems: generateSuggestions(newName, t)
+          };
+        }
+        return service; // Keep non-default services as they are
+      });
+      onUpdate(updatedServices);
+    }
+
+    prevLanguageRef.current = currentLanguage;
+
+  }, [services, onUpdate, t, currentLanguage]); // Add currentLanguage to dependency array
+
+  const prevLanguageRef = useRef<string>(currentLanguage);
 
   // No dynamic icon picker needed for predefined services
 

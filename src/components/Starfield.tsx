@@ -9,6 +9,39 @@ interface Star {
 	twinklePhase: number; // initial phase offset
 }
 
+interface ShootingStar {
+	x: number; // current x position (0..1)
+	y: number; // current y position (0..1)
+	vx: number; // velocity in x direction
+	vy: number; // velocity in y direction
+	length: number; // length of the streak
+	life: number; // remaining life (0..1)
+	maxLife: number; // total life duration
+}
+
+interface Moon {
+	x: number; // current x position (0..1)
+	y: number; // current y position (0..1)
+	radius: number; // radius in screen units
+	phase: number; // for subtle light/dark side effect
+	speedX: number; // horizontal drift speed
+	speedY: number; // vertical drift speed
+}
+
+interface Dot3D {
+	x: number;
+	y: number;
+	z: number;
+	size: number;
+	color: string;
+}
+
+interface DottedShape {
+	dots: Dot3D[];
+	rotation: { x: number; y: number; z: number };
+	position: { x: number; y: number; z: number };
+}
+
 interface StarfieldProps {
 	className?: string; // allow custom positioning (e.g., absolute inset-0)
 	starCount?: number; // total stars to render
@@ -31,6 +64,11 @@ const Starfield = ({
 	const rafRef = useRef<number | null>(null);
 	const mouseRef = useRef({ x: 0, y: 0 });
 	const lastTsRef = useRef<number>(0);
+
+	const shootingStarsRef = useRef<ShootingStar[]>([]);
+	const moonRef = useRef<Moon | null>(null);
+
+	const dottedShapesRef = useRef<DottedShape[]>([]);
 
 	// Initialize stars
 	useEffect(() => {
@@ -62,6 +100,115 @@ const Starfield = ({
 		};
 
 		starsRef.current = Array.from({ length: starCount }, makeStar);
+
+		const makeShootingStar = (): ShootingStar => {
+			const startSide = Math.random(); // 0: top, 0.25: right, 0.5: bottom, 0.75: left
+			let x, y, vx, vy;
+			const speedFactor = 0.5 + Math.random(); // Varied speeds
+
+			if (startSide < 0.25) { // From top
+				x = Math.random();
+				y = 0;
+				vx = (Math.random() - 0.5) * 0.5 * speedFactor;
+				vy = (0.5 + Math.random() * 0.5) * speedFactor;
+			} else if (startSide < 0.5) { // From right
+				x = 1;
+				y = Math.random();
+				vx = -(0.5 + Math.random() * 0.5) * speedFactor;
+				vy = (Math.random() - 0.5) * 0.5 * speedFactor;
+			} else if (startSide < 0.75) { // From bottom
+				x = Math.random();
+				y = 1;
+				vx = (Math.random() - 0.5) * 0.5 * speedFactor;
+				vy = -(0.5 + Math.random() * 0.5) * speedFactor;
+			} else { // From left
+				x = 0;
+				y = Math.random();
+				vx = (0.5 + Math.random() * 0.5) * speedFactor;
+				vy = (Math.random() - 0.5) * 0.5 * speedFactor;
+			}
+
+			const maxLife = 1 + Math.random() * 2; // 1 to 3 seconds
+
+			return {
+				x,
+				y,
+				vx,
+				vy,
+				length: 0.02 + Math.random() * 0.03, // 2% to 5% of screen width
+				life: maxLife,
+				maxLife,
+			};
+		};
+
+		shootingStarsRef.current = Array.from({ length: 3 }, makeShootingStar);
+
+		const makeMoon = (): Moon => ({
+			x: Math.random() * 0.8 + 0.1, // Start somewhere in the middle 80%
+			y: Math.random() * 0.8 + 0.1,
+			radius: 20 + Math.random() * 30, // 20-50px radius
+			phase: Math.random() * Math.PI * 2,
+			speedX: (Math.random() - 0.5) * 0.005, // very slow drift
+			speedY: (Math.random() - 0.5) * 0.005,
+		});
+		moonRef.current = makeMoon();
+
+		const makeDottedCube = (): DottedShape => {
+			const size = 0.1;
+			const dots: Dot3D[] = [];
+			// Vertices of a cube
+			for (let x = -1; x <= 1; x += 2) {
+				for (let y = -1; y <= 1; y += 2) {
+					for (let z = -1; z <= 1; z += 2) {
+						dots.push({
+							x: x * size,
+							y: y * size,
+							z: z * size,
+							size: 1.5 + Math.random() * 0.5,
+							color: `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`,
+						});
+					}
+				}
+			}
+
+			// Add some dots along edges for density
+			const addEdgeDots = (x1: number, y1: number, z1: number, x2: number, y2: number, z2: number) => {
+				for (let i = 1; i < 5; i++) {
+					const f = i / 5;
+					dots.push({
+						x: (x1 + (x2 - x1) * f) * size,
+						y: (y1 + (y2 - y1) * f) * size,
+						z: (z1 + (z2 - z1) * f) * size,
+						size: 1 + Math.random() * 0.5,
+						color: `rgba(255, 255, 255, ${0.3 + Math.random() * 0.3})`,
+					});
+				}
+			};
+
+			// Edges of the cube
+			addEdgeDots(-1, -1, -1, 1, -1, -1);
+			addEdgeDots(-1, 1, -1, 1, 1, -1);
+			addEdgeDots(-1, -1, 1, 1, -1, 1);
+			addEdgeDots(-1, 1, 1, 1, 1, 1);
+
+			addEdgeDots(-1, -1, -1, -1, 1, -1);
+			addEdgeDots(1, -1, -1, 1, 1, -1);
+			addEdgeDots(-1, -1, 1, -1, 1, 1);
+			addEdgeDots(1, -1, 1, 1, 1, 1);
+
+			addEdgeDots(-1, -1, -1, -1, -1, 1);
+			addEdgeDots(1, -1, -1, 1, -1, 1);
+			addEdgeDots(-1, 1, -1, -1, 1, 1);
+			addEdgeDots(1, 1, -1, 1, 1, 1);
+
+			return {
+				dots,
+				rotation: { x: Math.random() * Math.PI * 2, y: Math.random() * Math.PI * 2, z: Math.random() * Math.PI * 2 },
+				position: { x: Math.random() * 0.6 - 0.3, y: Math.random() * 0.6 - 0.3, z: -2 + Math.random() * -3 }, // -2 to -5 units away
+			};
+		};
+
+		dottedShapesRef.current = [makeDottedCube()]; // Start with one cube
 
 		const onMouseMove = (e: MouseEvent) => {
 			const rect = canvas.getBoundingClientRect();
@@ -121,6 +268,111 @@ const Starfield = ({
 				ctx.beginPath();
 				ctx.arc(px, py, r, 0, Math.PI * 2);
 				ctx.fill();
+			}
+
+			// Draw shooting stars
+			for (const star of shootingStarsRef.current) {
+				star.x += star.vx * dt * 0.1; // scale velocity for smoother movement
+				star.y += star.vy * dt * 0.1;
+				star.life -= dt;
+
+				if (star.life <= 0) {
+					Object.assign(star, makeShootingStar()); // reset shooting star
+					continue;
+				}
+
+				const headX = star.x * width;
+				const headY = star.y * height;
+				const tailX = (star.x - star.vx * star.length) * width;
+				const tailY = (star.y - star.vy * star.length) * height;
+
+				const alpha = clamp(star.life / star.maxLife, 0, 1);
+				ctx.globalAlpha = alpha;
+				ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+				ctx.lineWidth = 1.5;
+				ctx.beginPath();
+				ctx.moveTo(tailX, tailY);
+				ctx.lineTo(headX, headY);
+				ctx.stroke();
+			}
+
+			// Draw moon
+			if (moonRef.current) {
+				const moon = moonRef.current;
+
+				// Update moon position
+				moon.x += moon.speedX * dt;
+				moon.y += moon.speedY * dt;
+				// Wrap around if moon goes off screen
+				if (moon.x < -0.1) moon.x = 1.1;
+				if (moon.x > 1.1) moon.x = -0.1;
+				if (moon.y < -0.1) moon.y = 1.1;
+				if (moon.y > 1.1) moon.y = -0.1;
+
+				const moonPx = moon.x * width;
+				const moonPy = moon.y * height;
+				const moonRadius = moon.radius;
+
+				const moonGrad = ctx.createRadialGradient(moonPx, moonPy, moonRadius * 0.7, moonPx, moonPy, moonRadius);
+				moonGrad.addColorStop(0, "rgba(200, 200, 220, 0.7)");
+				moonGrad.addColorStop(1, "rgba(150, 150, 170, 0.5)");
+
+				ctx.globalAlpha = 1;
+				ctx.fillStyle = moonGrad;
+				ctx.beginPath();
+				ctx.arc(moonPx, moonPy, moonRadius, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			// Draw 3D dotted shapes
+			for (const shape of dottedShapesRef.current) {
+				shape.rotation.x += 0.05 * dt;
+				shape.rotation.y += 0.03 * dt;
+
+				const sinX = Math.sin(shape.rotation.x);
+				const cosX = Math.cos(shape.rotation.x);
+				const sinY = Math.sin(shape.rotation.y);
+				const cosY = Math.cos(shape.rotation.y);
+				const sinZ = Math.sin(shape.rotation.z);
+				const cosZ = Math.cos(shape.rotation.z);
+
+				for (const dot of shape.dots) {
+					// Apply rotation (ZXY order)
+					const x1 = dot.x;
+					const y1 = dot.y;
+					const z1 = dot.z;
+
+					// Rotate around Z
+					const x2 = x1 * cosZ - y1 * sinZ;
+					const y2 = x1 * sinZ + y1 * cosZ;
+					const z2 = z1;
+
+					// Rotate around X
+					const x3 = x2;
+					const y3 = y2 * cosX - z2 * sinX;
+					const z3 = y2 * sinX + z2 * cosX;
+
+					// Rotate around Y
+					const x4 = x3 * cosY + z3 * sinY;
+					const y4 = y3;
+					const z4 = -x3 * sinY + z3 * cosY;
+
+					// Add shape's position and simulate perspective
+					const fov = width * 0.8; // Field of view
+					const viewZ = shape.position.z;
+					const perspective = fov / (viewZ + z4);
+
+					const sx = (x4 * perspective + shape.position.x) * width + cx;
+					const sy = (y4 * perspective + shape.position.y) * height + cy;
+
+					if (perspective > 0) { // Only draw if in front of camera
+						ctx.globalAlpha = clamp(dot.size / 2, 0.1, 0.8) * clamp(perspective, 0.1, 1);
+						ctx.fillStyle = dot.color;
+						ctx.beginPath();
+						ctx.arc(sx, sy, dot.size * perspective, 0, Math.PI * 2);
+						ctx.fill();
+					}
+				}
 			}
 
 			ctx.globalAlpha = 1;
