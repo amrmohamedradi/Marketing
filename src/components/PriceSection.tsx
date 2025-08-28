@@ -218,7 +218,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Calculator className="w-5 h-5 text-primary" />
-              <span className="font-semibold text-lg">Total Price</span>
+              <span className="font-semibold text-lg">{t('total_price')}</span>
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-primary">
@@ -235,11 +235,11 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
         <div className="space-y-2">
           <Label htmlFor="priceNotes" className="flex items-center space-x-1">
             <PiggyBank className="w-4 h-4" />
-            <span>Additional Notes</span>
+            <span>{t('additional_notes')}</span>
           </Label>
           <Textarea
             id="priceNotes"
-            placeholder="Payment terms, conditions, or additional pricing information..."
+            placeholder={t('price_notes_placeholder')}
             value={priceData.notes}
             onChange={(e) => updateNotes(e.target.value)}
             className="input-enhanced min-h-[100px]"

@@ -141,6 +141,7 @@ type SubServiceRowProps = {
 };
 
 const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField, onDelete }: SubServiceRowProps) => {
+  const { t } = useI18n();
   return (
     <div className="flex items-center justify-between p-3 bg-muted/20 rounded border border-border/30">
       <div className="flex-1">
@@ -163,7 +164,7 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
               <CheckCircle className="w-4 h-4 text-emerald-500" />
               <span className="font-medium text-sm">{subService.name}</span>
               {subService.isCustom && (
-                <Badge variant="outline" className="text-xs">Custom</Badge>
+                <Badge variant="outline" className="text-xs">{t('custom')}</Badge>
               )}
             </div>
             {subService.description && (
@@ -358,20 +359,20 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           <div className="p-4 rounded-xl border border-border/50 bg-background/50 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Input
-                placeholder="Service name (e.g., Digital Marketing)"
+                placeholder={t('service_name_placeholder')}
                 value={newService.name}
                 onChange={(e) => setNewService({ ...newService, name: e.target.value })}
                 className="input-enhanced"
               />
               <Input
-                placeholder="Short description"
+                placeholder={t('service_description_placeholder')}
                 value={newService.description}
                 onChange={(e) => setNewService({ ...newService, description: e.target.value })}
                 className="input-enhanced"
               />
               <Button onClick={addService} className="btn-gradient">
                 <Plus className="w-4 h-4 mr-2" />
-                Add Service
+                {t('add_service')}
               </Button>
             </div>
           </div>
@@ -401,7 +402,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                               {service.name}
                             </h3>
                             <Badge variant="secondary" className="mt-1">
-                              {service.subServices.length} items
+                              {service.subServices.length} {t('items')}
                             </Badge>
                           </div>
                         </div>
@@ -453,7 +454,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                         <CheckCircle className="w-4 h-4 text-emerald-500" />
                                         <span className="font-medium text-sm">{subService.name}</span>
                                         {subService.isCustom && (
-                                          <Badge variant="outline" className="text-xs">Custom</Badge>
+                                          <Badge variant="outline" className="text-xs">{t('custom')}</Badge>
                                         )}
                                       </div>
                                       {subService.description && (
@@ -501,7 +502,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Pending Custom Drafts */}
                         {pendingForService.customDrafts.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">PENDING CUSTOM ITEMS</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground">{t('pending_custom_items')}</h4>
                             <div className="space-y-2">
                               {pendingForService.customDrafts.map((d) => (
                                 <div key={d.id} className="p-3 bg-muted/20 rounded-lg border border-border/30 animate-fade-in">
@@ -613,10 +614,10 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Heart className="w-5 h-5 text-primary" />
-            <span>Support & Benefits</span>
+            <span>{t('support_benefits')}</span>
           </CardTitle>
           <p className="text-muted-foreground">
-            Everything you get when working with us
+            {t('support_benefits_desc')}
           </p>
         </CardHeader>
         <CardContent>
