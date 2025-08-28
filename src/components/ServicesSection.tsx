@@ -27,6 +27,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import * as LucideIcons from "lucide-react"; // Import all Lucide icons
+import { motion } from "framer-motion";
 
 interface SubService {
   id: string;
@@ -39,9 +40,8 @@ interface Service {
   id: string;
   name: string;
   description: string;
-  icon: string; // Change from LucideIcon to string
+  icon: LucideIcon; // Change from string to LucideIcon
   subServices: SubService[];
-  suggestedItems: { name: string; description: string }[];
   isDefault?: boolean; // Add this line
   originalId?: string; // Add this line
 }
@@ -50,40 +50,6 @@ interface ServicesSectionProps {
   services: Service[];
   onUpdate: (services: Service[]) => void;
 }
-
-// Generate simple suggestions based on service name
-const generateSuggestions = (serviceName: string, t: (key: string) => string): { name: string; description: string }[] => {
-  const n = serviceName.toLowerCase();
-  if (n.includes("market") || n.includes(t("marketing").toLowerCase())) {
-    return [
-      { name: t("instagram_posts"), description: t("monthly_content_plan") },
-      { name: t("reels_10"), description: t("short_video_edits") },
-      { name: t("facebook_ads"), description: t("setup_optimization") },
-      { name: t("reports"), description: t("monthly_performance_report") },
-    ];
-  }
-  if (n.includes("photo") || n.includes("edit") || n.includes(t("photo_editing").toLowerCase())) {
-    return [
-      { name: t("product_photos"), description: t("lighting_editing") },
-      { name: t("portrait_editing"), description: t("skin_color_grading") },
-      { name: t("feature_videos"), description: t("sixty_ninety_sec_edits") },
-      { name: t("delivery"), description: t("web_ready_export") },
-    ];
-  }
-  if (n.includes("program") || n.includes("dev") || n.includes("app") || n.includes("web") || n.includes(t("programming").toLowerCase())) {
-    return [
-      { name: t("frontend_ui"), description: t("responsive_react_screens") },
-      { name: t("api_endpoints"), description: t("rest_graphql") },
-      { name: t("database_schema"), description: t("design_migration") },
-      { name: t("documentation"), description: t("setup_usage_notes") },
-    ];
-  }
-  return [
-    { name: t("discovery"), description: t("goals_requirements") },
-    { name: t("implementation"), description: t("core_deliverable") },
-    { name: t("quality_assurance"), description: t("testing_fixes") },
-  ];
-};
 
 // Build three default services with suggestions
 const buildDefaultServices = (t: (key: string) => string): Service[] => {
@@ -96,9 +62,8 @@ const buildDefaultServices = (t: (key: string) => string): Service[] => {
     id: s.id,
     name: t(s.nameKey),
     description: s.description,
-    icon: s.icon,
+    icon: LucideIcons[s.icon as keyof typeof LucideIcons] as LucideIcon,
     subServices: [],
-    suggestedItems: generateSuggestions(t(s.nameKey), t),
     isDefault: true, // Mark as default service
     originalId: s.nameKey, // Store original key
   }));
@@ -115,33 +80,39 @@ type SubServiceRowProps = {
 const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField, onDelete }: SubServiceRowProps) => {
   const { t } = useI18n();
   return (
-    <div className="flex items-center justify-between p-3 bg-muted/20 rounded border border-border/30">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
+      className="flex items-center justify-between p-3 bg-muted/20 rounded-md border border-border/30"
+    >
       <div className="flex-1">
         {isEditing ? (
           <div className="space-y-2">
             <Input
               value={subService.name}
               onChange={(e) => onUpdateField(subService.id, 'name', e.target.value)}
-              className="text-sm"
+              className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm"
             />
             <Input
               value={subService.description}
               onChange={(e) => onUpdateField(subService.id, 'description', e.target.value)}
-              className="text-sm"
+              className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm"
             />
           </div>
         ) : (
           <div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center sm:justify-start space-x-2">
               <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="font-medium text-sm">{subService.name}</span>
+              <span className="font-medium text-sm text-foreground">{t(subService.name)}</span>
               {subService.isCustom && (
-                <Badge variant="outline" className="text-xs">{t('custom')}</Badge>
+                <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">{t('custom')}</Badge>
               )}
             </div>
             {subService.description && (
-              <p className="text-xs text-muted-foreground mt-1 ml-6">
-                {subService.description}
+              <p className="text-xs text-muted-foreground mt-1 ml-6 text-center sm:text-left">
+                {t(subService.description)}
               </p>
             )}
           </div>
@@ -149,19 +120,19 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
       </div>
       <div className="flex items-center space-x-1">
         {isEditing ? (
-          <Button size="sm" onClick={() => onToggleEdit(subService.id, false)}>
+          <Button size="sm" onClick={() => onToggleEdit(subService.id, false)} className="hover:bg-primary/10 text-primary hover:text-primary transition-colors duration-200">
             <CheckCircle className="w-3 h-3" />
           </Button>
         ) : (
-          <Button size="sm" variant="ghost" onClick={() => onToggleEdit(subService.id, true)}>
+          <Button size="sm" variant="ghost" onClick={() => onToggleEdit(subService.id, true)} className="hover:bg-muted/50 transition-colors duration-200">
             <Edit3 className="w-3 h-3" />
           </Button>
         )}
-        <Button size="sm" variant="ghost" onClick={() => onDelete(subService.id)} className="text-destructive hover:text-destructive">
+        <Button size="sm" variant="ghost" onClick={() => onDelete(subService.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200">
           <X className="w-3 h-3" />
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 });
 SubServiceRow.displayName = 'SubServiceRow';
@@ -178,9 +149,6 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
     editedMain?: { name?: string; description?: string };
     newName?: string;
     newDescription?: string;
-    selectedSuggested?: Set<string>;
-    editedSuggested?: Record<string, { name: string; description: string }>;
-    deletedSuggested?: Set<string>;
   }>>({});
 
   const SUPPORT_ITEMS = [
@@ -230,7 +198,6 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           return {
             ...service,
             name: newName,
-            suggestedItems: generateSuggestions(newName, t)
           };
         }
         return service; // Keep non-default services as they are
@@ -336,20 +303,17 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
 
   const savePending = (serviceId: string) => {
     const pendingForService = pending[serviceId];
-    if (!pendingForService || (pendingForService.customDrafts.length === 0 && !(pendingForService.selectedSuggested && pendingForService.selectedSuggested.size > 0))) return;
+    if (!pendingForService || pendingForService.customDrafts.length === 0) return;
     const updated = services.map((service) => {
       if (service.id !== serviceId) return service;
       const newFromCustom: SubService[] = pendingForService.customDrafts.map((d) => ({ id: d.id, name: d.name, description: d.description, isCustom: true }));
-      const selectedSuggestedItems = service.suggestedItems.filter((s) => pendingForService.selectedSuggested?.has(s.name));
-      const newFromSuggested: SubService[] = selectedSuggestedItems.map((s) => ({ id: `${service.id}-sug-${s.name}-${Date.now()}`, name: s.name, description: s.description, isCustom: false }));
       return {
         ...service,
-        subServices: [...service.subServices, ...newFromSuggested, ...newFromCustom],
-        suggestedItems: service.suggestedItems.filter((s) => !(pendingForService.selectedSuggested?.has(s.name)))
+        subServices: [...service.subServices, ...newFromCustom],
       };
     });
     onUpdate(updated);
-    setPending((prev) => ({ ...prev, [serviceId]: { customDrafts: [], selectedSuggested: new Set<string>() } }));
+    setPending((prev) => ({ ...prev, [serviceId]: { customDrafts: [] } }));
   };
 
   const addService = () => {
@@ -360,9 +324,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       id,
       name,
       description: newService.description,
-      icon: "Settings", // Store icon name as a string
+      icon: Settings, // Store icon component directly
       subServices: [],
-      suggestedItems: []
     };
     onUpdate([...(services ?? []), service]);
     setNewService({ name: "", description: "" });
@@ -370,31 +333,36 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
   };
 
   return (
-    <div className="space-y-8">
-      <Card className="card-gradient slide-up overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-8"
+    >
+      <Card className="rounded-2xl shadow-lg border border-border bg-card text-card-foreground overflow-hidden p-4">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Settings className="w-5 h-5 text-primary" />
+          <CardTitle className="flex items-center justify-center sm:justify-start space-x-2 text-primary">
+            <Settings className="w-5 h-5" />
             <span>{t('our_services')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Create new main service */}
-          <div className="p-4 rounded-xl border border-border/50 bg-background/50 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="p-4 rounded-xl border border-border/50 bg-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex flex-col gap-3"> {/* Changed from grid to flex column */}
               <Input
                 placeholder={t('service_name_placeholder')}
                 value={newService.name}
                 onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-                className="input-enhanced"
+                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200"
               />
               <Input
                 placeholder={t('service_description_placeholder')}
                 value={newService.description}
                 onChange={(e) => setNewService({ ...newService, description: e.target.value })}
-                className="input-enhanced"
+                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200"
               />
-              <Button onClick={addService} className="btn-gradient">
+              <Button onClick={addService} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95">
                 <Plus className="w-4 h-4 mr-2" />
                 {t('add_service')}
               </Button>
@@ -404,213 +372,142 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           {/* Services - full width stacked panels */}
           <div className="grid grid-cols-1 gap-4">
             {services.map((service) => {
-              const Icon = LucideIcons[service.icon as keyof typeof LucideIcons] || Settings; // Dynamically get icon component
+              const Icon = service.icon; // Directly use service.icon
               const isExpanded = expandedServices.has(service.id);
               const pendingForService = pending[service.id] ?? { customDrafts: [] };
               
               return (
-                <div
+                <motion.div
                   key={service.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
                   className="group relative"
                 >
-                  <Card className="border border-border/50 bg-background p-0">
+                  <Card className="rounded-xl border border-border/50 bg-background p-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                     
-                    <CardHeader className="relative z-10">
-                      <div className="flex items-center justify-between">
+                    <CardHeader className="relative z-10 p-4 border-b border-border/50 bg-muted/10">
+                      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3">
                         <div className="flex items-center space-x-3">
-                          <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
+                          <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
                             <Icon className="w-6 h-6 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-200">
+                          <div className="text-center sm:text-left">
+                            <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
                               {service.name}
                             </h3>
-                            <Badge variant="secondary" className="mt-1">
+                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-3 py-1">
                               {service.subServices.length} {t('items')}
                             </Badge>
                           </div>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className="hover:bg-primary/10">
+                          <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className="hover:bg-muted/50 transition-colors duration-200">
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => deleteService(service.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-2">
+                      <p className="text-sm text-muted-foreground mt-2 text-center sm:text-left">
                         {service.description}
                       </p>
                     </CardHeader>
                     
                     {/* Expandable Content */}
-                    <div className={`overflow-hidden transition-all duration-500 ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                      <CardContent className="pt-0 space-y-4">
+                    <motion.div
+                      initial={false}
+                      animate={{ height: isExpanded ? "auto" : 0, opacity: isExpanded ? 1 : 0 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <CardContent className="pt-4 space-y-4">
                         {/* Current Sub-services (render only when expanded) */}
                         {isExpanded && service.subServices.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">{t('included_services')}</h4>
-                            {service.subServices.map((subService) => (
-                              <div key={subService.id} className="flex items-center justify-between p-3 bg-muted/20 rounded border border-border/30">
-                                <div className="flex-1">
-                                  {editingSubService === subService.id ? (
-                                    <div className="space-y-2">
-                                      <Input
-                                        value={subService.name}
-                                        onChange={(e) => updateSubService(service.id, subService.id, "name", e.target.value)}
-                                        className="input-enhanced text-sm"
-                                      />
-                                      <Input
-                                        value={subService.description}
-                                        onChange={(e) => updateSubService(service.id, subService.id, "description", e.target.value)}
-                                        className="input-enhanced text-sm"
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div>
-                                      <div className="flex items-center space-x-2">
-                                        <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                        <span className="font-medium text-sm">{subService.name}</span>
-                                        {subService.isCustom && (
-                                          <Badge variant="outline" className="text-xs">{t('custom')}</Badge>
-                                        )}
-                                      </div>
-                                      {subService.description && (
-                                        <p className="text-xs text-muted-foreground mt-1 ml-6">
-                                          {subService.description}
-                                        </p>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  {editingSubService === subService.id ? (
-                                    <Button
-                                      size="sm"
-                                      onClick={() => setEditingSubService(null)}
-                                      className="btn-ghost-primary"
-                                    >
-                                      <CheckCircle className="w-3 h-3" />
-                                    </Button>
-                                  ) : (
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => setEditingSubService(subService.id)}
-                                    >
-                                      <Edit3 className="w-3 h-3" />
-                                    </Button>
-                                  )}
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => deleteSubService(service.id, subService.id)}
-                                    className="text-destructive hover:text-destructive"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
+                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">{t('included_services')}</h4>
+                            <div className="space-y-2">
+                              {service.subServices.map((subService) => (
+                                <SubServiceRow
+                                  key={subService.id}
+                                  subService={subService}
+                                  isEditing={editingSubService === subService.id}
+                                  onToggleEdit={(id, edit) => setEditingSubService(edit ? id : null)}
+                                  onUpdateField={(id, field, value) => updateSubService(service.id, id, field, value)}
+                                  onDelete={(id) => deleteSubService(service.id, id)}
+                                />
+                              ))}
+                            </div>
                           </div>
                         )}
-
-                        {/* No suggested items in this variant */}
 
                         {/* Pending Custom Drafts */}
                         {pendingForService.customDrafts.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">{t('pending_custom_items')}</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">{t('pending_custom_items')}</h4>
                             <div className="space-y-2">
                               {pendingForService.customDrafts.map((d) => (
-                                <div key={d.id} className="p-3 bg-muted/20 rounded-lg border border-border/30 animate-fade-in">
+                                <motion.div
+                                  key={d.id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  transition={{ duration: 0.3 }}
+                                  className="p-3 bg-muted/20 rounded-md border border-border/30"
+                                >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1">
                                       {d.isEditing ? (
                                         <div className="space-y-2">
-                                          <Input value={d.name} onChange={(e) => updateCustomDraftField(service.id, d.id, 'name', e.target.value)} className="input-enhanced text-sm" />
-                                          <Input value={d.description} onChange={(e) => updateCustomDraftField(service.id, d.id, 'description', e.target.value)} className="input-enhanced text-sm" />
+                                          <Input value={d.name} onChange={(e) => updateCustomDraftField(service.id, d.id, 'name', e.target.value)} className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm" />
+                                          <Input value={d.description} onChange={(e) => updateCustomDraftField(service.id, d.id, 'description', e.target.value)} className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm" />
                                         </div>
                                       ) : (
                                         <div>
-                                          <div className="font-medium text-sm">{d.name}</div>
+                                          <div className="font-medium text-sm text-foreground">{d.name}</div>
                                           {d.description && <div className="text-xs text-muted-foreground">{d.description}</div>}
                                         </div>
                                       )}
                                     </div>
                                     <div className="flex items-center gap-1">
                                       {d.isEditing ? (
-                                        <Button size="sm" onClick={() => toggleEditCustomDraft(service.id, d.id, false)} className="btn-ghost-primary"><CheckCircle className="w-3 h-3" /></Button>
+                                        <Button size="sm" onClick={() => toggleEditCustomDraft(service.id, d.id, false)} className="hover:bg-primary/10 text-primary hover:text-primary transition-colors duration-200"><CheckCircle className="w-3 h-3" /></Button>
                                       ) : (
-                                        <Button size="sm" variant="ghost" onClick={() => toggleEditCustomDraft(service.id, d.id, true)}><Edit3 className="w-3 h-3" /></Button>
+                                        <Button size="sm" variant="ghost" onClick={() => toggleEditCustomDraft(service.id, d.id, true)} className="hover:bg-muted/50 transition-colors duration-200"><Edit3 className="w-3 h-3" /></Button>
                                       )}
-                                      <Button size="sm" variant="ghost" onClick={() => removeCustomDraft(service.id, d.id)} className="text-destructive hover:text-destructive"><X className="w-3 h-3" /></Button>
+                                      <Button size="sm" variant="ghost" onClick={() => removeCustomDraft(service.id, d.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200"><X className="w-3 h-3" /></Button>
                                     </div>
                                   </div>
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
                           </div>
                         )}
 
-                        {/* Suggested Items (select to stage) */}
-                        {isExpanded && service.suggestedItems.length > 0 && (
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">{t('suggested')}</h4>
-                            <div className="space-y-2">
-                              {service.suggestedItems.map((item) => {
-                                const p = pendingForService;
-                                const selected = p.selectedSuggested?.has(item.name) ?? false;
-                                return (
-                                  <label key={item.name} className="flex items-start gap-2 p-2 rounded border border-dashed border-border/40">
-                                    <input
-                                      type="checkbox"
-                                      checked={selected}
-                                      onChange={() => {
-                                        setPending((prev) => {
-                                          const current = prev[service.id] ?? { customDrafts: [] };
-                                          const nextSel = new Set(current.selectedSuggested ?? new Set<string>());
-                                          if (nextSel.has(item.name)) nextSel.delete(item.name); else nextSel.add(item.name);
-                                          return { ...prev, [service.id]: { ...current, selectedSuggested: nextSel } };
-                                        });
-                                      }}
-                                      className="mt-1"
-                                    />
-                                    <div>
-                                      <div className="font-medium text-sm">{item.name}</div>
-                                      {item.description && <div className="text-xs text-muted-foreground">{item.description}</div>}
-                                    </div>
-                                  </label>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
-
                         {/* Add Sub-service (always visible, simple) */}
-                        <div className="space-y-2 p-3 bg-muted/10 rounded border border-border/30">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="space-y-2 p-3 bg-muted/10 rounded-md border border-border/30">
+                          <div className="grid grid-cols-1 gap-2">
                               <Input
                               placeholder={t('subservice_name_ph')}
                                 value={customSubService.name}
                                 onChange={(e) => setCustomSubService({ ...customSubService, name: e.target.value })}
-                              className="text-sm"
+                              className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm"
                               />
                               <Input
                                 placeholder={t('subservice_desc_ph')}
                                 value={customSubService.description}
                                 onChange={(e) => setCustomSubService({ ...customSubService, description: e.target.value })}
-                              className="text-sm"
+                              className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm"
                               />
                             </div>
                           <div>
-                            <Button size="sm" onClick={() => stageCustomSubService(service.id)}>
+                            <Button size="sm" onClick={() => stageCustomSubService(service.id)} className="mt-2 w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95">
                                 <Plus className="w-3 h-3 mr-1" />
                                 {t('add')}
                               </Button>
@@ -618,15 +515,15 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                           </div>
 
                         {/* Save Pending */}
-                        <div className="flex justify-end">
-                          <Button size="sm" onClick={() => savePending(service.id)} disabled={(pendingForService.customDrafts.length === 0 && !(pendingForService.selectedSuggested && pendingForService.selectedSuggested.size > 0))}>
+                        <div className="flex justify-center">
+                          <Button size="sm" onClick={() => savePending(service.id)} disabled={pendingForService.customDrafts.length === 0} className="bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95">
                             {t('save')}
                           </Button>
                         </div>
                       </CardContent>
-                    </div>
+                    </motion.div>
                   </Card>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -634,13 +531,13 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       </Card>
 
       {/* Support & Benefits Section */}
-      <Card className="card-gradient slide-up">
+      <Card className="rounded-2xl shadow-lg border border-border bg-card text-card-foreground p-4">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Heart className="w-5 h-5 text-primary" />
+          <CardTitle className="flex items-center space-x-2 text-primary">
+            <Heart className="w-5 h-5" />
             <span>{t('support_benefits')}</span>
           </CardTitle>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-2">
             {t('support_benefits_desc')}
           </p>
         </CardHeader>
@@ -649,30 +546,33 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
             {SUPPORT_ITEMS.map((item, index) => {
               const Icon = item.icon;
               return (
-                <div
+                <motion.div
                   key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
                   className="group p-6 rounded-xl bg-gradient-to-br from-background/50 to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
                 >
-                  <div className="flex items-start space-x-4">
+                  <div className="flex flex-col items-center text-center space-y-2">
                     <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
                       <Icon className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
+                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-foreground text-wrap">
                         {item.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground text-wrap">
                         {item.description}
                       </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 };
 

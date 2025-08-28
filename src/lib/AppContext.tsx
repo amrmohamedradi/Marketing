@@ -65,6 +65,8 @@ interface AppContextType {
   priceData: PriceData;
   setPriceData: (data: PriceData) => void;
   clearAllData: () => void;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (loggedIn: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -85,6 +87,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return saved ? JSON.parse(saved) : defaultPriceData;
   });
 
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    const saved = localStorage.getItem('isLoggedIn');
+    return saved ? JSON.parse(saved) : false;
+  });
+
   // Save to LocalStorage whenever state changes
   useEffect(() => {
     localStorage.setItem('clientDetails', JSON.stringify(clientDetails));
@@ -98,6 +105,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('priceData', JSON.stringify(priceData));
   }, [priceData]);
 
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
+  }, [isLoggedIn]);
+
   const clearAllData = useCallback(() => {
     setClientDetails(defaultClientDetails);
     setServices([]);
@@ -105,6 +116,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('clientDetails');
     localStorage.removeItem('services');
     localStorage.removeItem('priceData');
+    setIsLoggedIn(false); // Also log out when clearing data
   }, []);
 
   const value = {
@@ -115,6 +127,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     priceData,
     setPriceData,
     clearAllData,
+    isLoggedIn,
+    setIsLoggedIn,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -12,6 +12,8 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   // Header & Navigation
   preview: { ar: 'معاينة', en: 'Preview' },
   logout: { ar: 'تسجيل الخروج', en: 'Logout' },
+  home: { ar: 'الرئيسية', en: 'Home' },
+  toggle_navigation_menu: { ar: 'تبديل قائمة التنقل', en: 'Toggle navigation menu' },
   
   // Main Page
   heading_main: { ar: 'إنشاء مواصفات الخدمات المهنية', en: 'Create Professional Service Specifications' },
@@ -160,6 +162,7 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   proposal_valid: { ar: 'هذا العرض صالح لمدة 30 يوماً من تاريخ الإنشاء.', en: 'This proposal is valid for 30 days from the date of creation.' },
   generated_with: { ar: 'MarketingCorner - ركن التسويق', en: 'MarketingCorner - Service Spec Maker' },
   marketing_corner_logo_text: { ar: 'ماركتنج كورنر', en: 'Marketing Corner' },
+  go_to_dashboard: { ar: 'الذهاب إلى لوحة التحكم', en: 'Go to Dashboard' },
   
   // Currency Labels
   usd_label: { ar: 'دولار أمريكي ($)', en: 'USD ($)' },

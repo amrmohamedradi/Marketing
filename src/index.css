@@ -38,6 +38,35 @@
   --gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
 }
 
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #111111;
+  --card-foreground: #ffffff;
+  --popover: #111111;
+  --popover-foreground: #ffffff;
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --secondary: #1f1f1f;
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a1a;
+  --muted-foreground: #a1a1aa;
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #2a2a2a;
+  --input: #1a1a1a;
+  --ring: #6366f1;
+  --radius: 0.5rem;
+
+  /* Dark Theme Gradients */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  --gradient-dark: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+  --gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
 /* Global RTL Layout */
 html {
   /* direction: rtl; */
@@ -131,114 +160,26 @@ body {
 }
 
 /* RTL-aware animations */
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
+/* The following animation keyframes will be replaced by Framer Motion */
+/* @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } } */
+/* @keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } } */
 
-@keyframes slide-in-left {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
+/* Dark Theme Components - These will be replaced by Tailwind classes */
+/* .card-gradient { background: var(--gradient-dark); border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); } */
+/* .btn-gradient { background: var(--gradient-primary); color: var(--primary-foreground); border: none; transition: all 0.3s ease; } */
+/* .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); } */
+/* .input-enhanced { background: var(--input); border: 1px solid var(--border); color: var(--foreground); transition: all 0.3s ease; } */
+/* .input-enhanced:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); } */
+/* .btn-ghost-primary { background: transparent; color: var(--primary); border: 1px solid var(--primary); transition: all 0.3s ease; } */
+/* .btn-ghost-primary:hover { background: var(--primary); color: var(--primary-foreground); } */
 
-/* Dark Theme Components */
-.card-gradient {
-  background: var(--gradient-dark);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.btn-gradient {
-  background: var(--gradient-primary);
-  color: var(--primary-foreground);
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.btn-gradient:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-}
-
-.input-enhanced {
-  background: var(--input);
-  border: 1px solid var(--border);
-  color: var(--foreground);
-  transition: all 0.3s ease;
-  /* text-align: right; */
-  /* direction: rtl; */
-}
-
-.input-enhanced:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.btn-ghost-primary {
-  background: transparent;
-  color: var(--primary);
-  border: 1px solid var(--primary);
-  transition: all 0.3s ease;
-}
-
-.btn-ghost-primary:hover {
-  background: var(--primary);
-  color: var(--primary-foreground);
-}
-
-/* Animations */
-.fade-in {
-  animation: fadeIn 0.8s ease-out;
-}
-
-.slide-up {
-  animation: slideUp 0.6s ease-out;
-}
-
-.scale-in {
-  animation: scaleIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
+/* Animations - These will be replaced by Framer Motion */
+/* .fade-in { animation: fadeIn 0.8s ease-out; } */
+/* .slide-up { animation: slideUp 0.6s ease-out; } */
+/* .scale-in { animation: scaleIn 0.5s ease-out; } */
+/* @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } */
+/* @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } } */
+/* @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } } */
 
 /* Floating 3D Shapes */
 .floating-shape {
@@ -283,6 +224,12 @@ body {
   }
   66% {
     transform: translateY(-10px) rotate(240deg);
+  }
+  77% {
+    transform: translateY(20px) rotate(300deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(360deg);
   }
 }
 
