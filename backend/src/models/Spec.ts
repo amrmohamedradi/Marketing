@@ -1,34 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-// Interface for the Spec document
+// Interface for the Spec document - using flexible Mixed type
 export interface ISpec extends Document {
   slug: string;
-  clientName: string;
-  brief: string;
-  services: Array<{
-    category: string;
-    items: string[];
-  }>;
-  pricing: Array<{
-    title: string;
-    price: number;
-    currency: string;
-    features: string[];
-  }>;
-  contact: {
-    email?: string;
-    phone?: string;
-    website?: string;
-  };
-  meta: {
-    brandColors?: string[];
-    logoUrl?: string;
-  };
+  data: any; // Store all spec data as flexible object
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Define the Spec schema
+// Define the Spec schema - simple and flexible
 const SpecSchema = new Schema<ISpec>(
   {
     slug: { 
@@ -36,39 +16,15 @@ const SpecSchema = new Schema<ISpec>(
       unique: true, 
       required: true 
     },
-    clientName: { 
-      type: String, 
-      required: true 
-    },
-    brief: { 
-      type: String, 
-      required: true 
-    },
-    services: [
-      {
-        category: String,
-        items: [String]
-      }
-    ],
-    pricing: [
-      {
-        title: String,
-        price: Number,
-        currency: String,
-        features: [String]
-      }
-    ],
-    contact: {
-      email: String,
-      phone: String,
-      website: String
-    },
-    meta: {
-      brandColors: [String],
-      logoUrl: String
+    data: {
+      type: Schema.Types.Mixed, // Flexible storage for any JSON structure
+      required: true
     }
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    strict: false // Allow additional fields
+  }
 );
 
 // Create index on slug field

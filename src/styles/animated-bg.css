@@ -1,0 +1,162 @@
+/* Premium animated background with motion preferences */
+.animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Aurora gradient background */
+.aurora-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(99, 102, 241, 0.1) 0%,
+    rgba(168, 85, 247, 0.08) 25%,
+    rgba(236, 72, 153, 0.06) 50%,
+    rgba(59, 130, 246, 0.08) 75%,
+    rgba(99, 102, 241, 0.1) 100%
+  );
+  background-size: 400% 400%;
+}
+
+/* Animated aurora movement */
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.aurora-gradient {
+  animation: aurora 20s ease infinite;
+}
+
+/* Floating stars */
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+/* Star animations */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.star:nth-child(1) { top: 20%; left: 10%; animation: twinkle 3s infinite, float 8s infinite; }
+.star:nth-child(2) { top: 30%; left: 80%; animation: twinkle 2.5s infinite 0.5s, float 6s infinite 1s; }
+.star:nth-child(3) { top: 60%; left: 20%; animation: twinkle 4s infinite 1s, float 10s infinite 2s; }
+.star:nth-child(4) { top: 80%; left: 70%; animation: twinkle 3.5s infinite 1.5s, float 7s infinite 0.5s; }
+.star:nth-child(5) { top: 15%; left: 60%; animation: twinkle 2.8s infinite 2s, float 9s infinite 1.5s; }
+.star:nth-child(6) { top: 70%; left: 90%; animation: twinkle 3.2s infinite 0.8s, float 8.5s infinite 3s; }
+
+/* Shooting star */
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  border-radius: 50%;
+  opacity: 0;
+}
+
+@keyframes shooting {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px) translateY(100px);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(300px) translateY(-300px);
+  }
+}
+
+.shooting-star {
+  animation: shooting 3s ease-out infinite 8s;
+  top: 20%;
+  left: 10%;
+}
+
+/* Reveal animations for content */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-gradient,
+  .star,
+  .shooting-star,
+  .reveal-section {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .reveal-section {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print styles - remove backgrounds and animations */
+@media print {
+  .animated-background,
+  .aurora-gradient,
+  .stars,
+  .shooting-star {
+    display: none !important;
+  }
+  
+  .reveal-section {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  
+  /* Ensure good contrast for printing */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  
+  .bg-card {
+    border: 1px solid #ccc !important;
+  }
+}

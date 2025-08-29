@@ -120,27 +120,44 @@ const PreviewPage = () => {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      console.log('Starting save process...');
       
-      // Map the frontend data to the backend model
-      const specData = mapToBackendModel(clientDetails, services, priceData);
-      console.log('Mapped data:', specData);
+      // Generate a slug from client name
+      const slug = clientDetails.name.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
       
-      // Save the specification to the backend
-      console.log('Calling saveSpecification...');
-      const response = await saveSpecification(specData);
-      console.log('Save response:', response);
+      // Map the frontend data to the new spec format
+      const specData = {
+        client: clientDetails,
+        services: services,
+        pricing: priceData,
+        summary: clientDetails.description,
+        deliverables: services.flatMap(s => s.subServices.map(sub => sub.name)),
+        team: [],
+        techStack: [],
+        timeline: '',
+        notes: priceData.notes,
+        contact: {
+          phone: clientDetails.phone,
+          email: clientDetails.email
+        }
+      };
       
-      if (response && response.ok && response.url) {
-        console.log('Save successful, URL:', response.url);
-        setSavedUrl(response.url);
+      // Import and use the new API
+      const { saveSpec } = await import('@/lib/api');
+      const response = await saveSpec(slug, specData);
+      
+      if (response && response.ok) {
+        const publicUrl = `/read/${slug}`;
+        setSavedUrl(publicUrl);
         toast({
           title: t('save_success'),
           description: t('spec_saved_successfully'),
           variant: 'default',
         });
       } else {
-        console.error('Save failed:', response);
         toast({
           title: t('save_error'),
           description: response?.error || t('error_saving_spec'),

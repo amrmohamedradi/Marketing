@@ -9,7 +9,55 @@ const mockSpecs: Record<string, any> = {};
 
 const router = express.Router();
 
-// POST /api/specs - Create a new spec
+// POST /api/specs/:slug - Create or update a spec (upsert)
+router.post('/api/specs/:slug', async (req: Request, res: Response) => {
+  try {
+    const { slug } = req.params;
+    const specData = req.body;
+    
+    // Set cache headers for no-store to ensure fresh data
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
+    // Check if MongoDB is connected
+    if (mongoose.connection.readyState === 1) {
+      // Upsert the spec in MongoDB with new flexible schema
+      const spec = await Spec.findOneAndUpdate(
+        { slug },
+        { 
+          slug, 
+          data: specData,
+          updatedAt: new Date() 
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+    } else {
+      // Store in mock data if MongoDB is not available
+      mockSpecs[slug] = {
+        slug,
+        data: specData,
+        createdAt: mockSpecs[slug]?.createdAt || new Date(),
+        updatedAt: new Date()
+      };
+      console.log(`[DEV] Upserted spec to mock storage with slug: ${slug}`);
+    }
+    
+    // Return success with slug
+    return res.status(200).json({ 
+      ok: true, 
+      slug
+    });
+  } catch (error) {
+    console.error('Error upserting spec:', error);
+    return res.status(500).json({ 
+      ok: false, 
+      error: 'Failed to save spec' 
+    });
+  }
+});
+
+// POST /api/specs - Create a new spec (legacy endpoint)
 router.post('/api/specs', async (req: Request, res: Response) => {
   try {
     // Validate the request body
@@ -69,6 +117,11 @@ router.get('/api/specs/:slug', async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
     
+    // Set cache headers for no-store to ensure fresh data
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     // Check if MongoDB is connected
     if (mongoose.connection.readyState === 1) {
       // Find the spec by slug in MongoDB
@@ -81,7 +134,8 @@ router.get('/api/specs/:slug', async (req: Request, res: Response) => {
         });
       }
       
-      return res.json(spec);
+      // Return the data field which contains the actual spec data
+      return res.json(spec.data);
     } else {
       // Use mock data if MongoDB is not available
       const mockSpec = mockSpecs[slug];
@@ -93,7 +147,8 @@ router.get('/api/specs/:slug', async (req: Request, res: Response) => {
         });
       }
       
-      return res.json(mockSpec);
+      // Return the data field for consistency
+      return res.json(mockSpec.data);
     }
   } catch (error) {
     console.error('Error fetching spec:', error);
