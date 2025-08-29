@@ -4,11 +4,14 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useNavigate } from "react-router-dom";
-import React from 'react';
+import React, { useState } from 'react';
 import {
   User, Building, Mail, Phone, CheckCircle, DollarSign,
-  FileText, Download, Share, X, LucideIcon
+  FileText, Download, Share, X, LucideIcon, Save, ExternalLink
 } from "lucide-react"; // Explicitly import all used Lucide icons and LucideIcon type
+import { useToast } from "@/hooks/use-toast";
+import { saveSpecification } from "@/services/api";
+import { mapToBackendModel } from "@/services/mapper";
 // import * as LucideIcons from "lucide-react"; // Remove this line
 import { useAppContext } from "@/lib/AppContext";
 import { motion } from "framer-motion";
@@ -67,7 +70,10 @@ interface PriceData {
 const PreviewPage = () => {
   const { t, currentLanguage } = useI18n();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { clientDetails, services, priceData, clearFormData } = useAppContext();
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (!clientDetails || !clientDetails.name || services.length === 0 || !priceData || priceData.basePrice === 0) {
@@ -111,6 +117,48 @@ const PreviewPage = () => {
     clearFormData(); // Clear form data
   };
 
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      console.log('Starting save process...');
+      
+      // Map the frontend data to the backend model
+      const specData = mapToBackendModel(clientDetails, services, priceData);
+      console.log('Mapped data:', specData);
+      
+      // Save the specification to the backend
+      console.log('Calling saveSpecification...');
+      const response = await saveSpecification(specData);
+      console.log('Save response:', response);
+      
+      if (response && response.ok && response.url) {
+        console.log('Save successful, URL:', response.url);
+        setSavedUrl(response.url);
+        toast({
+          title: t('save_success'),
+          description: t('spec_saved_successfully'),
+          variant: 'default',
+        });
+      } else {
+        console.error('Save failed:', response);
+        toast({
+          title: t('save_error'),
+          description: response?.error || t('error_saving_spec'),
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Exception in handleSave:', error);
+      toast({
+        title: t('save_error'),
+        description: error instanceof Error ? error.message : t('error_saving_spec'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -131,6 +179,28 @@ const PreviewPage = () => {
             <span>{t('service_specification')}</span>
           </div>
           <div className="flex items-center gap-1 sm:space-x-2">
+            {savedUrl ? (
+              <Button 
+                variant="outline" 
+                size="xs" 
+                className="hover:bg-accent hover:text-accent-foreground transition-colors duration-200 p-2"
+                onClick={() => window.open(savedUrl, '_blank')}
+              >
+                <ExternalLink className="w-4 h-4 mr-1 sm:mr-2" />
+                {t('view_saved')}
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="xs" 
+                className="hover:bg-primary hover:text-primary-foreground transition-colors duration-200 p-2"
+                onClick={handleSave}
+                disabled={isSaving}
+              >
+                <Save className="w-4 h-4 mr-1 sm:mr-2" />
+                {isSaving ? t('saving') : t('save')}
+              </Button>
+            )}
             <Button variant="outline" size="xs" className="hover:bg-accent hover:text-accent-foreground transition-colors duration-200 p-2">
               <Share className="w-4 h-4 mr-1 sm:mr-2 " />
               {t('share')}

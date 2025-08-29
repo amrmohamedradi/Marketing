@@ -1,6 +1,8 @@
+import React from 'react';
 import { LanguageProvider } from "@/lib/i18n";
 import NotFound from "./pages/NotFound";
 import PreviewPage from "./pages/Preview";
+import HealthPage from "./pages/debug/Health";
 import { AppProvider, useAppContext } from "@/lib/AppContext"; // Import AppProvider and useAppContext
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -25,6 +27,7 @@ const AppContent = () => {
             <Route path="/" element={<Index />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/preview" element={<PreviewPage />} />
+            <Route path="/debug/health" element={<HealthPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

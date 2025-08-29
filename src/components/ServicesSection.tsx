@@ -54,7 +54,7 @@ interface ServicesSectionProps {
 
 // Build three default services with suggestions
 const buildDefaultServices = (t: (key: string) => string): Service[] => {
-  const base: Array<{ id: string; nameKey: string; description: string; icon: string }> = [
+  const base: Array<{ id: string; nameKey: string; description: string; icon: keyof typeof LucideIcons }> = [
     { id: "programming", nameKey: "programming", description: "", icon: "Code" },
     { id: "marketing", nameKey: "marketing", description: "", icon: "TrendingUp" },
     { id: "photo-shoot", nameKey: "photo_editing", description: "", icon: "Camera" }
@@ -63,7 +63,7 @@ const buildDefaultServices = (t: (key: string) => string): Service[] => {
     id: s.id,
     name: t(s.nameKey),
     description: s.description,
-    icon: LucideIcons[s.icon as keyof typeof LucideIcons] as LucideIcon,
+    icon: LucideIcons[s.icon],
     subServices: [],
     suggestedItems: getSuggestedItemsForService(s.id, t),
     isDefault: true, // Mark as default service
@@ -188,32 +188,32 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
 
   const SUPPORT_ITEMS = [
     {
-      icon: Headphones,
+      icon: LucideIcons.Headphones,
       title: t("support_24_7_title"),
       description: t("support_24_7_description")
     },
     {
-      icon: Award,
+      icon: LucideIcons.Award,
       title: t("quality_guarantee_title"),
       description: t("quality_guarantee_description")
     },
     {
-      icon: Clock,
+      icon: LucideIcons.Clock,
       title: t("on_time_delivery_title"),
       description: t("on_time_delivery_description")
     },
     {
-      icon: Users,
+      icon: LucideIcons.Users,
       title: t("dedicated_team_title"),
       description: t("dedicated_team_description")
     },
     {
-      icon: Shield,
+      icon: LucideIcons.Shield,
       title: t("secure_process_title"),
       description: t("secure_process_description")
     },
     {
-      icon: Zap,
+      icon: LucideIcons.Zap,
       title: t("fast_turnaround_title"),
       description: t("fast_turnaround_description")
     }
@@ -378,7 +378,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       id,
       name,
       description: newService.description,
-      icon: Settings, // Store icon component directly
+      icon: LucideIcons.Settings, // Use from LucideIcons namespace
       subServices: [],
     };
     onUpdate([...(services ?? []), service]);
@@ -426,7 +426,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           {/* Services - full width stacked panels */}
           <div className="grid grid-cols-1 gap-4">
             {services.map((service) => {
-              const Icon = service.icon; // Directly use service.icon
+              // Make sure service.icon is a valid component
+              const IconComponent = service.icon || LucideIcons.Settings;
               const isExpanded = expandedServices.has(service.id);
               const pendingForService = pending[service.id] ?? { customDrafts: [] };
               
@@ -444,7 +445,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                       <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3">
                         <div className="flex items-center space-x-3">
                           <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
-                            <Icon className="w-6 h-6 text-primary" />
+                            <IconComponent className="w-6 h-6 text-primary" />
                           </div>
                           <div className="flex flex-col items-center sm:items-start">
                             <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
@@ -638,7 +639,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {SUPPORT_ITEMS.map((item, index) => {
-              const Icon = item.icon;
+              // Use the icon component from LucideIcons
+              const IconComponent = item.icon;
               return (
                 <motion.div
                   key={index}
@@ -649,7 +651,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                 >
                   <div className="flex flex-col items-center text-center space-y-2">
                     <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-300" />
+                      <IconComponent className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-foreground text-wrap">

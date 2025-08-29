@@ -1,44 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
+import * as LucideIcons from 'lucide-react'; // Import all Lucide icons
 
-// Interfaces for your data structures (copied from your existing files)
-interface SubService {
-  id: string;
-  name: string;
-  description: string;
-  isCustom?: boolean;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  subServices: SubService[];
-  suggestedItems: { name: string; description: string }[];
-  isDefault?: boolean;
-  originalId?: string;
-}
-
-interface ClientDetails {
-  name: string;
-  company: string;
-  email: string;
-  phone: string;
-  description: string;
-}
-
-interface PriceItem {
-  id: string;
-  description: string;
-  amount: number;
-}
-
-interface PriceData {
-  basePrice: number;
-  currency: string;
-  additionalItems: PriceItem[];
-  notes: string;
-}
+// Import types from the types file
+import { ClientDetails, Service, PriceData, SubService, PriceItem } from '../types';
 
 // Default values for the state
 const defaultClientDetails: ClientDetails = {
@@ -81,7 +45,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const [services, setServices] = useState<Service[]>(() => {
     const saved = localStorage.getItem('services');
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      // Convert string icon names back to LucideIcon components
+      const parsedServices = JSON.parse(saved);
+      return parsedServices.map((service: any) => {
+        // If icon is a string, convert it to a LucideIcon component
+        if (service.icon && typeof service.icon === 'string') {
+          // Use the default Settings icon if the icon name doesn't exist in LucideIcons
+          const iconComponent = LucideIcons[service.icon as keyof typeof LucideIcons] || LucideIcons.Settings;
+          return { ...service, icon: iconComponent };
+        }
+        return service;
+      });
+    }
+    return [];
   });
 
   const [priceData, setPriceData] = useState<PriceData>(() => {
@@ -100,7 +77,30 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [clientDetails]);
 
   useEffect(() => {
-    localStorage.setItem('services', JSON.stringify(services));
+    // Convert LucideIcon components to string names before saving to localStorage
+    const serializableServices = services.map(service => {
+      // Find the icon name by comparing the icon component with LucideIcons
+      let iconName = 'Settings'; // Default icon name
+      
+      // Only process if service.icon exists
+      if (service.icon) {
+        // Try to find the icon name by comparing references
+        for (const [key, value] of Object.entries(LucideIcons)) {
+          if (service.icon === value) {
+            iconName = key;
+            break;
+          }
+        }
+      }
+      
+      // Return a new object with the icon as a string
+      return {
+        ...service,
+        icon: iconName
+      };
+    });
+    
+    localStorage.setItem('services', JSON.stringify(serializableServices));
   }, [services]);
 
   useEffect(() => {
