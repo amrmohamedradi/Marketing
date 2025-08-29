@@ -65,6 +65,8 @@ interface AppContextType {
   priceData: PriceData;
   setPriceData: (data: PriceData) => void;
   clearAllData: () => void;
+  clearClientAndServicesData: () => void; // New function
+  clearFormData: () => void;
   isLoggedIn: boolean;
   setIsLoggedIn: (loggedIn: boolean) => void;
 }
@@ -119,6 +121,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn(false); // Also log out when clearing data
   }, []);
 
+  const clearClientAndServicesData = useCallback(() => {
+    setClientDetails(defaultClientDetails);
+    setServices([]);
+    localStorage.removeItem('clientDetails');
+    localStorage.removeItem('services');
+  }, []);
+
+  const clearFormData = useCallback(() => {
+    setClientDetails(defaultClientDetails);
+    setServices([]);
+    setPriceData(defaultPriceData);
+    localStorage.removeItem('clientDetails');
+    localStorage.removeItem('services');
+    localStorage.removeItem('priceData');
+  }, []);
+
   const value = {
     clientDetails,
     setClientDetails,
@@ -127,6 +145,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     priceData,
     setPriceData,
     clearAllData,
+    clearClientAndServicesData, // Include new function in context value
+    clearFormData,
     isLoggedIn,
     setIsLoggedIn,
   };

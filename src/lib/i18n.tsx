@@ -68,6 +68,7 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   included_items: { ar: 'العناصر المدرجة', en: 'Included Items' },
   included_services: { ar: 'الخدمات المدرجة', en: 'Included Services' },
   suggested: { ar: 'مقترح', en: 'Suggested' },
+  suggested_items: { ar: 'العناصر المقترحة', en: 'Suggested Items' },
   add: { ar: 'إضافة', en: 'Add' },
   
   // Default Services
@@ -104,6 +105,7 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   design_migration: { ar: 'تصميم وترحيل', en: 'Design & Migration' },
   documentation: { ar: 'وثائق', en: 'Documentation' },
   setup_usage_notes: { ar: 'ملاحظات الإعداد والاستخدام', en: 'Setup & Usage Notes' },
+  click_to_add_item_hint: { ar: 'انقر على أي عنصر لإضافته إلى خدمتك', en: 'Click any item to add it to your service' },
   
   // Generic Suggested Items
   discovery: { ar: 'اكتشاف', en: 'Discovery' },
@@ -170,6 +172,13 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   gbp_label: { ar: 'جنيه إسترليني (£)', en: 'GBP (£)' },
   cad_label: { ar: 'دولار كندي (C$)', en: 'CAD (C$)' },
   aud_label: { ar: 'دولار أسترالي (A$)', en: 'AUD (A$)' },
+  
+  // Arabic Currencies
+  aed_label: { ar: 'درهم إماراتي (د.إ)', en: 'UAE Dirham (AED)' },
+  sar_label: { ar: 'ريال سعودي (ر.س)', en: 'Saudi Riyal (SAR)' },
+  qar_label: { ar: 'ريال قطري (ر.ق)', en: 'Qatari Riyal (QAR)' },
+  kwd_label: { ar: 'دينار كويتي (د.ك)', en: 'Kuwaiti Dinar (KWD)' },
+  egp_label: { ar: 'جنيه مصري (ج.م)', en: 'Egyptian Pound (EGP)' },
   
   // Support Items
   support_24_7_title: { ar: 'دعم 24/7', en: '24/7 Support' },

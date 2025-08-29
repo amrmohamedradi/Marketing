@@ -42,6 +42,7 @@ interface Service {
   description: string;
   icon: LucideIcon; // Change from string to LucideIcon
   subServices: SubService[];
+  suggestedItems?: { name: string; description: string }[]; // Add suggested items
   isDefault?: boolean; // Add this line
   originalId?: string; // Add this line
 }
@@ -64,9 +65,43 @@ const buildDefaultServices = (t: (key: string) => string): Service[] => {
     description: s.description,
     icon: LucideIcons[s.icon as keyof typeof LucideIcons] as LucideIcon,
     subServices: [],
+    suggestedItems: getSuggestedItemsForService(s.id, t),
     isDefault: true, // Mark as default service
     originalId: s.nameKey, // Store original key
   }));
+};
+
+// Get suggested items for each service type
+const getSuggestedItemsForService = (serviceId: string, t: (key: string) => string) => {
+  switch (serviceId) {
+    case "marketing":
+      return [
+        { name: t('instagram_posts'), description: t('monthly_content_plan') },
+        { name: t('reels_10'), description: t('short_video_edits') },
+        { name: t('facebook_ads'), description: t('setup_optimization') },
+        { name: t('reports'), description: t('monthly_performance_report') },
+      ];
+    case "photo-shoot":
+      return [
+        { name: t('product_photos'), description: t('lighting_editing') },
+        { name: t('portrait_editing'), description: t('skin_color_grading') },
+        { name: t('feature_videos'), description: t('sixty_ninety_sec_edits') },
+        { name: t('delivery'), description: t('web_ready_export') },
+      ];
+    case "programming":
+      return [
+        { name: t('frontend_ui'), description: t('responsive_react_screens') },
+        { name: t('api_endpoints'), description: t('rest_graphql') },
+        { name: t('database_schema'), description: t('design_migration') },
+        { name: t('documentation'), description: t('setup_usage_notes') },
+      ];
+    default:
+      return [
+        { name: t('discovery'), description: t('goals_requirements') },
+        { name: t('implementation'), description: t('core_deliverable') },
+        { name: t('quality_assurance'), description: t('testing_fixes') },
+      ];
+  }
 };
 
 type SubServiceRowProps = {
@@ -198,6 +233,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           return {
             ...service,
             name: newName,
+            suggestedItems: getSuggestedItemsForService(service.originalId, t), // Re-translate suggested items
           };
         }
         return service; // Keep non-default services as they are
@@ -224,6 +260,24 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
   };
 
   // No suggested-item handlers in this variant
+
+  // Add suggested item as sub-service
+  const addSuggestedItem = (serviceId: string, suggestedItem: { name: string; description: string }) => {
+    const updated = services.map((service) => {
+      if (service.id !== serviceId) return service;
+      const newSubService: SubService = {
+        id: Date.now().toString(),
+        name: suggestedItem.name,
+        description: suggestedItem.description,
+        isCustom: false
+      };
+      return {
+        ...service,
+        subServices: [...service.subServices, newSubService]
+      };
+    });
+    onUpdate(updated);
+  };
 
   const stageCustomSubService = (serviceId: string) => {
     if (!customSubService.name.trim()) return;
@@ -444,6 +498,46 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                 />
                               ))}
                             </div>
+                          </div>
+                        )}
+
+                        {/* Suggested Items */}
+                        {isExpanded && service.suggestedItems && service.suggestedItems.length > 0 && (
+                          <div className="space-y-3">
+                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide flex items-center space-x-2">
+                              <TrendingUp className="w-4 h-4 text-accent" />
+                              <span>{t('suggested_items')}</span>
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {service.suggestedItems.map((item, index) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                                  className="group p-3 rounded-lg bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-md cursor-pointer"
+                                  onClick={() => addSuggestedItem(service.id, item)}
+                                >
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1 space-y-1">
+                                      <div className="flex items-center space-x-2">
+                                        <div className="w-2 h-2 rounded-full bg-accent group-hover:scale-125 transition-transform duration-200"></div>
+                                        <span className="font-medium text-sm text-foreground group-hover:text-accent transition-colors duration-200">
+                                          {item.name}
+                                        </span>
+                                      </div>
+                                      <p className="text-xs text-muted-foreground pl-4 group-hover:text-accent/80 transition-colors duration-200">
+                                        {item.description}
+                                      </p>
+                                    </div>
+                                    <Plus className="w-4 h-4 text-accent/60 group-hover:text-accent group-hover:scale-110 transition-all duration-200" />
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </div>
+                            <p className="text-xs text-muted-foreground text-center mt-2 italic">
+                              💡 {t('click_to_add_item_hint')}
+                            </p>
                           </div>
                         )}
 

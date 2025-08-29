@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface PriceItem {
   id: string;
@@ -37,7 +38,7 @@ interface PriceSectionProps {
 
 const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
   const [newItem, setNewItem] = useState({ description: "", amount: 0 });
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
 
   const currencies = [
     { value: "USD", label: t('usd_label'), symbol: "$" },
@@ -45,6 +46,12 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
     { value: "GBP", label: t('gbp_label'), symbol: "£" },
     { value: "CAD", label: t('cad_label'), symbol: "C$" },
     { value: "AUD", label: t('aud_label'), symbol: "A$" },
+    // Arabic Currencies
+    { value: "AED", label: t('aed_label'), symbol: "د.إ" },
+    { value: "SAR", label: t('sar_label'), symbol: "ر.س" },
+    { value: "QAR", label: t('qar_label'), symbol: "ر.ق" },
+    { value: "KWD", label: t('kwd_label'), symbol: "د.ك" },
+    { value: "EGP", label: t('egp_label'), symbol: "ج.م" },
   ];
 
   const selectedCurrency = currencies.find(c => c.value === priceData.currency) || currencies[0];
@@ -115,16 +122,13 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
             <div className="space-y-2 text-center sm:text-left">
               <Label htmlFor="basePrice" className="text-foreground flex items-center justify-center sm:justify-start">{t('base_price')}</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                  {selectedCurrency.symbol}
-                </span>
                 <Input
                   id="basePrice"
                   type="number"
                   placeholder="0.00"
                   value={priceData.basePrice || ""}
                   onChange={(e) => updateBasePrice(parseFloat(e.target.value) || 0)}
-                  className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 pl-8 [appearance:textfield]"
+                  className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 [appearance:textfield] pl-3"
                   min="0"
                   step="0.01"
                 />
@@ -170,16 +174,13 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
                <div className="space-y-2 text-center sm:text-left">
                  <Label htmlFor="itemAmount" className="text-foreground flex items-center justify-center sm:justify-start">{t('amount')}</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                    {selectedCurrency.symbol}
-                  </span>
                   <Input
                     id="itemAmount"
                     type="number"
                     placeholder="0.00"
                     value={newItem.amount || ""}
                     onChange={(e) => setNewItem({ ...newItem, amount: parseFloat(e.target.value) || 0 })}
-                    className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 pl-8 [appearance:textfield]"
+                    className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 [appearance:textfield] pl-3"
                     min="0"
                     step="0.01"
                   />

@@ -67,7 +67,7 @@ interface PriceData {
 const PreviewPage = () => {
   const { t, currentLanguage } = useI18n();
   const navigate = useNavigate();
-  const { clientDetails, services, priceData } = useAppContext();
+  const { clientDetails, services, priceData, clearFormData } = useAppContext();
 
   React.useEffect(() => {
     if (!clientDetails || !clientDetails.name || services.length === 0 || !priceData || priceData.basePrice === 0) {
@@ -87,6 +87,12 @@ const PreviewPage = () => {
     { value: "GBP", symbol: "£" },
     { value: "CAD", symbol: "C$" },
     { value: "AUD", symbol: "A$" },
+    // Arabic Currencies
+    { value: "AED", symbol: "د.إ" },
+    { value: "SAR", symbol: "ر.س" },
+    { value: "QAR", symbol: "ر.ق" },
+    { value: "KWD", symbol: "د.ك" },
+    { value: "EGP", symbol: "ج.م" },
   ].find(c => c.value === priceData.currency) || { value: "USD", symbol: "$" };
 
   const getTotalPrice = () => {
@@ -102,6 +108,7 @@ const PreviewPage = () => {
 
   const handleClose = () => {
     navigate(-1); // Go back to the previous page
+    clearFormData(); // Clear form data
   };
 
   return (
