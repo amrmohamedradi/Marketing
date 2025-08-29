@@ -281,6 +281,102 @@ const PreviewPage = () => {
             </motion.div>
           )}
 
+          {/* Support Section */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.55, duration: 0.5 }}
+            className="space-y-2 sm:space-y-4 bg-card text-card-foreground p-4 sm:p-6 rounded-2xl shadow-md border border-border"
+          >
+            <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-1 sm:space-x-2 text-primary">
+              <CheckCircle className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span>{t('support_benefits')}</span>
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base mb-4 sm:mb-6">
+              {t('support_benefits_desc')}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+              {/* Example Support Item 1: 24/7 Support */}
+              <div className="flex items-start gap-2 p-3 bg-muted/20 rounded-lg border border-border/30 sm:p-4">
+                <CheckCircle className="w-3 h-3 text-success mt-0.5 flex-shrink-0 sm:w-4 sm:h-4" />
+                <div>
+                  <h3 className="font-medium text-sm sm:text-base text-foreground mb-0.5">
+                    {t('support_24_7_title')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('support_24_7_description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Example Support Item 2: Quality Guarantee */}
+              <div className="flex items-start gap-2 p-3 bg-muted/20 rounded-lg border border-border/30 sm:p-4">
+                <CheckCircle className="w-3 h-3 text-success mt-0.5 flex-shrink-0 sm:w-4 sm:h-4" />
+                <div>
+                  <h3 className="font-medium text-sm sm:text-base text-foreground mb-0.5">
+                    {t('quality_guarantee_title')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('quality_guarantee_description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Example Support Item 3: On-Time Delivery */}
+              <div className="flex items-start gap-2 p-3 bg-muted/20 rounded-lg border border-border/30 sm:p-4">
+                <CheckCircle className="w-3 h-3 text-success mt-0.5 flex-shrink-0 sm:w-4 sm:h-4" />
+                <div>
+                  <h3 className="font-medium text-sm sm:text-base text-foreground mb-0.5">
+                    {t('on_time_delivery_title')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('on_time_delivery_description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Example Support Item 4: Dedicated Team */}
+              <div className="flex items-start gap-2 p-3 bg-muted/20 rounded-lg border border-border/30 sm:p-4">
+                <CheckCircle className="w-3 h-3 text-success mt-0.5 flex-shrink-0 sm:w-4 sm:h-4" />
+                <div>
+                  <h3 className="font-medium text-sm sm:text-base text-foreground mb-0.5">
+                    {t('dedicated_team_title')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('dedicated_team_description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Example Support Item 5: Secure Process */}
+              <div className="flex items-start gap-2 p-3 bg-muted/20 rounded-lg border border-border/30 sm:p-4">
+                <CheckCircle className="w-3 h-3 text-success mt-0.5 flex-shrink-0 sm:w-4 sm:h-4" />
+                <div>
+                  <h3 className="font-medium text-sm sm:text-base text-foreground mb-0.5">
+                    {t('secure_process_title')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('secure_process_description')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Example Support Item 6: Fast Turnaround */}
+              <div className="flex items-start gap-2 p-3 bg-muted/20 rounded-lg border border-border/30 sm:p-4">
+                <CheckCircle className="w-3 h-3 text-success mt-0.5 flex-shrink-0 sm:w-4 sm:h-4" />
+                <div>
+                  <h3 className="font-medium text-sm sm:text-base text-foreground mb-0.5">
+                    {t('fast_turnaround_title')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('fast_turnaround_description')}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </motion.div>
+
           {/* Pricing Section */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
