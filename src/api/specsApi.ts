@@ -1,10 +1,9 @@
 import axios, { AxiosError } from 'axios';
 
-// Configure axios instance
+// Configure axios instance to use proxy (no CORS needed)
 const api = axios.create({
-  baseURL: '/api', // Uses same-origin if using proxy, or full URL if CORS
+  baseURL: '/api',
   timeout: 10000,
-  withCredentials: true, // Only if cookies/sessions are needed
   headers: {
     'Content-Type': 'application/json',
   },
