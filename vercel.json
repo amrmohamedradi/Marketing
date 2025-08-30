@@ -1,0 +1,23 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/specs/:path*",
+      "destination": "https://backend-marketing-production.up.railway.app/api/specs/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://backend-marketing-production.up.railway.app/api/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
