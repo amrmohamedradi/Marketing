@@ -90,43 +90,25 @@ export const specsApi = {
   }
 };
 
-// React component example
-export const SpecUpdater: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+// Example usage function (not a React component)
+export const exampleUsage = async () => {
+  try {
+    const payload: SpecData = {
+      name: 'Updated Spec',
+      description: 'This is an updated specification',
+      version: '2.0.0'
+    };
 
-  const handleUpdateSpec = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const payload: SpecData = {
-        name: 'Updated Spec',
-        description: 'This is an updated specification',
-        version: '2.0.0'
-      };
-
-      const result = await specsApi.updateSpec('amr-radi', payload);
-      
-      if (result.success) {
-        console.log('Spec updated successfully:', result);
-        // Handle success (show toast, redirect, etc.)
-      } else {
-        setError(result.message || 'Update failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
-    } finally {
-      setLoading(false);
+    const result = await specsApi.updateSpec('amr-radi', payload);
+    
+    if (result.success) {
+      console.log('Spec updated successfully:', result);
+      return result;
+    } else {
+      throw new Error(result.message || 'Update failed');
     }
-  };
-
-  return (
-    <div>
-      <button onClick={handleUpdateSpec} disabled={loading}>
-        {loading ? 'Updating...' : 'Update Spec'}
-      </button>
-      {error && <div style={{ color: 'red' }}>Error: {error}</div>}
-    </div>
-  );
+  } catch (err) {
+    console.error('Update failed:', err);
+    throw err;
+  }
 };

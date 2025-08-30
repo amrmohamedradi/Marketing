@@ -37,6 +37,7 @@ export async function DELETE(
   return forwardRequest(request, params.path, 'DELETE');
 }
 
+// Handle OPTIONS preflight locally (204)
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204 });
 }
@@ -56,7 +57,7 @@ async function forwardRequest(
       body = await request.text();
     }
 
-    // Forward headers
+    // Preserve Content-Type and Authorization headers
     const headers: Record<string, string> = {};
     const contentType = request.headers.get('content-type');
     const authorization = request.headers.get('authorization');
@@ -64,17 +65,16 @@ async function forwardRequest(
     if (contentType) headers['Content-Type'] = contentType;
     if (authorization) headers['Authorization'] = authorization;
 
-    // Make request to backend
+    // Forward request to Railway backend
     const response = await fetch(url, {
       method,
       headers,
       body,
     });
 
-    // Get response data
+    // Get response data and return upstream status/body as-is
     const responseData = await response.text();
     
-    // Return response with same status and content-type
     return new NextResponse(responseData, {
       status: response.status,
       headers: {
