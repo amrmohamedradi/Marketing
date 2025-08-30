@@ -11,6 +11,15 @@ export const api = axios.create({
   }
 });
 
+// Request interceptor to prevent /api duplication
+api.interceptors.request.use((config) => {
+  if (config.url?.startsWith("/api/")) {
+    config.url = config.url.replace(/^\/api\//, "/"); // Remove duplicate /api
+    console.warn(`⚠️ Removed duplicate /api from: ${config.url}`);
+  }
+  return config;
+});
+
 // Alternative: Direct fetch without baseURL confusion
 export async function fetchJson(path: string, init?: RequestInit) {
   const res = await fetch(`/api${path}`, init);
