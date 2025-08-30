@@ -1,13 +1,6 @@
 import axios, { AxiosError } from 'axios';
 
-// Configure axios instance to use proxy (no CORS needed)
-const api = axios.create({
-  baseURL: '/api',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { api } from '../lib/api';
 
 // Types
 interface SpecData {
