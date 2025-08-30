@@ -1,12 +1,12 @@
 import axios from "axios";
 
 // Use relative URLs in development to leverage Vite proxy, full URLs in production
-const isDevelopment = typeof import.meta !== "undefined" && import.meta.env?.DEV;
-const BASE_URL = isDevelopment 
+const BASE_URL = 
+  typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "" // Use relative URLs in development to avoid CORS issues
   : (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) ||
     (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE_URL) ||
-    "https://backend-marketing-production.up.railway.app";
+    "https://backend-marketing-production-67fd.up.railway.app";
 
 export const api = axios.create({ baseURL: BASE_URL, timeout: 20000 });
 

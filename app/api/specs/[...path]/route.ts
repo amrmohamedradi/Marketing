@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_BASE_URL = 'https://backend-marketing-production.up.railway.app';
+const BACKEND_BASE_URL = 'https://backend-marketing-production-67fd.up.railway.app';
 
 export async function GET(
   request: NextRequest,

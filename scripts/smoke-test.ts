@@ -24,7 +24,7 @@ class SmokeTest {
   private baseUrl: string;
   private results: TestResult[] = [];
 
-  constructor(baseUrl = 'https://backend-marketing-production.up.railway.app') {
+  constructor(baseUrl = 'https://backend-marketing-production-67fd.up.railway.app') {
     this.baseUrl = baseUrl;
   }
 
@@ -194,7 +194,7 @@ class SmokeTest {
 
 // Run smoke tests
 async function main() {
-  const baseUrl = process.env.API_BASE_URL || 'https://backend-marketing-production.up.railway.app';
+  const baseUrl = process.env.API_BASE_URL || 'https://backend-marketing-production-67fd.up.railway.app';
   const smokeTest = new SmokeTest(baseUrl);
   
   try {

@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/specs/:path*",
-      "destination": "https://backend-marketing-production.up.railway.app/api/specs/:path*"
+      "destination": "https://backend-marketing-production-67fd.up.railway.app/api/specs/:path*"
     },
     {
       "source": "/api/:path*",
-      "destination": "https://backend-marketing-production.up.railway.app/api/:path*"
+      "destination": "https://backend-marketing-production-67fd.up.railway.app/api/:path*"
     }
   ],
   "headers": [

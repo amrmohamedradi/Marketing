@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-let baseUrl = process.env.VITE_API_BASE_URL || 'https://backend-marketing-production.up.railway.app';
+let baseUrl = process.env.VITE_API_BASE_URL || 'https://backend-marketing-production-67fd.up.railway.app';
 
 // Check for --base argument
 const baseIndex = args.indexOf('--base');

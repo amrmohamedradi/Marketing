@@ -261,7 +261,7 @@ export default function HealthDebug() {
 
             <div className="flex justify-between items-center">
               <span>API Base URL:</span>
-              <p className="text-sm text-gray-600">Base URL: {import.meta.env.VITE_API_BASE_URL || 'https://backend-marketing-production.up.railway.app'}</p>
+              <p className="text-sm text-gray-600">Base URL: {import.meta.env.VITE_API_BASE_URL || 'https://backend-marketing-production-67fd.up.railway.app'}</p>
             </div>
 
             <div className="flex justify-between items-center">
