@@ -25,7 +25,6 @@ const Header = () => {
     >
       <nav className="container mx-auto flex flex-col sm:flex-row items-center justify-center sm:justify-between p-4 gap-2">
         <div className='flex items-center space-x-2'>
-        <img src='/src/assets/logo.webp' className='w-8 h-8'  /> 
         <Link to="/" className="text-2xl font-bold text-primary p-2">
           {t('marketing_corner_logo_text')}
         </Link>
