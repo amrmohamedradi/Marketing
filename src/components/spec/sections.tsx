@@ -1,4 +1,8 @@
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { CheckCircle, Clock, Users, Code, Phone, Mail, Globe, MessageCircle } from 'lucide-react';
+import { t } from '../../lib/utils/localization';
 import { ClientDetails, Service, PriceData } from '@/types';
 import { deepCompact } from '@/lib/utils/deepCompact';
 
@@ -61,14 +65,14 @@ export const sectionRegistry: SectionConfig[] = [
     render: (spec) => (
       <div className="text-center mb-8">
         {spec.client?.company && (
-          <div className="text-sm text-muted-foreground mb-2">{spec.client.company}</div>
+          <div className="text-sm text-muted-foreground mb-2">{t(spec.client.company)}</div>
         )}
         {spec.client?.name && (
-          <h1 className="text-3xl font-bold mb-4">{spec.client.name}</h1>
+          <h1 className="text-3xl font-bold mb-4">{t(spec.client.name)}</h1>
         )}
         {spec.client?.description && (
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {spec.client.description}
+            {t(spec.client.description)}
           </p>
         )}
       </div>

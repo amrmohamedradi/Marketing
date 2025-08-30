@@ -14,8 +14,9 @@ export const api = axios.create({
 // Request interceptor to prevent /api duplication
 api.interceptors.request.use((config) => {
   if (config.url?.startsWith("/api/")) {
+    const originalUrl = config.url;
     config.url = config.url.replace(/^\/api\//, "/"); // Remove duplicate /api
-    console.warn(`⚠️ Removed duplicate /api from: ${config.url}`);
+    console.warn(`⚠️ Fixed double /api: ${originalUrl} → ${config.url}`);
   }
   return config;
 });
