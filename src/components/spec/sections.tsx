@@ -6,6 +6,7 @@ export interface SpecData {
   client?: ClientDetails;
   services?: Service[];
   pricing?: PriceData;
+  support?: { id: string; title: string; description: string }[];
   summary?: string;
   deliverables?: string[];
   team?: string[];

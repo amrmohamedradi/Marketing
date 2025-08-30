@@ -4,6 +4,9 @@ interface I18nContextType {
   t: (key: string) => string;
   changeLanguage: (lang: string) => void;
   currentLanguage: string;
+  dir: string;
+  formatDate: (date: Date) => string;
+  formatNumber: (num: number) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -20,18 +23,41 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   heading_desc: { ar: 'أنشئ عروض خدمات شاملة لعملائك بسهولة واحترافية', en: 'Easily and professionally create comprehensive service proposals for your clients.' },
   preview_spec: { ar: 'معاينة المواصفات', en: 'Preview Specification' },
   complete_steps_hint: { ar: 'يرجى إكمال جميع الحقول المطلوبة لمعاينة المواصفات', en: 'Please complete all required fields to preview the specification' },
+  required_fields_note: { ar: 'تشير إلى الحقول المطلوبة', en: 'Indicates required fields' },
+  client_name_required: { ar: 'اسم العميل مطلوب', en: 'Client name is required' },
+  services_required: { ar: 'يجب اختيار خدمة واحدة على الأقل', en: 'At least one service must be selected' },
+  base_price_required: { ar: 'السعر الأساسي مطلوب ويجب أن يكون أكبر من صفر', en: 'Base price is required and must be greater than zero' },
+  support_benefits: { ar: 'مزايا الدعم', en: 'Support Benefits' },
+  
+  // Preview Page
+  service_specification: { ar: 'مواصفات الخدمة', en: 'Service Specification' },
+  comprehensive_overview: { ar: 'نظرة شاملة على الخدمات والأسعار المقترحة', en: 'A comprehensive overview of the proposed services and pricing' },
+  save_specification: { ar: 'حفظ المواصفات', en: 'Save Specification' },
+  saving: { ar: 'جاري الحفظ...', en: 'Saving...' },
+  view_public: { ar: 'عرض عام', en: 'View Public' },
+  proposal_valid: { ar: 'هذا العرض صالح لمدة 30 يوماً من تاريخ الإصدار', en: 'This proposal is valid for 30 days from the date of issue' },
+  generated_with: { ar: 'Marketing Corner - ماركتنج كورنر', en: 'Marketing Corner - ماركتنج كورنر' },
+  loading_or_redirecting: { ar: 'جاري التحميل أو إعادة التوجيه...', en: 'Loading or redirecting...' },
+  save_success: { ar: 'تم الحفظ بنجاح', en: 'Save Successful' },
+  spec_saved_successfully: { ar: 'تم حفظ المواصفات بنجاح', en: 'Specification saved successfully' },
+  save_error: { ar: 'خطأ في الحفظ', en: 'Save Error' },
+  error_saving_spec: { ar: 'حدث خطأ أثناء حفظ المواصفات', en: 'An error occurred while saving the specification' },
   
   // Login Form
   welcome_back: { ar: 'مرحباً بعودتك', en: 'Welcome Back' },
+  login_description: { ar: 'سجل الدخول لإنشاء مواصفات خدمات جميلة لعملائك', en: 'Sign in to create beautiful service specifications for your clients' },
   sign_in_desc: { ar: 'سجل الدخول لإنشاء مواصفات خدمات جميلة لعملائك', en: 'Sign in to create beautiful service specifications for your clients' },
   sign_in: { ar: 'تسجيل الدخول', en: 'Sign In' },
   sign_in_desc_card: { ar: 'استخدم أي بيانات اعتماد للوصول إلى العرض التوضيحي', en: 'Use any credentials to access the demo' },
   email: { ar: 'البريد الإلكتروني', en: 'Email' },
   email_placeholder: { ar: 'demo@servicespec.com', en: 'demo@servicespec.com' },
+  enter_email: { ar: 'أدخل بريدك الإلكتروني', en: 'Enter your email' },
   password: { ar: 'كلمة المرور', en: 'Password' },
   password_placeholder: { ar: 'أدخل أي كلمة مرور', en: 'Enter any password' },
+  enter_password: { ar: 'أدخل كلمة المرور', en: 'Enter your password' },
   signing_in: { ar: 'جاري تسجيل الدخول...', en: 'Signing In...' },
   demo_notice: { ar: 'هذا تطبيق تجريبي. استخدم أي بريد إلكتروني وكلمة مرور للمتابعة.', en: 'This is a demo app. Use any email and password to proceed.' },
+  demo_credentials: { ar: 'بيانات اعتماد العرض التوضيحي', en: 'Demo Credentials' },
   
   // Client Details
   client_details: { ar: 'تفاصيل العميل', en: 'Client Details' },
@@ -61,7 +87,7 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   subservice_desc_ph: { ar: 'أدخل وصف الخدمة الفرعية', en: 'Enter sub-service description' },
   edit: { ar: 'تعديل', en: 'Edit' },
   delete: { ar: 'حذف', en: 'Delete' },
-  save: { ar: 'حفظ', en: 'Save' },
+  save_btn: { ar: 'حفظ', en: 'Save' },
   cancel: { ar: 'إلغاء', en: 'Cancel' },
   items: { ar: 'عنصر', en: 'Item' },
   custom: { ar: 'خاص', en: 'Custom' },
@@ -116,6 +142,7 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   testing_fixes: { ar: 'اختبار وإصلاحات', en: 'Testing & Fixes' },
   
   // Support & Benefits
+  support: { ar: 'الدعم', en: 'Support' },
   support_benefits: { ar: 'الدعم والمزايا', en: 'Support & Benefits' },
   support_benefits_desc: { ar: 'كل ما تحصل عليه عند العمل معنا', en: 'All you get when working with us' },
   support_24_7: { ar: 'الدعم 24/7', en: '24/7 Support' },
@@ -149,13 +176,17 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   service_specification: { ar: 'مواصفات الخدمة', en: 'Service Specification' },
   share: { ar: 'مشاركة', en: 'Share' },
   export: { ar: 'تصدير', en: 'Export' },
-  save: { ar: 'حفظ', en: 'Save' },
+  save_spec: { ar: 'حفظ', en: 'Save' },
   saving: { ar: 'جاري الحفظ...', en: 'Saving...' },
+  save_specification: { ar: 'حفظ المواصفات', en: 'Save Specification' },
   view_saved: { ar: 'عرض المحفوظ', en: 'View Saved' },
+  view_public: { ar: 'عرض عام', en: 'View Public' },
   save_success: { ar: 'تم الحفظ بنجاح', en: 'Saved Successfully' },
   save_error: { ar: 'خطأ في الحفظ', en: 'Save Error' },
   spec_saved_successfully: { ar: 'تم حفظ المواصفات بنجاح', en: 'Specification saved successfully' },
   error_saving_spec: { ar: 'حدث خطأ أثناء حفظ المواصفات', en: 'An error occurred while saving the specification' },
+  loading_or_redirecting: { ar: 'جاري التحميل أو إعادة التوجيه...', en: 'Loading or redirecting...' },
+  comprehensive_overview: { ar: 'نظرة شاملة على خدماتنا المهنية المصممة خصيصاً لاحتياجاتك', en: 'A comprehensive overview of our professional services tailored to your needs' },
   service_proposal: { ar: 'عرض الخدمة', en: 'Service Proposal' },
   prepared_for: { ar: 'أُعد لـ', en: 'Prepared for' },
   your_client: { ar: 'عميلك', en: 'Your Client' },
@@ -169,7 +200,7 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   all_prices_in: { ar: 'جميع الأسعار بـ', en: 'All prices in' },
   terms_conditions: { ar: 'الشروط والأحكام', en: 'Terms & Conditions' },
   proposal_valid: { ar: 'هذا العرض صالح لمدة 30 يوماً من تاريخ الإنشاء.', en: 'This proposal is valid for 30 days from the date of creation.' },
-  generated_with: { ar: 'MarketingCorner - ركن التسويق', en: 'MarketingCorner - Service Spec Maker' },
+  generated_with: { ar: 'Marketing Corner - ماركتنج كورنر', en: 'Marketing Corner - ماركتنج كورنر' },
   marketing_corner_logo_text: { ar: 'ماركتنج كورنر', en: 'Marketing Corner' },
   go_to_dashboard: { ar: 'الذهاب إلى لوحة التحكم', en: 'Go to Dashboard' },
   
@@ -186,6 +217,23 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   qar_label: { ar: 'ريال قطري (ر.ق)', en: 'Qatari Riyal (QAR)' },
   kwd_label: { ar: 'دينار كويتي (د.ك)', en: 'Kuwaiti Dinar (KWD)' },
   egp_label: { ar: 'جنيه مصري (ج.م)', en: 'Egyptian Pound (EGP)' },
+
+  // Read-only page labels
+  about_client: { ar: 'حول العميل', en: 'About Client' },
+  industry: { ar: 'الصناعة', en: 'Industry' },
+  location: { ar: 'الموقع', en: 'Location' },
+  email_address: { ar: 'البريد الإلكتروني', en: 'Email Address' },
+  phone_number: { ar: 'رقم الهاتف', en: 'Phone Number' },
+  whatsapp: { ar: 'واتساب', en: 'WhatsApp' },
+  website: { ar: 'الموقع الإلكتروني', en: 'Website' },
+  whats_included: { ar: 'ما يشمله', en: 'What\'s Included' },
+  total: { ar: 'المجموع', en: 'Total' },
+  contact: { ar: 'اتصل', en: 'Contact' },
+  
+  // Contact
+  get_in_touch: { ar: 'تواصل معنا', en: 'Get In Touch' },
+  ready_to_start_project: { ar: 'مستعد لبدء مشروعك؟ نحن نحب أن نسمع منك.', en: "Ready to start your project? We'd love to hear from you." },
+  included: { ar: 'مشمول', en: 'Included' },
   
   // Support Items
   support_24_7_title: { ar: 'دعم 24/7', en: '24/7 Support' },
@@ -200,10 +248,47 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   secure_process_description: { ar: 'أمان وسرية على مستوى المؤسسات', en: 'Enterprise-level security and confidentiality' },
   fast_turnaround_title: { ar: 'استجابة سريعة', en: 'Fast Turnaround' },
   fast_turnaround_description: { ar: 'تكرارات سريعة وتواصل متجاوب', en: 'Rapid iterations and responsive communication' },
+  
+  // Additional Support Features
+  monthly_checkins_title: { ar: 'مراجعات شهرية', en: 'Monthly Check-ins' },
+  monthly_checkins_description: { ar: 'مراجعات منتظمة للتقدم وتعديل الاستراتيجيات', en: 'Regular progress reviews and strategy adjustments' },
+  bug_fix_sla_title: { ar: 'ضمان إصلاح الأخطاء (48 ساعة)', en: 'Bug-fix SLA (48h)' },
+  bug_fix_sla_description: { ar: 'إصلاح سريع للمشاكل التقنية الحرجة', en: 'Rapid resolution of critical technical issues' },
+  performance_monitoring_title: { ar: 'مراقبة الأداء', en: 'Performance Monitoring' },
+  performance_monitoring_description: { ar: 'تتبع مستمر لأداء النظام والتحسينات', en: 'Continuous system performance tracking and optimization' },
+  security_updates_title: { ar: 'تحديثات الأمان', en: 'Security Updates' },
+  security_updates_description: { ar: 'تحديثات أمنية منتظمة وتقييم نقاط الضعف', en: 'Regular security patches and vulnerability assessments' },
 };
 
+// Language resolution helper
+function getInitialLanguage(): string {
+  // 1. Check URL query param
+  const urlParams = new URLSearchParams(window.location.search);
+  const langParam = urlParams.get('lang');
+  if (langParam === 'ar' || langParam === 'en') {
+    return langParam;
+  }
+
+  // 2. Check cookie
+  const cookies = document.cookie.split(';');
+  const langCookie = cookies.find(cookie => cookie.trim().startsWith('lang='));
+  if (langCookie) {
+    const cookieValue = langCookie.split('=')[1]?.trim();
+    if (cookieValue === 'ar' || cookieValue === 'en') {
+      return cookieValue;
+    }
+  }
+
+  // 3. Default to Arabic
+  return 'ar';
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [currentLanguage, setCurrentLanguage] = React.useState('ar');
+  const [currentLanguage, setCurrentLanguage] = React.useState(() => {
+    // SSR-safe initialization
+    if (typeof window === 'undefined') return 'ar';
+    return getInitialLanguage();
+  });
 
   React.useEffect(() => {
     document.documentElement.setAttribute("dir", currentLanguage === 'ar' ? 'rtl' : 'ltr');
@@ -219,8 +304,22 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setCurrentLanguage(lang);
   };
 
+  const dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+
+  const formatDate = (date: Date): string => {
+    return new Intl.DateTimeFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  };
+
+  const formatNumber = (num: number): string => {
+    return new Intl.NumberFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US').format(num);
+  };
+
   return (
-    <I18nContext.Provider value={{ t, changeLanguage, currentLanguage }}>
+    <I18nContext.Provider value={{ t, changeLanguage, currentLanguage, dir, formatDate, formatNumber }}>
       {children}
     </I18nContext.Provider>
   );
@@ -234,4 +333,5 @@ export function useI18n(): I18nContextType {
   return context;
 }
 
-
+// Alias for compatibility
+export const useLang = useI18n;

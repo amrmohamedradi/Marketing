@@ -1,7 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { renderVisibleSections, SpecData } from '@/components/spec/sections';
-import '@/styles/animated-bg.css';
+import { deepCompact } from '@/lib/utils/deepCompact';
+import { LanguageProvider } from '@/lib/i18n';
+import { PublicHeader } from '@/components/public/PublicHeader';
+import { AboutClient } from '@/components/public/AboutClient';
+import { Services } from '@/components/public/Services';
+import Support from '@/components/public/Support';
+import { Pricing } from '@/components/public/Pricing';
+import { ContactCompany } from '@/components/public/ContactCompany';
+import { Reveal } from '@/components/Reveal';
+import { LucideIcon } from 'lucide-react';
+import '@/styles/space.css';
+import '@/styles/readonly-page.css';
+
+interface SpecData {
+  client?: {
+    name?: string;
+    company?: string;
+    email?: string;
+    phone?: string;
+    description?: string;
+  };
+  services?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    icon?: LucideIcon;
+    subServices?: Array<{
+      id: string;
+      name: string;
+      description?: string;
+    }>;
+  }>;
+  pricing?: {
+    basePrice?: number;
+    currency?: string;
+    additionalItems?: Array<{
+      id: string;
+      description: string;
+      amount?: number;
+    }>;
+    notes?: string;
+  };
+}
 
 const ReadSpec: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -31,7 +72,9 @@ const ReadSpec: React.FC = () => {
         }
 
         const data = await response.json();
-        setSpec(data);
+        // Apply deepCompact to sanitize the data
+        const cleanedData = deepCompact(data) as SpecData;
+        setSpec(cleanedData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load specification');
       } finally {
@@ -42,82 +85,59 @@ const ReadSpec: React.FC = () => {
     fetchSpec();
   }, [slug]);
 
-  useEffect(() => {
-    // Reveal sections on scroll
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    });
-
-    // Observe all reveal sections after a short delay
-    const timer = setTimeout(() => {
-      const sections = document.querySelectorAll('.reveal-section');
-      sections.forEach(section => observer.observe(section));
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      observer.disconnect();
-    };
-  }, [spec]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (error || !spec) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Specification Not Found</h1>
-          <p className="text-muted-foreground">{error || 'The requested specification could not be found.'}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <>
-      {/* Animated Background */}
-      <div className="animated-background">
-        <div className="aurora-gradient"></div>
-        <div className="stars">
-          <div className="star"></div>
-          <div className="star"></div>
-          <div className="star"></div>
-          <div className="star"></div>
-          <div className="star"></div>
-          <div className="star"></div>
-        </div>
-        <div className="shooting-star"></div>
+    <LanguageProvider>
+      <div className="readonly-page min-h-screen overflow-visible space-bg">
+        <PublicHeader />
+        
+        <main className="container mx-auto px-4 py-8 max-w-4xl overflow-visible">
+          {loading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading specification...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold text-destructive mb-4">Error</h1>
+                <p className="text-muted-foreground">{error}</p>
+              </div>
+            </div>
+          ) : spec ? (
+            <div className="space-y-12">
+              <Reveal>
+                <AboutClient client={spec.client || {}} />
+              </Reveal>
+              
+              <Reveal>
+                <Services services={spec.services || []} />
+              </Reveal>
+              
+              <Reveal>
+                <Support />
+              </Reveal>
+              
+              <Reveal>
+                <Pricing pricing={spec.pricing || {}} />
+              </Reveal>
+              
+              <Reveal>
+                <ContactCompany />
+              </Reveal>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold mb-4">Specification Not Found</h1>
+                <p className="text-muted-foreground">The requested specification could not be found.</p>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
-
-      {/* Main Content */}
-      <div className="min-h-screen py-8 relative">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="reveal-section">
-            {renderVisibleSections(spec)}
-          </div>
-          
-          {/* Footer */}
-          <div className="reveal-section mt-12 text-center text-sm text-muted-foreground">
-            <p>Generated with Service Spec Maker</p>
-          </div>
-        </div>
-      </div>
-    </>
+    </LanguageProvider>
   );
 };
 

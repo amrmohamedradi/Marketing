@@ -1,0 +1,150 @@
+import React from 'react';
+import { clientFieldLabels, ClientFieldKey } from '@/lib/formMetadata';
+import { deepCompact } from '@/lib/utils/deepCompact';
+import { useI18n } from '@/lib/i18n';
+import { i18nText } from '@/lib/i18nContent';
+import { User, Building, Mail, Phone, FileText, MapPin, Globe, MessageCircle } from 'lucide-react';
+
+interface ClientData {
+  name?: string | { ar?: string; en?: string };
+  company?: string | { ar?: string; en?: string };
+  industry?: string;
+  location?: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  website?: string;
+  description?: string;
+}
+
+interface AboutClientProps {
+  client: ClientData;
+}
+
+const fieldIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  name: User,
+  company: Building,
+  industry: Building,
+  location: MapPin,
+  email: Mail,
+  phone: Phone,
+  whatsapp: MessageCircle,
+  website: Globe,
+  description: FileText
+};
+
+export function AboutClient({ client }: AboutClientProps) {
+  const { t, currentLanguage } = useI18n();
+  
+  // Apply deepCompact to sanitize data
+  const sanitizedClient = deepCompact(client) as ClientData;
+  
+  if (!sanitizedClient || Object.keys(sanitizedClient).length === 0) return null;
+
+  const renderValue = (key: string, value: string) => {
+    switch (key) {
+      case 'email':
+        return (
+          <a 
+            href={`mailto:${value}`}
+            className="underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400/40 break-all"
+          >
+            {value}
+          </a>
+        );
+      case 'phone':
+        return (
+          <a 
+            href={`tel:${value}`}
+            className="underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+          >
+            {value}
+          </a>
+        );
+      case 'whatsapp':
+        return (
+          <a 
+            href={`https://wa.me/${value.replace(/[^\d]/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+          >
+            {value}
+          </a>
+        );
+      case 'website': {
+        const url = value.startsWith('http') ? value : `https://${value}`;
+        return (
+          <a 
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400/40 break-all"
+          >
+            {value}
+          </a>
+        );
+      }
+      default:
+        return (
+          <span className={key === 'description' ? 'leading-relaxed' : 'break-words'}>
+            {value}
+          </span>
+        );
+    }
+  };
+
+  const getFieldLabel = (key: string): string => {
+    const labelKeys: Record<string, string> = {
+      name: 'client_name',
+      company: 'company',
+      industry: 'industry',
+      location: 'location',
+      email: 'email_address',
+      phone: 'phone_number',
+      whatsapp: 'whatsapp',
+      website: 'website',
+      description: 'project_description'
+    };
+    return t(labelKeys[key] || key);
+  };
+
+  return (
+    <section className="card-neo p-6 no-motion-client" aria-labelledby="about-client">
+      <h2 id="about-client" className="text-lg font-semibold mb-4 text-white">{t('about_client')}</h2>
+
+      <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        {Object.entries(sanitizedClient).map(([key, value]) => {
+          if (!value) return null;
+          
+          const Icon = fieldIcons[key];
+          const label = getFieldLabel(key);
+          
+          // Convert i18n objects to strings using the helper
+          const displayValue = i18nText(value, currentLanguage as 'ar' | 'en');
+          if (!displayValue) return null;
+
+          return (
+            <div key={key} className="flex items-start gap-2">
+              {Icon ? (
+                <Icon className="mt-0.5 h-4 w-4 opacity-75 text-blue-400 flex-shrink-0" aria-hidden="true" />
+              ) : (
+                <svg aria-hidden="true" className="mt-0.5 h-4 w-4 opacity-75 text-blue-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              )}
+              <div className="min-w-0 flex-1">
+                <dt className="text-xs tracking-wide text-gray-400 uppercase mb-1">
+                  {label}
+                </dt>
+                <dd className="text-sm font-medium text-white">
+                  {renderValue(key, displayValue)}
+                </dd>
+              </div>
+            </div>
+          );
+        })}
+      </dl>
+    </section>
+  );
+}

@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 // Interface for the Spec document - using flexible Mixed type
 export interface ISpec extends Document {
   slug: string;
-  data: any; // Store all spec data as flexible object
+  data: Record<string, unknown>; // Store all spec data as flexible object
   createdAt: Date;
   updatedAt: Date;
 }

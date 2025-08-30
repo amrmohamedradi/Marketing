@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { i18nText } from "@/lib/i18nText";
 import * as LucideIcons from "lucide-react"; // Import all Lucide icons
 import { motion } from "framer-motion";
 
@@ -54,16 +55,16 @@ interface ServicesSectionProps {
 
 // Build three default services with suggestions
 const buildDefaultServices = (t: (key: string) => string): Service[] => {
-  const base: Array<{ id: string; nameKey: string; description: string; icon: keyof typeof LucideIcons }> = [
-    { id: "programming", nameKey: "programming", description: "", icon: "Code" },
-    { id: "marketing", nameKey: "marketing", description: "", icon: "TrendingUp" },
-    { id: "photo-shoot", nameKey: "photo_editing", description: "", icon: "Camera" }
+  const base: Array<{ id: string; nameKey: string; description: string; icon: LucideIcon }> = [
+    { id: "programming", nameKey: "programming", description: "", icon: Code },
+    { id: "marketing", nameKey: "marketing", description: "", icon: TrendingUp },
+    { id: "photo-shoot", nameKey: "photo_editing", description: "", icon: Camera }
   ];
   return base.map((s) => ({
     id: s.id,
     name: t(s.nameKey),
     description: s.description,
-    icon: LucideIcons[s.icon],
+    icon: s.icon,
     subServices: [],
     suggestedItems: getSuggestedItemsForService(s.id, t),
     isDefault: true, // Mark as default service
@@ -113,7 +114,7 @@ type SubServiceRowProps = {
 };
 
 const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField, onDelete }: SubServiceRowProps) => {
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -140,14 +141,14 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
           <div>
             <div className="flex items-center justify-center sm:justify-start space-x-2">
               <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="font-medium text-sm text-foreground">{t(subService.name)}</span>
+              <span className="font-medium text-sm text-foreground">{i18nText(subService.name, currentLanguage)}</span>
               {subService.isCustom && (
                 <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">{t('custom')}</Badge>
               )}
             </div>
             {subService.description && (
               <p className="text-xs text-muted-foreground mt-1 ml-6 text-center sm:text-left">
-                {t(subService.description)}
+                {i18nText(subService.description, currentLanguage)}
               </p>
             )}
           </div>
@@ -188,32 +189,32 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
 
   const SUPPORT_ITEMS = [
     {
-      icon: LucideIcons.Headphones,
+      icon: Headphones,
       title: t("support_24_7_title"),
       description: t("support_24_7_description")
     },
     {
-      icon: LucideIcons.Award,
+      icon: Award,
       title: t("quality_guarantee_title"),
       description: t("quality_guarantee_description")
     },
     {
-      icon: LucideIcons.Clock,
+      icon: Clock,
       title: t("on_time_delivery_title"),
       description: t("on_time_delivery_description")
     },
     {
-      icon: LucideIcons.Users,
+      icon: Users,
       title: t("dedicated_team_title"),
       description: t("dedicated_team_description")
     },
     {
-      icon: LucideIcons.Shield,
+      icon: Shield,
       title: t("secure_process_title"),
       description: t("secure_process_description")
     },
     {
-      icon: LucideIcons.Zap,
+      icon: Zap,
       title: t("fast_turnaround_title"),
       description: t("fast_turnaround_description")
     }
@@ -378,7 +379,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       id,
       name,
       description: newService.description,
-      icon: LucideIcons.Settings, // Use from LucideIcons namespace
+      icon: Settings, // Use directly imported Settings icon
       subServices: [],
     };
     onUpdate([...(services ?? []), service]);
@@ -398,9 +399,16 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           <CardTitle className="flex items-center justify-center sm:justify-start space-x-2 text-primary">
             <Settings className="w-5 h-5" />
             <span>{t('our_services')}</span>
+            <span className="text-red-500 ml-1">*</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Validation message for services */}
+          {services.length === 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-red-600">{t('services_required')}</p>
+            </div>
+          )}
           {/* Create new main service */}
           <div className="p-4 rounded-xl border border-border/50 bg-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
             <div className="flex flex-col gap-3"> {/* Changed from grid to flex column */}
@@ -427,7 +435,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           <div className="grid grid-cols-1 gap-4">
             {services.map((service) => {
               // Make sure service.icon is a valid component
-              const IconComponent = service.icon || LucideIcons.Settings;
+              const IconComponent = typeof service.icon === 'function' ? service.icon : Settings;
               const isExpanded = expandedServices.has(service.id);
               const pendingForService = pending[service.id] ?? { customDrafts: [] };
               
@@ -436,7 +444,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                   key={service.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
+                  transition={{ duration: 0.2, delay: 0.05 }}
                   className="group relative"
                 >
                   <Card className="rounded-xl border border-border/50 bg-background p-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -448,10 +456,10 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                             <IconComponent className="w-6 h-6 text-primary" />
                           </div>
                           <div className="flex flex-col items-center sm:items-start">
-                            <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
-                              {service.name}
+                            <h3 className="font-semibold text-sm sm:text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
+                              {i18nText(service.name, currentLanguage)}
                             </h3>
-                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-3 py-1 mx-auto sm:mx-0">
+                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-2 py-0.5 mx-auto sm:mx-0">
                               {service.subServices.length} {t('items')}
                             </Badge>
                           </div>
@@ -470,8 +478,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-2 text-center sm:text-left">
-                        {service.description}
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center sm:text-left">
+                        {i18nText(service.description, currentLanguage)}
                       </p>
                     </CardHeader>
                     
@@ -479,14 +487,14 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                     <motion.div
                       initial={false}
                       animate={{ height: isExpanded ? "auto" : 0, opacity: isExpanded ? 1 : 0 }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
                       <CardContent className="pt-4 space-y-4">
                         {/* Current Sub-services (render only when expanded) */}
                         {isExpanded && service.subServices.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">{t('included_services')}</h4>
+                            <h4 className="font-medium text-xs sm:text-sm text-muted-foreground uppercase tracking-wide">{t('included_services')}</h4>
                             <div className="space-y-2">
                               {service.subServices.map((subService) => (
                                 <SubServiceRow
@@ -505,8 +513,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Suggested Items */}
                         {isExpanded && service.suggestedItems && service.suggestedItems.length > 0 && (
                           <div className="space-y-3">
-                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide flex items-center space-x-2">
-                              <TrendingUp className="w-4 h-4 text-accent" />
+                            <h4 className="font-medium text-xs sm:text-sm text-muted-foreground uppercase tracking-wide flex items-center space-x-2">
+                              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
                               <span>{t('suggested_items')}</span>
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -515,7 +523,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                   key={index}
                                   initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                                  transition={{ duration: 0.15, delay: index * 0.02 }}
                                   className="group p-3 rounded-lg bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-md cursor-pointer"
                                   onClick={() => addSuggestedItem(service.id, item)}
                                 >
@@ -523,15 +531,15 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                     <div className="flex-1 space-y-1">
                                       <div className="flex items-center space-x-2">
                                         <div className="w-2 h-2 rounded-full bg-accent group-hover:scale-125 transition-transform duration-200"></div>
-                                        <span className="font-medium text-sm text-foreground group-hover:text-accent transition-colors duration-200">
+                                        <span className="font-medium text-xs sm:text-sm text-foreground group-hover:text-accent transition-colors duration-200">
                                           {item.name}
                                         </span>
                                       </div>
-                                      <p className="text-xs text-muted-foreground pl-4 group-hover:text-accent/80 transition-colors duration-200">
+                                      <p className="text-xs text-muted-foreground pl-4 group-hover:text-accent/80 transition-colors duration-200 leading-tight">
                                         {item.description}
                                       </p>
                                     </div>
-                                    <Plus className="w-4 h-4 text-accent/60 group-hover:text-accent group-hover:scale-110 transition-all duration-200" />
+                                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-accent/60 group-hover:text-accent group-hover:scale-110 transition-all duration-200" />
                                   </div>
                                 </motion.div>
                               ))}
@@ -545,7 +553,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Pending Custom Drafts */}
                         {pendingForService.customDrafts.length > 0 && (
                           <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">{t('pending_custom_items')}</h4>
+                            <h4 className="font-medium text-xs sm:text-sm text-muted-foreground uppercase tracking-wide">{t('pending_custom_items')}</h4>
                             <div className="space-y-2">
                               {pendingForService.customDrafts.map((d) => (
                                 <motion.div
@@ -553,7 +561,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                   initial={{ opacity: 0, y: 10 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   exit={{ opacity: 0, y: -10 }}
-                                  transition={{ duration: 0.3 }}
+                                  transition={{ duration: 0.15 }}
                                   className="p-3 bg-muted/20 rounded-md border border-border/30"
                                 >
                                   <div className="flex items-start justify-between gap-2">
@@ -565,8 +573,8 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                         </div>
                                       ) : (
                                         <div>
-                                          <div className="font-medium text-sm text-foreground">{d.name}</div>
-                                          {d.description && <div className="text-xs text-muted-foreground">{d.description}</div>}
+                                          <div className="font-medium text-xs sm:text-sm text-foreground">{d.name}</div>
+                                          {d.description && <div className="text-xs text-muted-foreground leading-tight">{d.description}</div>}
                                         </div>
                                       )}
                                     </div>
@@ -639,25 +647,25 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {SUPPORT_ITEMS.map((item, index) => {
-              // Use the icon component from LucideIcons
-              const IconComponent = item.icon;
+              // Use the icon component directly
+              const IconComponent = typeof item.icon === 'function' ? item.icon : Settings;
               return (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="group p-6 rounded-xl bg-gradient-to-br from-background/50 to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                  className="group p-6 rounded-xl bg-gradient-to-br from-background/50 to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-150 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
                 >
                   <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
-                      <IconComponent className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-150">
+                      <IconComponent className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-150" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-foreground text-wrap">
+                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-foreground text-wrap text-xs sm:text-sm">
                         {item.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground text-wrap">
+                      <p className="text-xs text-muted-foreground text-wrap leading-tight">
                         {item.description}
                       </p>
                     </div>

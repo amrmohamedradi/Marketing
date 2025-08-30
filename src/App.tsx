@@ -2,14 +2,14 @@ import React from 'react';
 import { LanguageProvider } from "@/lib/i18n";
 import NotFound from "./pages/NotFound";
 import PreviewPage from "./pages/Preview";
-import HealthPage from "./pages/debug/Health";
+import HealthPage from "./pages/Health";
 import { AppProvider, useAppContext } from "@/lib/AppContext"; // Import AppProvider and useAppContext
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster"; // For shadcn/ui toasts
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import ReadSpec from "./pages/ReadSpec";
 import Header from "./components/Header"; // Import the new Header component
@@ -18,22 +18,35 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { isLoggedIn } = useAppContext();
+  const location = useLocation();
+  
+  // Check if current route is read-only page
+  const isReadOnlyRoute = location.pathname.startsWith('/read/');
+
+  return (
+    <div className="min-h-screen w-full h-full bg-background text-foreground">
+      {isLoggedIn && !isReadOnlyRoute && <Header />}
+      <main className={isReadOnlyRoute ? "" : "container mx-auto py-8"}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/read/:slug" element={<ReadSpec />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/preview" element={<PreviewPage />} />
+          <Route path="/health" element={<HealthPage />} />
+          <Route path="/debug/health" element={<HealthPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
+
+const AppWithRouter = () => {
+  const { isLoggedIn } = useAppContext();
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen w-full h-full bg-background text-foreground">
-        {isLoggedIn && <Header />}
-        <main className="container mx-auto py-8">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/read/:slug" element={<ReadSpec />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="/preview" element={<PreviewPage />} />
-            <Route path="/debug/health" element={<HealthPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-      </div>
+      <AppContent />
     </BrowserRouter>
   );
 };
@@ -46,7 +59,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <AppProvider> {/* Wrap BrowserRouter with AppProvider */}
-          <AppContent />
+          <AppWithRouter />
         </AppProvider>
       </TooltipProvider>
     </QueryClientProvider>

@@ -1,4 +1,5 @@
 import { SpecData } from '@/components/spec/sections';
+import { safeFetch } from './safeFetch';
 
 const API_BASE_URL = '/api';
 
@@ -10,18 +11,32 @@ export interface ApiResponse {
 
 export async function saveSpec(slug: string, specData: SpecData): Promise<ApiResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/specs/${slug}`, {
+    // Check if support editor is disabled and exclude support from payload
+    const shouldExcludeSupport = import.meta.env.VITE_FEATURE_SUPPORT_EDITOR !== 'true';
+    const payload = { ...specData };
+    const extraHeaders: Record<string, string> = {};
+    
+    if (shouldExcludeSupport) {
+      delete payload.support;
+      extraHeaders['X-Preserve-Support'] = '1';
+    }
+    
+    const data = await safeFetch(`${API_BASE_URL}/specs/${slug}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        ...extraHeaders
       },
-      body: JSON.stringify(specData)
+      body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
-    return data;
+    return {
+      ok: data.ok || true,
+      slug: data.slug || slug
+    };
   } catch (error) {
     console.error('Error saving spec:', error);
     return {
@@ -33,7 +48,7 @@ export async function saveSpec(slug: string, specData: SpecData): Promise<ApiRes
 
 export async function getSpec(slug: string): Promise<SpecData | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/specs/${slug}`, {
+    const data = await safeFetch(`${API_BASE_URL}/specs/${slug}`, {
       method: 'GET',
       headers: {
         'Cache-Control': 'no-cache',
@@ -41,11 +56,6 @@ export async function getSpec(slug: string): Promise<SpecData | null> {
       }
     });
 
-    if (!response.ok) {
-      throw new Error('Specification not found');
-    }
-
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error fetching spec:', error);

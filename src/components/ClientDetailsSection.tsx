@@ -46,14 +46,18 @@ const ClientDetailsSection = ({ clientDetails, onUpdate }: ClientDetailsProps) =
               <Label htmlFor="clientName" className="flex items-center justify-center sm:justify-start space-x-1 text-foreground">
                 <User className="w-4 h-4 text-muted-foreground" />
                 <span>{t('client_name')}</span>
+                <span className="text-red-500 ml-1">*</span>
               </Label>
               <Input
                 id="clientName"
                 placeholder={t('client_name_placeholder')}
                 value={clientDetails.name}
                 onChange={(e) => handleChange("name", e.target.value)}
-                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200"
+                className={`bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 ${!clientDetails.name.trim() ? 'border-red-300 focus:border-red-500' : ''}`}
               />
+              {!clientDetails.name.trim() && (
+                <p className="text-sm text-red-500 mt-1">{t('client_name_required')}</p>
+              )}
             </div>
             <div className="space-y-2 text-center sm:text-left">
               <Label htmlFor="company" className="flex items-center justify-center sm:justify-start space-x-1 text-foreground">

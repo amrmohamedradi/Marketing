@@ -1,0 +1,132 @@
+/* Reveal animation utilities */
+.reveal {
+  opacity: 0;
+  transform: translateY(2rem);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Service card animations */
+.service-card {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s ease-out;
+}
+
+.service-card:hover,
+.service-card:focus-within {
+  transform: scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Icon parallax effect */
+.service-icon {
+  transition: transform 0.3s ease-out;
+}
+
+.service-card:hover .service-icon {
+  transform: scale(1.1);
+}
+
+/* Gradient glow effects */
+.gradient-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    rgba(var(--primary), 0.05) 0%, 
+    transparent 25%, 
+    transparent 75%, 
+    rgba(var(--accent), 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none;
+}
+
+.gradient-glow:hover::before {
+  opacity: 1;
+}
+
+/* Focus visible styles for accessibility */
+.focus-visible {
+  outline: 2px solid rgba(var(--primary), 0.5);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .service-card,
+  .service-icon,
+  .gradient-glow::before {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .service-card:hover,
+  .service-card:focus-within {
+    transform: none;
+  }
+  
+  .service-card:hover .service-icon {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .reveal,
+  .service-card,
+  .service-icon,
+  .gradient-glow::before {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .reveal {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  
+  .service-card {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .gradient-glow::before {
+    display: none !important;
+  }
+  
+  /* Ensure good contrast for printing */
+  * {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .bg-card,
+  .bg-background {
+    background: white !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  .text-primary,
+  .text-accent {
+    color: #333 !important;
+  }
+  
+  .text-muted-foreground {
+    color: #666 !important;
+  }
+}

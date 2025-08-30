@@ -1,0 +1,24 @@
+/* ReadOnly Page - Remove Inner Scrollbars */
+.readonly-page, .readonly-page * {
+  overscroll-behavior: auto;
+}
+
+.readonly-page .avoid-inner-scroll {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Ensure no containers create inner scrollbars */
+.readonly-page .container,
+.readonly-page main,
+.readonly-page section {
+  overflow: visible !important;
+}
+
+/* Remove any height constraints that might cause scrolling */
+.readonly-page [class*="max-h-"],
+.readonly-page [class*="h-screen"],
+.readonly-page [class*="h-[100vh]"] {
+  max-height: none !important;
+  height: auto !important;
+}

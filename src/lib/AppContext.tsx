@@ -20,6 +20,15 @@ const defaultPriceData: PriceData = {
   notes: "",
 };
 
+const defaultSupportItems = [
+  { id: "support_24_7", title: "support_24_7_title", description: "support_24_7_description" },
+  { id: "quality_guarantee", title: "quality_guarantee_title", description: "quality_guarantee_description" },
+  { id: "on_time_delivery", title: "on_time_delivery_title", description: "on_time_delivery_description" },
+  { id: "dedicated_team", title: "dedicated_team_title", description: "dedicated_team_description" },
+  { id: "secure_process", title: "secure_process_title", description: "secure_process_description" },
+  { id: "fast_turnaround", title: "fast_turnaround_title", description: "fast_turnaround_description" }
+];
+
 // Context Type
 interface AppContextType {
   clientDetails: ClientDetails;
@@ -28,6 +37,8 @@ interface AppContextType {
   setServices: (services: Service[]) => void;
   priceData: PriceData;
   setPriceData: (data: PriceData) => void;
+  supportItems: { id: string; title: string; description: string }[];
+  setSupportItems: (items: { id: string; title: string; description: string }[]) => void;
   clearAllData: () => void;
   clearClientAndServicesData: () => void; // New function
   clearFormData: () => void;
@@ -64,6 +75,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [priceData, setPriceData] = useState<PriceData>(() => {
     const saved = localStorage.getItem('priceData');
     return saved ? JSON.parse(saved) : defaultPriceData;
+  });
+
+  const [supportItems, setSupportItems] = useState<{ id: string; title: string; description: string }[]>(() => {
+    const saved = localStorage.getItem('supportItems');
+    return saved ? JSON.parse(saved) : defaultSupportItems;
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -108,6 +124,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [priceData]);
 
   useEffect(() => {
+    localStorage.setItem('supportItems', JSON.stringify(supportItems));
+  }, [supportItems]);
+
+  useEffect(() => {
     localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
   }, [isLoggedIn]);
 
@@ -115,9 +135,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setClientDetails(defaultClientDetails);
     setServices([]);
     setPriceData(defaultPriceData);
+    setSupportItems(defaultSupportItems);
     localStorage.removeItem('clientDetails');
     localStorage.removeItem('services');
     localStorage.removeItem('priceData');
+    localStorage.removeItem('supportItems');
     setIsLoggedIn(false); // Also log out when clearing data
   }, []);
 
@@ -132,9 +154,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setClientDetails(defaultClientDetails);
     setServices([]);
     setPriceData(defaultPriceData);
+    setSupportItems(defaultSupportItems);
     localStorage.removeItem('clientDetails');
     localStorage.removeItem('services');
     localStorage.removeItem('priceData');
+    localStorage.removeItem('supportItems');
   }, []);
 
   const value = {
@@ -144,6 +168,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setServices,
     priceData,
     setPriceData,
+    supportItems,
+    setSupportItems,
     clearAllData,
     clearClientAndServicesData, // Include new function in context value
     clearFormData,

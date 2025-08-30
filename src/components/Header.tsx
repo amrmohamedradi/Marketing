@@ -24,9 +24,12 @@ const Header = () => {
       className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md shadow-lg"
     >
       <nav className="container mx-auto flex flex-col sm:flex-row items-center justify-center sm:justify-between p-4 gap-2">
-        <Link to="/" className="text-2xl font-bold text-primary">
+        <div className='flex items-center space-x-2'>
+        <img src='/src/assets/logo.webp' className='w-8 h-8'  /> 
+        <Link to="/" className="text-2xl font-bold text-primary p-2">
           {t('marketing_corner_logo_text')}
         </Link>
+        </div>
 
         {/* Desktop Navigation - only Logout button */}
         <div className="flex items-center space-x-4">

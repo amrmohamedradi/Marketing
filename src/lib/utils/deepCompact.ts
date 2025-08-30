@@ -2,7 +2,7 @@
  * Recursively removes empty, null, undefined values and empty arrays/objects
  * Preserves numbers (including 0) and booleans
  */
-export function deepCompact(value: any): any {
+export function deepCompact(value: unknown): unknown {
   if (value === null || value === undefined) {
     return undefined;
   }
@@ -23,8 +23,8 @@ export function deepCompact(value: any): any {
     return compacted.length === 0 ? undefined : compacted;
   }
 
-  if (typeof value === 'object') {
-    const compacted: any = {};
+  if (typeof value === 'object' && value !== null) {
+    const compacted: Record<string, unknown> = {};
     let hasValidKeys = false;
 
     for (const [key, val] of Object.entries(value)) {

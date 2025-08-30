@@ -114,9 +114,16 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
           <CardTitle className="flex items-center justify-center sm:justify-start space-x-2 text-primary">
             <DollarSign className="w-5 h-5" />
             <span>{t('pricing')}</span>
+            <span className="text-red-500 ml-1">*</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Validation message for base price */}
+          {priceData.basePrice <= 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-red-600">{t('base_price_required')}</p>
+            </div>
+          )}
           {/* Base Price and Currency */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2 text-center sm:text-left">
