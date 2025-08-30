@@ -1,7 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { t } from '../lib/utils/localization';
 import { 
-  Shield, Star, Clock, Zap, Users, Lock, CheckCircle, Sparkles 
+  MessageCircle, 
+  Phone, 
+  Mail, 
+  Clock, 
+  Shield, 
+  Zap,
+  Users,
+  Award,
+  Headphones
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
@@ -123,7 +133,7 @@ const Support = () => {
                   {/* Content */}
                   <div className="space-y-4">
                     <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-300">
-                      {item.title}
+                      {t(item.title)}
                     </h3>
                     
                     <div className="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent group-hover:via-purple-400 transition-all duration-500" />

@@ -103,18 +103,18 @@ export const sectionRegistry: SectionConfig[] = [
             <div key={service.id || index} className="border rounded-lg p-4">
               <div className="flex items-center gap-3 mb-2">
                 {service.icon && <service.icon className="h-5 w-5 text-primary" />}
-                <h3 className="font-medium">{service.name}</h3>
+                <h3 className="font-medium">{t(service.name)}</h3>
               </div>
               {service.description && (
-                <p className="text-sm text-muted-foreground mb-3">{service.description}</p>
+                <p className="text-sm text-muted-foreground mb-3">{t(service.description)}</p>
               )}
               {service.subServices && service.subServices.length > 0 && (
                 <ul className="space-y-1">
                   {service.subServices.map((sub, subIndex) => (
                     <li key={sub.id || subIndex} className="text-sm">
-                      <span className="font-medium">{sub.name}</span>
+                      <span className="font-medium">{t(sub.name)}</span>
                       {sub.description && (
-                        <span className="text-muted-foreground"> - {sub.description}</span>
+                        <span className="text-muted-foreground"> - {t(sub.description)}</span>
                       )}
                     </li>
                   ))}
