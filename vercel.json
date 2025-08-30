@@ -7,6 +7,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://backend-marketing-production-67fd.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/((?!api|_next|favicon.ico|.*\\.).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
