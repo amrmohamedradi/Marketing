@@ -23,7 +23,7 @@ export const SpecExample: React.FC = () => {
       };
 
       // ✅ Correct: Uses '/specs/...' (no '/api' prefix)
-      // Browser will request: https://marketing-mauve-ten.vercel.app/api/specs/client-123
+      // Browser will request: https://my-frontend.vercel.app/api/specs/client-123
       const response = await api.post('/specs/client-123', payload);
       
       setResult(`Success: ${JSON.stringify(response.data, null, 2)}`);

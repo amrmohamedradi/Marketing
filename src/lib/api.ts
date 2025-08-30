@@ -1,21 +1,32 @@
 import axios from "axios";
 
-// Central Axios instance - baseURL already includes '/api'
-// DO NOT prefix paths with '/api' when using this instance
+// Central Axios instance - baseURL = '/api'
+// Use paths like '/specs/:id' (NOT '/api/specs/:id')
 export const api = axios.create({
   baseURL: '/api',
   timeout: 20000,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   }
 });
 
+// Alternative: Direct fetch without baseURL confusion
 export async function fetchJson(path: string, init?: RequestInit) {
   const res = await fetch(`/api${path}`, init);
   if (!res.ok) throw new Error(await res.text());
   const ct = res.headers.get("content-type") || "";
   return ct.includes("application/json") ? res.json() : res.text();
 }
+
+// Alternative: Axios without baseURL (use full paths)
+export const directApi = axios.create({
+  timeout: 20000,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
 
 export const HEALTH_PATH = "/health";
 
