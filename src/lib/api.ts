@@ -1,15 +1,32 @@
-import { SpecData } from '@/components/spec/sections';
-import { safeFetch } from './safeFetch';
+import axios from "axios";
 
-const API_BASE_URL = '/api';
+// Use relative URLs in development to leverage Vite proxy, full URLs in production
+const isDevelopment = typeof import.meta !== "undefined" && import.meta.env?.DEV;
+const BASE_URL = isDevelopment 
+  ? "" // Use relative URLs in development to avoid CORS issues
+  : (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) ||
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE_URL) ||
+    "https://backend-marketing-production.up.railway.app";
 
+export const api = axios.create({ baseURL: BASE_URL, timeout: 20000 });
+
+export async function fetchJson(path: string, init?: RequestInit) {
+  const res = await fetch(`${BASE_URL}${path}`, init);
+  if (!res.ok) throw new Error(await res.text());
+  const ct = res.headers.get("content-type") || "";
+  return ct.includes("application/json") ? res.json() : res.text();
+}
+
+export const HEALTH_PATH = "/health";
+
+// Legacy compatibility
 export interface ApiResponse {
   ok: boolean;
   slug?: string;
   error?: string;
 }
 
-export async function saveSpec(slug: string, specData: SpecData): Promise<ApiResponse> {
+export async function saveSpec(slug: string, specData: Record<string, unknown>): Promise<ApiResponse> {
   try {
     // Check if support editor is disabled and exclude support from payload
     const shouldExcludeSupport = import.meta.env.VITE_FEATURE_SUPPORT_EDITOR !== 'true';
@@ -21,21 +38,18 @@ export async function saveSpec(slug: string, specData: SpecData): Promise<ApiRes
       extraHeaders['X-Preserve-Support'] = '1';
     }
     
-    const data = await safeFetch(`${API_BASE_URL}/specs/${slug}`, {
-      method: 'POST',
+    const response = await api.post(`/api/specs/${slug}`, payload, {
       headers: {
-        'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
         'Expires': '0',
         ...extraHeaders
-      },
-      body: JSON.stringify(payload)
+      }
     });
 
     return {
-      ok: data.ok || true,
-      slug: data.slug || slug
+      ok: response.data.ok || true,
+      slug: response.data.slug || slug
     };
   } catch (error) {
     console.error('Error saving spec:', error);
@@ -46,17 +60,16 @@ export async function saveSpec(slug: string, specData: SpecData): Promise<ApiRes
   }
 }
 
-export async function getSpec(slug: string): Promise<SpecData | null> {
+export async function getSpec(slug: string): Promise<unknown> {
   try {
-    const data = await safeFetch(`${API_BASE_URL}/specs/${slug}`, {
-      method: 'GET',
+    const response = await api.get(`/api/specs/${slug}`, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
       }
     });
 
-    return data;
+    return response.data;
   } catch (error) {
     console.error('Error fetching spec:', error);
     return null;

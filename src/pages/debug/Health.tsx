@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+import { api, HEALTH_PATH } from '@/lib/api';
 
 interface HealthResponse {
   ok: boolean;
@@ -64,7 +63,8 @@ export default function HealthDebug() {
     const fetchSsrData = async () => {
       const startTime = Date.now();
       try {
-        const response = await fetch(`${API_BASE_URL}/health`, { cache: 'no-store' });
+        const baseUrl = HEALTH_PATH;
+        const response = await fetch(`${baseUrl}`, { cache: 'no-store' });
         const data = await response.json();
         setSsrData(data);
         setSsrLatency(Date.now() - startTime);
@@ -81,7 +81,12 @@ export default function HealthDebug() {
     const fetchCsrData = async () => {
       const startTime = Date.now();
       try {
-        const response = await axios.get(`${API_BASE_URL}/health`);
+        const response = await api.get(HEALTH_PATH, {
+          timeout: 10000,
+        });
+        if (response.status !== 200) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         setCsrData(response.data);
         setCsrLatency(Date.now() - startTime);
       } catch (error) {
@@ -105,7 +110,7 @@ export default function HealthDebug() {
     const pingTest = async () => {
       const startTime = Date.now();
       try {
-        const response = await axios.post(`${API_BASE_URL}/health/ping`, { message: 'Hello from debug page' });
+        const response = await api.post(`${HEALTH_PATH}/ping`, { message: 'Hello from debug page' });
         setPingData(response.data);
         setPingLatency(Date.now() - startTime);
       } catch (error) {
@@ -256,7 +261,7 @@ export default function HealthDebug() {
 
             <div className="flex justify-between items-center">
               <span>API Base URL:</span>
-              <span className="text-sm font-mono">{API_BASE_URL}</span>
+              <p className="text-sm text-gray-600">Base URL: {import.meta.env.VITE_API_BASE_URL || 'https://backend-marketing-production.up.railway.app'}</p>
             </div>
 
             <div className="flex justify-between items-center">
