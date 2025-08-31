@@ -148,12 +148,14 @@ const PreviewPage = () => {
       const response = await saveSpec(slug, specData);
       
       if (response && response.ok) {
-        // Navigate to the OnlyPage to show client data alongside services:
-        navigate(`/only/${response.id || slug}`);
-        
-        toast({        // Navigate to your UI page, NOT the backend JSON:
+        // Navigate to your UI page, NOT the backend JSON:
         navigate(`/read/${response.id || slug}`);
-});
+        
+        toast({
+          title: t('save_success'),
+          description: t('spec_saved_successfully'),
+          variant: 'default',
+        });
         
         console.log('Spec saved successfully:', response);
       } else {
