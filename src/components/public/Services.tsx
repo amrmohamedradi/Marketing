@@ -63,9 +63,23 @@ export function Services({ services }: ServicesProps) {
             const subServices = service.subServices || [];
             return items.length > 0 || subServices.length > 0; // Only show services with items
           }).map((service, index) => {
-            const serviceName = i18nText(service.name || service.title, lang);
+            // ✅ Safe string conversion to prevent React error #130
+            const serviceName = typeof service.name === 'object' && service.name !== null
+              ? (typeof service.name[lang] === 'string' ? service.name[lang] : '') ||
+                (typeof service.name[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.name[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                ''
+              : typeof service.title === 'object' && service.title !== null
+              ? (typeof service.title[lang] === 'string' ? service.title[lang] : '') ||
+                (typeof service.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                ''
+              : String(service.name || service.title || '');
 
             const Icon = service.icon;
+
+            // ✅ Guard dynamic component rendering - prevent React error #130
+            if (Icon && typeof Icon !== 'function') {
+              console.error('Invalid icon component in Services', { Icon, service });
+            }
 
             return (
               <div
@@ -73,10 +87,10 @@ export function Services({ services }: ServicesProps) {
                 className="service-card-neo p-6 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 hover:shadow-xl hover:-translate-y-2 hover:bg-white/5 transition-all duration-300 group"
                 tabIndex={0}
                 role="article"
-                aria-label={`Service: ${i18nText(service.name, lang)}`}
+                aria-label={`Service: ${serviceName}`}
               >
                 <div className="flex items-start space-x-4 mb-4">
-                  {Icon && (
+                  {Icon && typeof Icon === 'function' && (
                     <div className="flex-shrink-0 p-2 bg-white/10 rounded-lg 
                                   group-hover:bg-blue-500/20 group-hover:shadow-lg transition-all duration-300">
                       <Icon className="h-6 w-6 text-white 
@@ -100,7 +114,13 @@ export function Services({ services }: ServicesProps) {
                     <ul className="mt-3 grid gap-2">
                       {/* Prefer new items structure; render if present */}
                       {service.items && service.items.map((item, itemIndex) => {
-                        const itemText = i18nText(item.text, lang);
+                        // ✅ Safe string conversion to prevent React error #130
+                        const itemText = typeof item.text === 'object' && item.text !== null
+                          ? (typeof item.text[lang] === 'string' ? item.text[lang] : '') ||
+                            (typeof item.text[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.text[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                            ''
+                          : String(item.text || '');
+                        
                         if (!itemText) return null;
                         
                         return (
@@ -137,7 +157,17 @@ export function Services({ services }: ServicesProps) {
                       })}
                       
                       {/* Fallback to legacy subServices structure ONLY when items are absent */}
-                      {(!service.items || service.items.length === 0) && service.subServices && service.subServices.map((subService, subIndex) => (
+                      {(!service.items || service.items.length === 0) && service.subServices && service.subServices.map((subService, subIndex) => {
+                        // ✅ Safe string conversion to prevent React error #130
+                        const subServiceName = typeof subService.name === 'object' && subService.name !== null
+                          ? (typeof subService.name[lang] === 'string' ? subService.name[lang] : '') ||
+                            (typeof subService.name[lang === 'ar' ? 'en' : 'ar'] === 'string' ? subService.name[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                            ''
+                          : String(subService.name || '');
+                        
+                        if (!subServiceName) return null;
+                        
+                        return (
                         <li
                           key={subService.id || subIndex}
                           className="group/item relative flex items-start gap-2 rounded-lg px-3 py-2
@@ -148,7 +178,7 @@ export function Services({ services }: ServicesProps) {
                           style={{ transitionDelay: `${subIndex * 50}ms` }}
                           tabIndex={0}
                           role="listitem"
-                          aria-label={i18nText(subService.name, lang)}
+                          aria-label={subServiceName}
                         >
                           {/* Sparkle/star icon */}
                           <svg 
@@ -165,7 +195,7 @@ export function Services({ services }: ServicesProps) {
                           </svg>
 
                           <div className="leading-relaxed">
-                            <span className="text-sm font-medium">{i18nText(subService.name, lang)}</span>
+                            <span className="text-sm font-medium">{subServiceName}</span>
                           </div>
 
                           {/* Subtle glow ring on hover */}
@@ -177,7 +207,8 @@ export function Services({ services }: ServicesProps) {
                                      transition duration-200"
                           />
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   </div>
                 )}

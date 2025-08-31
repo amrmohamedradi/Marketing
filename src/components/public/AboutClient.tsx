@@ -120,8 +120,12 @@ export function AboutClient({ client }: AboutClientProps) {
           const Icon = fieldIcons[key];
           const label = getFieldLabel(key);
           
-          // Convert i18n objects to strings using the helper
-          const displayValue = i18nText(value, currentLanguage as 'ar' | 'en');
+          // Convert i18n objects to strings using inline safe conversion - prevent React error #130
+          const displayValue = typeof value === 'object' && value !== null
+            ? (typeof value[currentLanguage as 'ar' | 'en'] === 'string' ? value[currentLanguage as 'ar' | 'en'] : '') ||
+              (typeof value[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? value[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
+              ''
+            : String(value || '');
           if (!displayValue) return null;
 
           return (

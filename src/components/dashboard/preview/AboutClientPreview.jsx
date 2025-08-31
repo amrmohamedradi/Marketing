@@ -9,12 +9,37 @@ export default function AboutClientPreview({ data, lang }) {
   const client = data?.client || data?.clientDetails;
   if (!client) return null;
 
-  // Safe text extraction for conditional checks and rendering
-  const getName = () => i18nText(client.name, lang);
-  const getCompany = () => i18nText(client.company, lang);
-  const getEmail = () => i18nText(client.email, lang);
-  const getPhone = () => i18nText(client.phone, lang);
-  const getDescription = () => i18nText(client.description, lang);
+  // Safe text extraction with inline object-to-string conversion - prevent React error #130
+  const getName = () => {
+    const name = client.name;
+    return typeof name === 'object' && name !== null
+      ? (typeof name.ar === 'string' ? name.ar : '') || (typeof name.en === 'string' ? name.en : '') || ''
+      : String(name || '');
+  };
+  const getCompany = () => {
+    const company = client.company;
+    return typeof company === 'object' && company !== null
+      ? (typeof company.ar === 'string' ? company.ar : '') || (typeof company.en === 'string' ? company.en : '') || ''
+      : String(company || '');
+  };
+  const getEmail = () => {
+    const email = client.email;
+    return typeof email === 'object' && email !== null
+      ? (typeof email.ar === 'string' ? email.ar : '') || (typeof email.en === 'string' ? email.en : '') || ''
+      : String(email || '');
+  };
+  const getPhone = () => {
+    const phone = client.phone;
+    return typeof phone === 'object' && phone !== null
+      ? (typeof phone.ar === 'string' ? phone.ar : '') || (typeof phone.en === 'string' ? phone.en : '') || ''
+      : String(phone || '');
+  };
+  const getDescription = () => {
+    const description = client.description;
+    return typeof description === 'object' && description !== null
+      ? (typeof description.ar === 'string' ? description.ar : '') || (typeof description.en === 'string' ? description.en : '') || ''
+      : String(description || '');
+  };
 
   const hasAnyField = getName() || getCompany() || getEmail() || getPhone();
   if (!hasAnyField) return null;

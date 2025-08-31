@@ -88,14 +88,23 @@ export default function ServicesPreview({ data, lang }) {
                           </h4>
                           <div className="space-y-2">
                             {(service.subServices || service.items || []).map((subService, subIndex) => {
-                              // ✅ Guard against rendering objects - only use string values
-                              const itemName = i18nText(
-                                subService.name || 
-                                subService.text || 
-                                (typeof subService === 'string' ? subService : ''), 
-                                lang
-                              );
-                              const itemDesc = i18nText(subService.description, lang);
+                              // ✅ Convert objects to strings safely - prevent React error #130
+                              const itemName = typeof subService.name === 'object' && subService.name !== null
+                                ? (typeof subService.name.ar === 'string' ? subService.name.ar : '')
+                                  || (typeof subService.name.en === 'string' ? subService.name.en : '')
+                                  || ''
+                                : typeof subService.text === 'object' && subService.text !== null
+                                ? (typeof subService.text.ar === 'string' ? subService.text.ar : '')
+                                  || (typeof subService.text.en === 'string' ? subService.text.en : '')
+                                  || ''
+                                : typeof subService === 'string' ? subService
+                                : String(subService.name || subService.text || '');
+                              
+                              const itemDesc = typeof subService.description === 'object' && subService.description !== null
+                                ? (typeof subService.description.ar === 'string' ? subService.description.ar : '')
+                                  || (typeof subService.description.en === 'string' ? subService.description.en : '')
+                                  || ''
+                                : String(subService.description || '');
                               
                               if (!itemName) return null;
                               
