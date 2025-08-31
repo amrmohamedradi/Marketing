@@ -1,9 +1,12 @@
 import axios from "axios";
 
-// Central Axios instance - baseURL = '/api'
-// Use paths like '/specs/:id' (NOT '/api/specs/:id')
-export const api = axios.create({
-  baseURL: '/api',
+export const BASE_URL =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) ||
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE_URL) ||
+  "https://backend-marketing-production.up.railway.app";
+
+export const api = axios.create({ 
+  baseURL: BASE_URL, 
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
@@ -11,32 +14,21 @@ export const api = axios.create({
   }
 });
 
-// Request interceptor to prevent /api duplication
-api.interceptors.request.use((config) => {
-  if (config.url?.startsWith("/api/")) {
-    const originalUrl = config.url;
-    config.url = config.url.replace(/^\/api\//, "/"); // Remove duplicate /api
-    console.warn(`⚠️ Fixed double /api: ${originalUrl} → ${config.url}`);
-  }
-  return config;
-});
-
-// Alternative: Direct fetch without baseURL confusion
 export async function fetchJson(path: string, init?: RequestInit) {
-  const res = await fetch(`/api${path}`, init);
+  const res = await fetch(`${BASE_URL}${path}`, init);
   if (!res.ok) throw new Error(await res.text());
   const ct = res.headers.get("content-type") || "";
   return ct.includes("application/json") ? res.json() : res.text();
 }
 
-// Alternative: Axios without baseURL (use full paths)
-export const directApi = axios.create({
-  timeout: 20000,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
+export async function healthCheck(): Promise<boolean> {
+  try {
+    const response = await api.get("/health");
+    return response.status === 200;
+  } catch {
+    return false;
   }
-});
+}
 
 export const HEALTH_PATH = "/health";
 
@@ -59,7 +51,7 @@ export async function saveSpec(slug: string, specData: Record<string, unknown>):
       extraHeaders['X-Preserve-Support'] = '1';
     }
     
-    const response = await api.post(`/specs/${slug}`, payload, {
+    const response = await api.post(`/api/specs/${slug}`, payload, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
@@ -83,7 +75,7 @@ export async function saveSpec(slug: string, specData: Record<string, unknown>):
 
 export async function getSpec(slug: string): Promise<unknown> {
   try {
-    const response = await api.get(`/specs/${slug}`, {
+    const response = await api.get(`/api/specs/${slug}`, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'

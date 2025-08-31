@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { LanguageProvider } from "@/lib/i18n";
 import NotFound from "./pages/NotFound";
 import PreviewPage from "./pages/Preview";
 import HealthPage from "./pages/Health";
 import { AppProvider, useAppContext } from "@/lib/AppContext"; // Import AppProvider and useAppContext
+import { healthCheck } from "@/lib/api";
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster"; // For shadcn/ui toasts
@@ -19,12 +20,37 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const { isLoggedIn } = useAppContext();
   const location = useLocation();
+  const [isApiOnline, setIsApiOnline] = useState(true);
+  const [showHealthBanner, setShowHealthBanner] = useState(false);
   
   // Check if current route is read-only page
   const isReadOnlyRoute = location.pathname.startsWith('/read/');
 
+  useEffect(() => {
+    const checkHealth = async () => {
+      const isOnline = await healthCheck();
+      setIsApiOnline(isOnline);
+      setShowHealthBanner(!isOnline);
+    };
+    
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen w-full h-full bg-background text-foreground">
+      {showHealthBanner && (
+        <div className="bg-red-600 text-white px-4 py-2 text-center relative">
+          <span>⚠️ API is currently offline. Some features may not work properly.</span>
+          <button 
+            onClick={() => setShowHealthBanner(false)}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-200"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       {isLoggedIn && !isReadOnlyRoute && <Header />}
       <main className={isReadOnlyRoute ? "" : "container mx-auto py-8"}>
         <Routes>
