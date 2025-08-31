@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import specsRouter from "./routes/specs.js"; // IMPORTANT: .js with NodeNext
+import translateRouter from "./routes/translate.js"; // IMPORTANT: .js with NodeNext
 
 const app = express();
 
@@ -8,7 +9,8 @@ const ALLOWED_ORIGINS = [
   "https://marketing-mauve-ten.vercel.app",
   "http://localhost:3000",
   "http://localhost:5173",
-  "http://localhost:8080"
+  "http://localhost:8080",
+  "http://localhost:8084"
 ];
 
 app.use(cors({
@@ -31,8 +33,9 @@ app.use("/api", (req, _res, next) => {
 
 app.get("/health", (_req, res) => res.status(200).send("ok"));
 
-// ✅ Mount router here
+// ✅ Mount routers here
 app.use("/api/specs", specsRouter);
+app.use("/api", translateRouter);
 
 // Return useful 404 for unknown API routes
 app.use("/api/*", (req, res) => {

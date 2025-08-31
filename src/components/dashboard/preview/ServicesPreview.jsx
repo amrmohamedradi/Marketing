@@ -1,13 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { i18nText } from '@/lib/i18nText';
 import { useI18n } from '@/lib/i18n';
+import { canonLang } from '@/lib/lang';
+import { translateMany } from '@/lib/translate';
 
 export default function ServicesPreview({ data, lang }) {
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
   const services = data?.services || [];
+  const locale = canonLang(currentLanguage);
+  
+  // Translation state
+  const [tr, setTr] = useState(null);
+  
   if (!services.length) return null;
+  
+  // Translate services when locale changes to Arabic
+  useEffect(() => {
+    if (!services.length || locale !== "ar") { 
+      setTr(null); 
+      return; 
+    }
+
+    // Collect unique labels (service names + items)
+    const labels = [];
+    services.forEach((s) => {
+      // Extract service name (handle both string and object formats)
+      const serviceName = typeof s.name === 'string' ? s.name :
+                         typeof s.title === 'string' ? s.title :
+                         typeof s.name === 'object' && s.name?.en ? s.name.en :
+                         typeof s.title === 'object' && s.title?.en ? s.title.en : '';
+      if (serviceName) labels.push(serviceName);
+      
+      // Extract item names
+      (s.subServices || s.items || []).forEach((item) => {
+        const itemName = typeof item === 'string' ? item :
+                        typeof item.name === 'string' ? item.name :
+                        typeof item.text === 'string' ? item.text :
+                        typeof item.name === 'object' && item.name?.en ? item.name.en :
+                        typeof item.text === 'object' && item.text?.en ? item.text.en : '';
+        if (itemName) labels.push(itemName);
+      });
+    });
+    
+    const unique = Array.from(new Set(labels));
+    if (!unique.length) return;
+
+    translateMany(unique, "ar", "en").then((arr) => {
+      const map = {};
+      unique.forEach((k, i) => { map[k] = arr[i]; });
+      setTr(map);
+    }).catch((error) => {
+      console.warn('Translation failed:', error);
+      setTr(null);
+    });
+  }, [services, locale]);
+
+  // Translation helper
+  const TX = (s) => {
+    if (locale === "ar" && tr && tr[s]) return tr[s];
+    return s;
+  };
 
   return (
     <div className="relative py-4 overflow-hidden">
@@ -46,21 +100,19 @@ export default function ServicesPreview({ data, lang }) {
                 return items.length > 0; // Only show services with items
               }).map((service, index) => {
                 const Icon = service.icon;
-                // ✅ Safe string conversion to prevent React error #130
-                const serviceName = typeof service.name === 'object' && service.name !== null
-                  ? (typeof service.name[lang] === 'string' ? service.name[lang] : '') ||
-                    (typeof service.name[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.name[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                    ''
-                  : typeof service.title === 'object' && service.title !== null
-                  ? (typeof service.title[lang] === 'string' ? service.title[lang] : '') ||
-                    (typeof service.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                    ''
-                  : String(service.name || service.title || '');
+                
+                // Extract service name with TX translation
+                const serviceNameRaw = typeof service.name === 'string' ? service.name :
+                                      typeof service.title === 'string' ? service.title :
+                                      typeof service.name === 'object' && service.name !== null
+                                        ? (service.name[locale] || service.name.en || '')
+                                      : typeof service.title === 'object' && service.title !== null
+                                        ? (service.title[locale] || service.title.en || '')
+                                      : '';
+                const serviceName = TX(serviceNameRaw);
                 
                 const serviceDesc = typeof service.description === 'object' && service.description !== null
-                  ? (typeof service.description[lang] === 'string' ? service.description[lang] : '') ||
-                    (typeof service.description[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.description[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                    ''
+                  ? (service.description[locale] || service.description.en || '')
                   : String(service.description || '');
                 
                 if (!serviceName) return null;
@@ -102,22 +154,19 @@ export default function ServicesPreview({ data, lang }) {
                           </h4>
                           <div className="space-y-2">
                             {(service.subServices || service.items || []).map((subService, subIndex) => {
-                              // ✅ Convert objects to strings safely - prevent React error #130
-                              const itemName = typeof subService.name === 'object' && subService.name !== null
-                                ? (typeof subService.name.ar === 'string' ? subService.name.ar : '')
-                                  || (typeof subService.name.en === 'string' ? subService.name.en : '')
-                                  || ''
-                                : typeof subService.text === 'object' && subService.text !== null
-                                ? (typeof subService.text.ar === 'string' ? subService.text.ar : '')
-                                  || (typeof subService.text.en === 'string' ? subService.text.en : '')
-                                  || ''
-                                : typeof subService === 'string' ? subService
-                                : String(subService.name || subService.text || '');
+                              // Extract item name with TX translation
+                              const itemNameRaw = typeof subService === 'string' ? subService :
+                                                 typeof subService.name === 'string' ? subService.name :
+                                                 typeof subService.text === 'string' ? subService.text :
+                                                 typeof subService.name === 'object' && subService.name !== null
+                                                   ? (subService.name[locale] || subService.name.en || '')
+                                                 : typeof subService.text === 'object' && subService.text !== null
+                                                   ? (subService.text[locale] || subService.text.en || '')
+                                                 : '';
+                              const itemName = TX(itemNameRaw);
                               
                               const itemDesc = typeof subService.description === 'object' && subService.description !== null
-                                ? (typeof subService.description.ar === 'string' ? subService.description.ar : '')
-                                  || (typeof subService.description.en === 'string' ? subService.description.en : '')
-                                  || ''
+                                ? (subService.description[locale] || subService.description.en || '')
                                 : String(subService.description || '');
                               
                               if (!itemName) return null;

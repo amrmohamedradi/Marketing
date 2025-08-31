@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useRevealOnScroll } from '@/hooks/useRevealOnScroll';
 import { useI18n } from '@/lib/i18n';
 import { canonLang } from '@/lib/lang';
 import { i18nText } from "@/lib/i18nText";
 import { useAutoTranslateMissing } from '@/hooks/useAutoTranslateMissing';
+import { translateMany } from '@/lib/translate';
 import { CheckCircle, LucideIcon } from 'lucide-react';
 
 interface SubService {
@@ -48,103 +49,72 @@ export function Services({ services }: ServicesProps) {
   // Canonicalize language from the same source as UI labels
   const lang = canonLang(currentLanguage);
   const loc = lang?.startsWith('ar') ? 'ar' : 'en';
+  
+  // Translation state
+  const [tr, setTr] = useState<Record<string, string> | null>(null);
 
-  // Optional tiny dictionary for common labels (extend only if needed)
-  const DICT: Record<string, { ar: string; en?: string }> = {
-    Programming: { ar: 'البرمجة' },
-    Documentation: { ar: 'التوثيق' },
-    'Frontend UI': { ar: 'واجهة المستخدم' },
-    Includes: { ar: 'ما يشمله' },
-    'Web Development': { ar: 'تطوير الويب' },
-    'Mobile Development': { ar: 'تطوير التطبيقات' },
-    'Backend Development': { ar: 'تطوير الخادم' },
-    'API Integration': { ar: 'تكامل واجهات برمجة التطبيقات' },
-    'Database Design': { ar: 'تصميم قواعد البيانات' },
-    'UI/UX Design': { ar: 'تصميم واجهة المستخدم' },
-    'Quality Assurance': { ar: 'ضمان الجودة' },
-    'Testing': { ar: 'الاختبار' },
-    'Maintenance': { ar: 'الصيانة' },
-    'Support': { ar: 'الدعم' },
-    'Security': { ar: 'الأمان' },
-    'Performance': { ar: 'الأداء' },
+  // OPTIONAL: auto-translate missing sides via server endpoint (disabled - no API available)
+  const data = useAutoTranslateMissing(services, lang, { enable: false });
+  
+  // Translate services when locale changes to Arabic
+  useEffect(() => {
+    if (!data.length || loc !== "ar") { 
+      setTr(null); 
+      return; 
+    }
+
+    // Collect unique labels (service names + items + common labels) - USE RAW TEXT EXTRACTION
+    const labels: string[] = [];
+    
+    // Add common labels for translation
+    labels.push('Our Services', 'Includes');
+    
+    data.forEach((service) => {
+      // Extract service name using raw text extraction
+      const serviceName = extractRawText(service.category ?? service.categoryKey ?? service.name ?? service.title);
+      if (serviceName && typeof serviceName === 'string') labels.push(serviceName);
+      
+      // Extract item names using raw text extraction
+      (service.items || service.subServices || []).forEach((item: any) => {
+        const itemName = extractRawText(item.label ?? item.name ?? item.key ?? item.text ?? item);
+        if (itemName && typeof itemName === 'string') labels.push(itemName);
+      });
+    });
+    
+    const unique = Array.from(new Set(labels));
+    if (!unique.length) return;
+
+    translateMany(unique, "ar", "en").then((arr) => {
+      const map: Record<string, string> = {};
+      unique.forEach((k, i) => { map[k] = arr[i]; });
+      setTr(map);
+    }).catch((error) => {
+      console.warn('Services translation failed:', error);
+      setTr(null);
+    });
+  }, [data, loc]);
+
+  // Translation helper with fallback chain - ONLY USE LibreTranslate
+  const TX = (s: string) => {
+    if (loc === "ar" && tr && tr[s]) return tr[s];
+    return s;
   };
-
-  // Fallback token translator for unseen English phrases (zero-deps)
-  function tokenFallback(label?: string) {
-    if (!label || loc !== 'ar') return label || '';
-    const TOKEN: Record<string, string> = {
-      programming: 'البرمجة',
-      documentation: 'التوثيق',
-      'frontend': 'واجهة أمامية',
-      'ui': 'واجهة المستخدم',
-      backend: 'باك-إند',
-      integration: 'تكامل',
-      api: 'واجهات برمجة التطبيقات',
-      security: 'أمن',
-      performance: 'الأداء',
-      testing: 'اختبار',
-      support: 'دعم',
-      web: 'ويب',
-      mobile: 'محمول',
-      database: 'قاعدة بيانات',
-      design: 'تصميم',
-      maintenance: 'صيانة',
-      quality: 'جودة',
-      assurance: 'ضمان',
-      development: 'تطوير',
-    };
-    const clean = label.trim();
-
-    // exact dictionary hit
-    if (DICT[clean]) return DICT[clean].ar || clean;
-
-    // split on separators, keep them
-    return clean.split(/([\/#,&|\-+]+)/).map(seg => {
-      if (/^[\/#,&|\-+]+$/.test(seg)) return seg;
-      const spaced = seg.replace(/([a-z])([A-Z])/g, '$1 $2'); // FrontendUI -> Frontend UI
-      return spaced.split(/\s+/).map(tok => {
-        const low = tok.toLowerCase();
-        if (TOKEN[low]) return TOKEN[low];
-        if (['ui','api'].includes(low)) return TOKEN[low] || tok;
-        return tok; // unknown: keep as-is
-      }).join(' ');
-    }).join(' ');
-  }
-
-  // Main resolver that works for A/B/C
-  function L(value: any, tPrefix?: string) {
-    // C: multilingual object
+  
+  // Raw text extractor - NO dictionary fallback, just extract English text for translation
+  function extractRawText(value: any): string {
+    // C: multilingual object - extract English text
     if (value && typeof value === 'object') {
-      const v = value[loc] ?? value.en ?? '';
-      return v ? v : '';
+      return value.en || value.ar || '';
     }
-    // B: slug/key -> prefer i18n key, fallback tokens
-    if (typeof value === 'string' && /^[a-z0-9._-]+$/.test(value)) {
-      const key = tPrefix ? `${tPrefix}.${value}` : value;
-      const viaT = typeof t === 'function' ? t(key) : undefined;
-      if (viaT && viaT !== key) return viaT;
-      return tokenFallback(value);
-    }
-    // A: raw English label -> dict or token fallback
+    // B & A: strings - return as-is for translation
     if (typeof value === 'string') {
-      // try i18n with a normalized key if provided
-      if (tPrefix) {
-        const norm = value.toLowerCase().replace(/\s+/g, '_');
-        const viaT = typeof t === 'function' ? t(`${tPrefix}.${norm}`) : undefined;
-        if (viaT && viaT !== `${tPrefix}.${norm}`) return viaT;
-      }
-      // DICT or token fallback
-      if (loc === 'ar' && DICT[value]?.ar) return DICT[value].ar;
-      return tokenFallback(value);
+      return value;
     }
     return value ?? '';
   }
 
-  // OPTIONAL: auto-translate missing sides via server endpoint (disabled - no API available)
-  const data = useAutoTranslateMissing(services, lang, { enable: false });
-
   const hasValidServices = data.some(service => {
-    const serviceName = L(service.name || service.title || service.category || service.categoryKey);
+    const serviceName = extractRawText(service.name || service.title || service.category || service.categoryKey);
     return serviceName?.trim() || (service.subServices && service.subServices.length > 0) || (service.items && service.items.length > 0);
   });
 
@@ -164,7 +134,7 @@ export function Services({ services }: ServicesProps) {
     >
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-8 text-center text-white">
-          {typeof t === 'function' ? t('our_services') : (loc === 'ar' ? 'خدماتنا' : 'Our Services')}
+          {loc === 'ar' ? TX('Our Services') : 'Our Services'}
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -173,8 +143,9 @@ export function Services({ services }: ServicesProps) {
             const subServices = service.subServices || [];
             return items.length > 0 || subServices.length > 0; // Only show services with items
           }).map((service, index) => {
-            // Use unified resolver L() for service name - handles A/B/C cases
-            const serviceName = L(service.category ?? service.categoryKey ?? service.name ?? service.title, 'services.categories');
+            // Extract raw service name and translate via TX (LibreTranslate only)
+            const serviceNameRaw = extractRawText(service.category ?? service.categoryKey ?? service.name ?? service.title);
+            const serviceName = loc === 'ar' ? TX(serviceNameRaw) : serviceNameRaw;
 
             const Icon = service.icon;
 
@@ -211,13 +182,14 @@ export function Services({ services }: ServicesProps) {
                 {((service.items && service.items.length > 0) || (service.subServices && service.subServices.length > 0)) && (
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wide">
-                      {L('Includes', 'services.meta') /* label if needed */}
+                      {loc === 'ar' ? TX('Includes') : 'Includes'}
                     </h4>
                     <ul className="mt-3 grid gap-2">
                       {/* Case A/B/C all resolved via L() */}
                       {service.items && service.items.map((item: any, itemIndex: number) => {
-                        // Use unified resolver for item text - handles A/B/C cases
-                        const itemText = L(item.label ?? item.name ?? item.key ?? item.text ?? item, 'services.items');
+                        // Extract raw item text and translate via TX (LibreTranslate only)
+                        const itemTextRaw = extractRawText(item.label ?? item.name ?? item.key ?? item.text ?? item);
+                        const itemText = loc === 'ar' ? TX(itemTextRaw) : itemTextRaw;
                         
                         if (!itemText) return null;
                         
@@ -256,8 +228,9 @@ export function Services({ services }: ServicesProps) {
                       
                       {/* Fallback to legacy subServices structure ONLY when items are absent */}
                       {(!service.items || service.items.length === 0) && service.subServices && service.subServices.map((subService, subIndex) => {
-                        // Use unified resolver for subService name - handles A/B/C cases
-                        const subServiceName = L(subService.name ?? subService.key ?? subService, 'services.items');
+                        // Extract raw subservice name and translate via TX (LibreTranslate only)
+                        const subServiceNameRaw = extractRawText(subService.name ?? subService.key ?? subService);
+                        const subServiceName = loc === 'ar' ? TX(subServiceNameRaw) : subServiceNameRaw;
                         
                         if (!subServiceName) return null;
                         
