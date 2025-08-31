@@ -230,6 +230,22 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
     }
   ];
 
+  // Fix existing Arabic-only services by checking if any service has Arabic name without English
+  useEffect(() => {
+    if (services && services.length > 0) {
+      const hasArabicOnlyServices = services.some(service => 
+        typeof service.name === 'object' && 
+        service.name?.ar && 
+        !service.name?.en
+      );
+      
+      if (hasArabicOnlyServices) {
+        // Force regeneration with properly translated services
+        onUpdate(buildDefaultServices(t));
+      }
+    }
+  }, []); // Run once on mount
+
   // Seed three predefined services on first mount if empty, or re-translate if language changes
   useEffect(() => {
     // If services array is empty, initialize with default services

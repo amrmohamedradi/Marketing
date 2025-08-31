@@ -30,6 +30,8 @@ const defaultSupportItems = [
 ];
 
 // Context Type
+import { normalizeServices } from './normalizeServices.js';
+
 interface AppContextType {
   clientDetails: ClientDetails;
   setClientDetails: (details: ClientDetails) => void;
@@ -42,6 +44,7 @@ interface AppContextType {
   clearAllData: () => void;
   clearClientAndServicesData: () => void; // New function
   clearFormData: () => void;
+  clearArabicOnlyServices: () => void;
   isLoggedIn: boolean;
   setIsLoggedIn: (loggedIn: boolean) => void;
 }
@@ -57,9 +60,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [services, setServices] = useState<Service[]>(() => {
     const saved = localStorage.getItem('services');
     if (saved) {
-      // Convert string icon names back to LucideIcon components
+      // Convert string icon names back to LucideIcon components and normalize services
       const parsedServices = JSON.parse(saved);
-      return parsedServices.map((service: any) => {
+      const normalizedServices = normalizeServices(parsedServices);
+      return normalizedServices.map((service: any) => {
         // If icon is a string, convert it to a LucideIcon component
         if (service.icon && typeof service.icon === 'string') {
           // Use the default Settings icon if the icon name doesn't exist in LucideIcons
@@ -161,6 +165,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('supportItems');
   }, []);
 
+  const clearArabicOnlyServices = useCallback(() => {
+    // Clear localStorage to force re-initialization with proper bilingual services
+    localStorage.removeItem('services');
+    setServices([]);
+  }, []);
+
   const value = {
     clientDetails,
     setClientDetails,
@@ -173,6 +183,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     clearAllData,
     clearClientAndServicesData, // Include new function in context value
     clearFormData,
+    clearArabicOnlyServices,
     isLoggedIn,
     setIsLoggedIn,
   };

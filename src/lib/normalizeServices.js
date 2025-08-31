@@ -1,6 +1,8 @@
+import { translateArabicToEnglish } from './serviceTranslations.js';
+
 /**
- * Normalize service data to ensure bilingual format
- * Converts legacy string titles to { ar: string } format
+ * Normalize service data to ensure bilingual format with intelligent translation
+ * Converts legacy string titles to proper bilingual objects using translation mappings
  * @param {Array} services - Array of service objects
  * @returns {Array} - Normalized services with bilingual titles and items
  */
@@ -10,24 +12,47 @@ export function normalizeServices(services) {
   return services.map(service => {
     const normalizedService = { ...service };
     
+    // Helper function to create bilingual object from string
+    const createBilingualObject = (text) => {
+      if (!text || typeof text !== 'string') return text;
+      
+      // Check if it's Arabic text by testing for Arabic characters
+      const isArabic = /[\u0600-\u06FF]/.test(text);
+      
+      if (isArabic) {
+        // Try to translate Arabic to English
+        const englishTranslation = translateArabicToEnglish(text);
+        return {
+          ar: text,
+          en: englishTranslation !== text ? englishTranslation : '' // Only use translation if it's different from original
+        };
+      } else {
+        // Assume it's English text
+        return {
+          ar: '', // We don't have reverse translation capability
+          en: text
+        };
+      }
+    };
+    
     // Normalize service title
     if (typeof service.title === 'string') {
-      normalizedService.title = { ar: service.title };
+      normalizedService.title = createBilingualObject(service.title);
     }
     
     // Normalize service name (for dashboard compatibility)
     if (typeof service.name === 'string') {
-      normalizedService.name = { ar: service.name };
+      normalizedService.name = createBilingualObject(service.name);
     }
     
     // Normalize service items
     if (Array.isArray(service.items)) {
       normalizedService.items = service.items.map(item => {
         if (typeof item === 'string') {
-          return { text: { ar: item } };
+          return { text: createBilingualObject(item) };
         }
         if (item && typeof item.text === 'string') {
-          return { ...item, text: { ar: item.text } };
+          return { ...item, text: createBilingualObject(item.text) };
         }
         return item;
       });
@@ -38,10 +63,10 @@ export function normalizeServices(services) {
       normalizedService.subServices = service.subServices.map(subService => {
         const normalized = { ...subService };
         if (typeof subService.name === 'string') {
-          normalized.name = { ar: subService.name };
+          normalized.name = createBilingualObject(subService.name);
         }
         if (typeof subService.description === 'string') {
-          normalized.description = { ar: subService.description };
+          normalized.description = createBilingualObject(subService.description);
         }
         return normalized;
       });
