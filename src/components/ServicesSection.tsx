@@ -30,6 +30,8 @@ import { i18nText } from "@/lib/i18nText";
 import * as LucideIcons from "lucide-react"; // Import all Lucide icons
 import { motion } from "framer-motion";
 
+import { useIsMobile, useIsExtraSmall } from "@/hooks/use-mobile";
+
 interface SubService {
   id: string;
   name: string;
@@ -115,33 +117,35 @@ type SubServiceRowProps = {
 
 const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField, onDelete }: SubServiceRowProps) => {
   const { t, currentLanguage } = useI18n();
+  const isMobile = useIsMobile();
+  const isExtraSmall = useIsExtraSmall();
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className="flex items-center justify-between p-3 bg-muted/20 rounded-md border border-border/30"
+      className={`flex items-center justify-between ${isExtraSmall ? 'p-2' : 'p-3'} bg-muted/20 rounded-md border border-border/30`}
     >
       <div className="flex-1">
         {isEditing ? (
-          <div className="space-y-2">
+          <div className={`${isExtraSmall ? 'space-y-1.5' : 'space-y-2'}`}>
             <Input
               value={subService.name}
               onChange={(e) => onUpdateField(subService.id, 'name', e.target.value)}
-              className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm"
+              className={`bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 ${isExtraSmall ? 'text-xs' : 'text-sm'}`}
             />
             <Input
               value={subService.description}
               onChange={(e) => onUpdateField(subService.id, 'description', e.target.value)}
-              className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm"
+              className={`bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 ${isExtraSmall ? 'text-xs' : 'text-sm'}`}
             />
           </div>
         ) : (
           <div>
-            <div className="flex items-center justify-center sm:justify-start space-x-2">
-              <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="font-medium text-sm text-foreground">
+            <div className={`flex items-center justify-center sm:justify-start ${isExtraSmall ? 'space-x-1' : 'space-x-2'}`}>
+              <CheckCircle className={`${isExtraSmall ? 'w-3 h-3' : 'w-4 h-4'} text-emerald-500`} />
+              <span className={`font-medium ${isExtraSmall ? 'text-xs' : 'text-sm'} text-foreground`}>
                 {typeof subService.name === 'object' && subService.name !== null
                   ? (typeof subService.name?.[currentLanguage as 'ar' | 'en'] === 'string' ? subService.name?.[currentLanguage as 'ar' | 'en'] : '') ||
                     (typeof subService.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? subService.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
@@ -149,11 +153,11 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
                   : String(subService.name || '')}
               </span>
               {subService.isCustom && (
-                <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">{t('custom')}</Badge>
+                <Badge variant="outline" className={`${isExtraSmall ? 'text-xs px-1 py-0' : 'text-xs px-2 py-0.5'} bg-primary/10 text-primary border-primary/20`}>{t('custom')}</Badge>
               )}
             </div>
             {subService.description && (
-              <p className="text-xs text-muted-foreground mt-1 ml-6 text-center sm:text-left">
+              <p className={`${isExtraSmall ? 'text-xs mt-0.5 ml-4' : 'text-xs mt-1 ml-6'} text-muted-foreground text-center sm:text-left`}>
                 {typeof subService.description === 'object' && subService.description !== null
                   ? (typeof subService.description?.[currentLanguage as 'ar' | 'en'] === 'string' ? subService.description?.[currentLanguage as 'ar' | 'en'] : '') ||
                     (typeof subService.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? subService.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
@@ -164,18 +168,18 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
           </div>
         )}
       </div>
-      <div className="flex items-center space-x-1">
+      <div className={`flex items-center ${isExtraSmall ? 'space-x-0.5' : 'space-x-1'}`}>
         {isEditing ? (
           <Button size="sm" onClick={() => onToggleEdit(subService.id, false)} className="hover:bg-primary/10 text-primary hover:text-primary transition-colors duration-200">
-            <CheckCircle className="w-3 h-3" />
+            <CheckCircle className={`${isExtraSmall ? 'w-2 h-2' : 'w-3 h-3'}`} />
           </Button>
         ) : (
           <Button size="sm" variant="ghost" onClick={() => onToggleEdit(subService.id, true)} className="hover:bg-muted/50 transition-colors duration-200">
-            <Edit3 className="w-3 h-3" />
+            <Edit3 className={`${isExtraSmall ? 'w-2 h-2' : 'w-3 h-3'}`} />
           </Button>
         )}
         <Button size="sm" variant="ghost" onClick={() => onDelete(subService.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200">
-          <X className="w-3 h-3" />
+          <X className={`${isExtraSmall ? 'w-2 h-2' : 'w-3 h-3'}`} />
         </Button>
       </div>
     </motion.div>
@@ -185,6 +189,8 @@ SubServiceRow.displayName = 'SubServiceRow';
 
 const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
   const { t, currentLanguage, dir } = useI18n();
+  const isMobile = useIsMobile();
+  const isExtraSmall = useIsExtraSmall();
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
   const [editingSubService, setEditingSubService] = useState<string | null>(null);
   const [customSubService, setCustomSubService] = useState({ name: "", description: "" });
@@ -422,24 +428,24 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       dir={dir}
       key={`services-${currentLanguage}`}
     >
-      <Card className="rounded-2xl shadow-lg border border-border bg-card text-card-foreground overflow-hidden p-4">
+      <Card className={`${isExtraSmall ? 'rounded-xl' : 'rounded-2xl'} shadow-lg border border-border bg-card text-card-foreground overflow-hidden ${isExtraSmall ? 'p-2' : isMobile ? 'p-3' : 'p-4'}`}>
         <CardHeader>
-          <CardTitle className="flex items-center justify-center sm:justify-start gap-2 text-primary">
-            <Settings className="w-5 h-5" />
+          <CardTitle className={`flex items-center justify-center sm:justify-start gap-2 text-primary ${isExtraSmall ? 'text-base' : 'text-lg'}`}>
+            <Settings className={`${isExtraSmall ? 'w-4 h-4' : 'w-5 h-5'}`} />
             <span>{t('our_services')}</span>
             <span className="text-red-500">*</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className={`${isExtraSmall ? 'space-y-4' : 'space-y-6'}`}>
           {/* Validation message for services */}
           {services.length === 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-red-600">{t('services_required')}</p>
+            <div className={`bg-red-50 border border-red-200 rounded-lg ${isExtraSmall ? 'p-2' : 'p-3'} mb-4`}>
+              <p className={`${isExtraSmall ? 'text-xs' : 'text-sm'} text-red-600`}>{t('services_required')}</p>
             </div>
           )}
           {/* Create new main service */}
-          <div className="p-3 sm:p-4 rounded-xl border border-border/50 bg-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
-            <div className="flex flex-col gap-2 sm:gap-3">
+          <div className={`${isExtraSmall ? 'p-2 rounded-lg' : 'p-3 sm:p-4 rounded-xl'} border border-border/50 bg-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-md`}>
+            <div className={`flex flex-col ${isExtraSmall ? 'gap-1.5' : 'gap-2 sm:gap-3'}`}>
               <Input
                 placeholder={t('service_name_placeholder')}
                 value={newService.name}
@@ -452,15 +458,15 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                 onChange={(e) => setNewService({ ...newService, description: e.target.value })}
                 className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm sm:text-base"
               />
-              <Button onClick={addService} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95 text-sm sm:text-base py-2 sm:py-3">
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <Button onClick={addService} className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95 ${isExtraSmall ? 'text-sm py-2.5' : 'text-sm sm:text-base py-2 sm:py-3'}`}>
+                <Plus className={`${isExtraSmall ? 'w-3 h-3' : 'w-3 h-3 sm:w-4 sm:h-4'} mr-2`} />
                 {t('add_service')}
               </Button>
             </div>
           </div>
  
           {/* Services - full width stacked panels */}
-          <div className="grid grid-cols-1 gap-4">
+          <div className={`grid grid-cols-1 ${isExtraSmall ? 'gap-3' : 'gap-4'}`}>
             {services.map((service) => {
               // Make sure service.icon is a valid component
               const IconComponent = typeof service.icon === 'function' ? service.icon : Settings;
@@ -475,42 +481,42 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                   transition={{ duration: 0.2, delay: 0.05 }}
                   className="group relative"
                 >
-                  <Card className="rounded-xl border border-border/50 bg-background p-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <Card className={`${isExtraSmall ? 'rounded-lg' : 'rounded-xl'} border border-border/50 bg-background p-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300`}>
                     
-                    <CardHeader className="relative z-10 p-3 sm:p-4 border-b border-border/50 bg-muted/10">
+                    <CardHeader className={`relative z-10 ${isExtraSmall ? 'p-2' : 'p-3 sm:p-4'} border-b border-border/50 bg-muted/10`}>
                       <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 sm:gap-3">
-                        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-start">
-                          <div className="p-2 sm:p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
-                            <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-primary" />
+                        <div className={`flex items-center ${isExtraSmall ? 'gap-1.5' : 'gap-2 sm:gap-3'} w-full sm:w-auto justify-center sm:justify-start`}>
+                          <div className={`${isExtraSmall ? 'p-1.5 rounded-md' : 'p-2 sm:p-3 rounded-lg'} bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200`}>
+                            <IconComponent className={`${isExtraSmall ? 'w-3 h-3' : 'w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6'} text-primary`} />
                           </div>
                           <div className="flex flex-col items-center sm:items-start">
-                            <h3 className="font-semibold text-sm sm:text-base lg:text-lg group-hover:text-primary transition-colors duration-200 text-foreground text-center sm:text-left">
+                            <h3 className={`font-semibold ${isExtraSmall ? 'text-xs' : 'text-sm sm:text-base lg:text-lg'} group-hover:text-primary transition-colors duration-200 text-foreground text-center sm:text-left`}>
                               {typeof service.name === 'object' && service.name !== null
                                 ? (typeof service.name?.[currentLanguage as 'ar' | 'en'] === 'string' ? service.name?.[currentLanguage as 'ar' | 'en'] : '') ||
                                   (typeof service.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? service.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
                                   ''
                                 : String(service.name || '')}
                             </h3>
-                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-2 py-0.5">
+                            <Badge variant="secondary" className={`mt-1 bg-accent/10 text-accent border-accent/20 ${isExtraSmall ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-0.5'}`}>
                               {service.subServices.length} {t('items')}
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className="hover:bg-muted/50 transition-colors duration-200 p-1 sm:p-2">
-                            {isExpanded ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" /> : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />}
+                        <div className={`flex items-center ${isExtraSmall ? 'gap-0.5' : 'gap-1'}`}>
+                          <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className={`hover:bg-muted/50 transition-colors duration-200 ${isExtraSmall ? 'p-1' : 'p-1 sm:p-2'}`}>
+                            {isExpanded ? <ChevronUp className={`${isExtraSmall ? 'w-3 h-3' : 'w-3 h-3 sm:w-4 sm:h-4'}`} /> : <ChevronDown className={`${isExtraSmall ? 'w-3 h-3' : 'w-3 h-3 sm:w-4 sm:h-4'}`} />}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => deleteService(service.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200 p-1 sm:p-2"
+                            className={`text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200 ${isExtraSmall ? 'p-1' : 'p-1 sm:p-2'}`}
                           >
-                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Trash2 className={`${isExtraSmall ? 'w-3 h-3' : 'w-3 h-3 sm:w-4 sm:h-4'}`} />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center sm:text-left leading-relaxed">
+                      <p className={`${isExtraSmall ? 'text-xs mt-1.5' : 'text-xs sm:text-sm mt-2'} text-muted-foreground text-center sm:text-left leading-relaxed`}>
                         {typeof service.description === 'object' && service.description !== null
                           ? (typeof service.description?.[currentLanguage as 'ar' | 'en'] === 'string' ? service.description?.[currentLanguage as 'ar' | 'en'] : '') ||
                             (typeof service.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? service.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
@@ -526,7 +532,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <CardContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4">
+                      <CardContent className={`${isExtraSmall ? 'pt-2 space-y-2' : 'pt-3 sm:pt-4 space-y-3 sm:space-y-4'}`}>
                         {/* Current Sub-services (render only when expanded) */}
                         {isExpanded && service.subServices.length > 0 && (
                           <div className="space-y-2">
