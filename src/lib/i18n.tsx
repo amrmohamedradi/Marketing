@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
+import { setupTranslationValidation } from '@/utils/translationValidator';
 
 interface I18nContextType {
   t: (key: string) => string;
@@ -7,6 +8,7 @@ interface I18nContextType {
   dir: string;
   formatDate: (date: Date) => string;
   formatNumber: (num: number) => string;
+  formatCurrency: (amount: number, currency: string) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -58,6 +60,23 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   signing_in: { ar: 'جاري تسجيل الدخول...', en: 'Signing In...' },
   demo_notice: { ar: 'هذا تطبيق تجريبي. استخدم أي بريد إلكتروني وكلمة مرور للمتابعة.', en: 'This is a demo app. Use any email and password to proceed.' },
   demo_credentials: { ar: 'بيانات اعتماد العرض التوضيحي', en: 'Demo Credentials' },
+  
+  // Additional missing translations
+  exit: { ar: 'خروج', en: 'Exit' },
+  select_currency: { ar: 'اختر العملة', en: 'Select currency' },
+  api_test_component: { ar: 'مكون اختبار API', en: 'API Test Component' },
+  service_spec: { ar: 'مواصفات الخدمة', en: 'Service Spec' },
+  payment_service: { ar: 'خدمة الدفع', en: 'Payment Service' },
+  basic_plan: { ar: 'الخطة الأساسية', en: 'Basic Plan' },
+  premium_plan: { ar: 'الخطة المتميزة', en: 'Premium Plan' },
+  starter_plan: { ar: 'خطة البداية', en: 'Starter Plan' },
+  business_plan: { ar: 'خطة الأعمال', en: 'Business Plan' },
+  advanced_features: { ar: 'ميزات متقدمة', en: 'Advanced features' },
+  standard_features: { ar: 'ميزات قياسية', en: 'Standard features' },
+  client_service_package: { ar: 'حزمة خدمات العميل', en: 'Client Service Package' },
+  raw_api_response: { ar: 'استجابة API الخام', en: 'Raw API Response' },
+  language_selection: { ar: 'اختيار اللغة', en: 'Language selection' },
+  phone_label: { ar: 'الهاتف', en: 'Phone' },
   
   // Client Details
   client_details: { ar: 'تفاصيل العميل', en: 'Client Details' },
@@ -161,7 +180,6 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   pricing: { ar: 'التسعير', en: 'Pricing' },
   base_price: { ar: 'السعر الأساسي', en: 'Base Price' },
   currency: { ar: 'العملة', en: 'Currency' },
-  select_currency: { ar: 'اختر العملة', en: 'Select Currency' },
   additional_items: { ar: 'العناصر الإضافية', en: 'Additional Items' },
   item_description: { ar: 'الوصف', en: 'Description' },
   item_description_placeholder: { ar: 'مثال: مراجعات إضافية، دعم متميز', en: 'e.g., Extra revisions, premium support' },
@@ -245,10 +263,39 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   performance_monitoring_description: { ar: 'تتبع مستمر لأداء النظام والتحسينات', en: 'Continuous system performance tracking and optimization' },
   security_updates_title: { ar: 'تحديثات الأمان', en: 'Security Updates' },
   security_updates_description: { ar: 'تحديثات أمنية منتظمة وتقييم نقاط الضعف', en: 'Regular security patches and vulnerability assessments' },
+  
+  // Additional UI elements and form actions
+  save: { ar: 'حفظ', en: 'Save' },
+  back: { ar: 'رجوع', en: 'Back' },
+  next: { ar: 'التالي', en: 'Next' },
+  continue: { ar: 'متابعة', en: 'Continue' },
+  close: { ar: 'إغلاق', en: 'Close' },
+  open: { ar: 'فتح', en: 'Open' },
+  show: { ar: 'عرض', en: 'Show' },
+  hide: { ar: 'إخفاء', en: 'Hide' },
+  loading: { ar: 'جاري التحميل...', en: 'Loading...' },
+  error: { ar: 'خطأ', en: 'Error' },
+  success: { ar: 'نجح', en: 'Success' },
+  warning: { ar: 'تحذير', en: 'Warning' },
+  info: { ar: 'معلومات', en: 'Info' },
+  submit: { ar: 'إرسال', en: 'Submit' },
+  reset: { ar: 'إعادة تعيين', en: 'Reset' },
+  clear: { ar: 'مسح', en: 'Clear' },
+  search: { ar: 'بحث', en: 'Search' },
+  filter: { ar: 'تصفية', en: 'Filter' },
+  sort: { ar: 'ترتيب', en: 'Sort' },
+
+  // Missing translation key for ServicesSection
+  pending_custom_items: { ar: 'العناصر المخصصة المعلقة', en: 'Pending Custom Items' },
 };
 
 // Language resolution helper
 function getInitialLanguage(): string {
+  // SSR-safe initialization - avoid localStorage during SSR
+  if (typeof window === 'undefined') {
+    return 'ar'; // Default for SSR
+  }
+
   // 1. Check URL query param
   const urlParams = new URLSearchParams(window.location.search);
   const langParam = urlParams.get('lang');
@@ -256,17 +303,42 @@ function getInitialLanguage(): string {
     return langParam;
   }
 
-  // 2. Check cookie
-  const cookies = document.cookie.split(';');
-  const langCookie = cookies.find(cookie => cookie.trim().startsWith('lang='));
-  if (langCookie) {
-    const cookieValue = langCookie.split('=')[1]?.trim();
-    if (cookieValue === 'ar' || cookieValue === 'en') {
-      return cookieValue;
+  // 2. Check localStorage
+  try {
+    const storedLang = localStorage.getItem('preferred-language');
+    if (storedLang === 'ar' || storedLang === 'en') {
+      return storedLang;
     }
+  } catch (e) {
+    // Handle localStorage access errors gracefully
+    console.warn('Unable to access localStorage for language preference:', e);
   }
 
-  // 3. Default to Arabic
+  // 3. Check cookie
+  try {
+    const cookies = document.cookie.split(';');
+    const langCookie = cookies.find(cookie => cookie.trim().startsWith('lang='));
+    if (langCookie) {
+      const cookieValue = langCookie.split('=')[1]?.trim();
+      if (cookieValue === 'ar' || cookieValue === 'en') {
+        return cookieValue;
+      }
+    }
+  } catch (e) {
+    console.warn('Unable to read cookies for language preference:', e);
+  }
+
+  // 4. Check browser language preference
+  try {
+    const browserLang = navigator.language.toLowerCase();
+    if (browserLang.startsWith('ar')) {
+      return 'ar';
+    }
+  } catch (e) {
+    console.warn('Unable to detect browser language:', e);
+  }
+
+  // 5. Default to Arabic
   return 'ar';
 }
 
@@ -280,33 +352,106 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   React.useEffect(() => {
     document.documentElement.setAttribute("dir", currentLanguage === 'ar' ? 'rtl' : 'ltr');
     document.documentElement.setAttribute("lang", currentLanguage);
+    
+    // Setup translation validation in development
+    if (process.env.NODE_ENV === 'development') {
+      setupTranslationValidation(translations);
+    }
   }, [currentLanguage]);
 
   const t = (key: string): string => {
     const translation = translations[key];
-    return translation ? translation[currentLanguage] || key : key;
+    if (!translation) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`🌐 Missing translation key: "${key}"`);
+      }
+      return key;
+    }
+    
+    const result = translation[currentLanguage];
+    if (!result) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`🌐 Missing ${currentLanguage} translation for key: "${key}"`);
+      }
+      // Fallback to the other language
+      const fallback = currentLanguage === 'ar' ? translation.en : translation.ar;
+      return fallback || key;
+    }
+    
+    return result;
   };
 
   const changeLanguage = (lang: string) => {
     setCurrentLanguage(lang);
+    
+    // Persist language choice to multiple sources for reliability
+    try {
+      localStorage.setItem('preferred-language', lang);
+    } catch (e) {
+      console.warn('Unable to save language preference to localStorage:', e);
+    }
+    
+    // Update URL query parameter for immediate language switching
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.history.replaceState({}, '', url.toString());
+    } catch (e) {
+      console.warn('Unable to update URL language parameter:', e);
+    }
+    
+    // Set cookie for server-side rendering
+    try {
+      document.cookie = `lang=${lang}; path=/; max-age=31536000`; // 1 year
+    } catch (e) {
+      console.warn('Unable to set language cookie:', e);
+    }
   };
 
   const dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
 
   const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
+    try {
+      return new Intl.DateTimeFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    } catch (e) {
+      console.warn('Date formatting failed:', e);
+      return date.toLocaleDateString();
+    }
   };
 
   const formatNumber = (num: number): string => {
-    return new Intl.NumberFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US').format(num);
+    try {
+      return new Intl.NumberFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }).format(num);
+    } catch (e) {
+      console.warn('Number formatting failed:', e);
+      return num.toString();
+    }
+  };
+
+  // Helper function for currency formatting
+  const formatCurrency = (amount: number, currency: string): string => {
+    try {
+      return new Intl.NumberFormat(currentLanguage === 'ar' ? 'ar-SA' : 'en-US', {
+        style: 'currency',
+        currency: currency || 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount);
+    } catch (e) {
+      console.warn('Currency formatting failed:', e);
+      return `${amount} ${currency || 'USD'}`;
+    }
   };
 
   return (
-    <I18nContext.Provider value={{ t, changeLanguage, currentLanguage, dir, formatDate, formatNumber }}>
+    <I18nContext.Provider value={{ t, changeLanguage, currentLanguage, dir, formatDate, formatNumber, formatCurrency }}>
       {children}
     </I18nContext.Provider>
   );

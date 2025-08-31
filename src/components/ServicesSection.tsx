@@ -184,7 +184,7 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
 SubServiceRow.displayName = 'SubServiceRow';
 
 const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
-  const { t, currentLanguage } = useI18n();
+  const { t, currentLanguage, dir } = useI18n();
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
   const [editingSubService, setEditingSubService] = useState<string | null>(null);
   const [customSubService, setCustomSubService] = useState({ name: "", description: "" });
@@ -403,13 +403,15 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="space-y-8"
+      dir={dir}
+      key={`services-${currentLanguage}`}
     >
       <Card className="rounded-2xl shadow-lg border border-border bg-card text-card-foreground overflow-hidden p-4">
         <CardHeader>
-          <CardTitle className="flex items-center justify-center sm:justify-start space-x-2 text-primary">
+          <CardTitle className="flex items-center justify-center sm:justify-start gap-2 text-primary">
             <Settings className="w-5 h-5" />
             <span>{t('our_services')}</span>
-            <span className="text-red-500 ml-1">*</span>
+            <span className="text-red-500">*</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -461,7 +463,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                     
                     <CardHeader className="relative z-10 p-3 sm:p-4 border-b border-border/50 bg-muted/10">
                       <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 sm:gap-3">
-                        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-center sm:justify-start">
+                        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-start">
                           <div className="p-2 sm:p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
                             <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-primary" />
                           </div>
@@ -478,7 +480,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center gap-1">
                           <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className="hover:bg-muted/50 transition-colors duration-200 p-1 sm:p-2">
                             {isExpanded ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" /> : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />}
                           </Button>
@@ -531,7 +533,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         {/* Suggested Items */}
                         {isExpanded && service.suggestedItems && service.suggestedItems.length > 0 && (
                           <div className="space-y-3">
-                            <h4 className="font-medium text-xs sm:text-sm text-muted-foreground uppercase tracking-wide flex items-center space-x-2">
+                            <h4 className="font-medium text-xs sm:text-sm text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                               <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
                               <span>{t('suggested_items')}</span>
                             </h4>
@@ -547,7 +549,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1 space-y-1">
-                                      <div className="flex items-center space-x-2">
+                                      <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-accent group-hover:scale-125 transition-transform duration-200"></div>
                                         <span className="font-medium text-xs sm:text-sm text-foreground group-hover:text-accent transition-colors duration-200 line-clamp-2">
                                           {item.name}
@@ -654,7 +656,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
       {/* Support & Benefits Section */}
       <Card className="rounded-2xl shadow-lg border border-border bg-card text-card-foreground p-4">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-primary">
+          <CardTitle className="flex items-center gap-2 text-primary">
             <Heart className="w-5 h-5" />
             <span>{t('support_benefits')}</span>
           </CardTitle>
@@ -675,7 +677,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                   transition={{ duration: 0.2, delay: index * 0.05 }}
                   className="group p-4 sm:p-6 rounded-xl bg-gradient-to-br from-background/50 to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-150 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
                 >
-                  <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
+                  <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
                     <div className="p-2 sm:p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-150">
                       <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform duration-150" />
                     </div>

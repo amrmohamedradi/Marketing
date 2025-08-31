@@ -38,7 +38,7 @@ interface PriceSectionProps {
 
 const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
   const [newItem, setNewItem] = useState({ description: "", amount: 0 });
-  const { t, currentLanguage } = useI18n();
+  const { t, currentLanguage, formatNumber, formatCurrency } = useI18n();
 
   const currencies = [
     { value: "USD", label: t('usd_label'), symbol: "$" },
@@ -97,10 +97,19 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
   };
 
   const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    // Use the proper formatNumber function from i18n context with locale-aware formatting
+    return formatNumber(amount);
+  };
+
+  const formatPriceWithCurrency = (amount: number, currency: string) => {
+    // Use formatCurrency for proper currency formatting with locale
+    try {
+      return formatCurrency(amount, currency);
+    } catch (e) {
+      // Fallback to manual formatting if Intl.NumberFormat fails
+      const symbol = selectedCurrency?.symbol || '$';
+      return `${symbol}${formatPrice(amount)}`;
+    }
   };
 
   return (
@@ -145,7 +154,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
               <Label htmlFor="currency" className="text-foreground flex items-center justify-center sm:justify-start text-sm">{t('currency')}</Label>
               <Select value={priceData.currency} onValueChange={updateCurrency}>
                 <SelectTrigger className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm sm:text-base py-2 sm:py-3">
-                  <SelectValue placeholder="Select currency" />
+                  <SelectValue placeholder={t('select_currency')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card text-card-foreground border-border">
                   {currencies.map((currency) => (
@@ -217,7 +226,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
                   </div>
                   <div className="flex items-center justify-center sm:justify-end space-x-2 sm:space-x-3 w-full sm:w-auto">
                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-2 sm:px-3 py-1 text-xs sm:text-sm">
-                      {selectedCurrency.symbol}{formatPrice(item.amount)}
+                      {formatPriceWithCurrency(item.amount, priceData.currency)}
                     </Badge>
                     <Button
                       size="sm"
@@ -248,7 +257,7 @@ const PriceSection = ({ priceData, onUpdate }: PriceSectionProps) => {
             </div>
             <div className="text-center sm:text-right">
               <div className="text-xl sm:text-2xl font-bold text-primary">
-                {selectedCurrency.symbol}{formatPrice(getTotalPrice())}
+                {formatPriceWithCurrency(getTotalPrice(), priceData.currency)}
               </div>
               <div className="text-xs sm:text-sm text-muted-foreground">
                 {priceData.currency}

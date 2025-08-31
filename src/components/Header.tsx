@@ -39,7 +39,7 @@ const Header = () => {
           >
             <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             <span className="hidden xs:inline">{t('logout')}</span>
-            <span className="xs:hidden">Exit</span>
+            <span className="xs:hidden">{t('exit')}</span>
           </Button>
         </div>
       </nav>

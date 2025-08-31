@@ -1,10 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
-import { i18nText } from '@/lib/i18nText';
 import { useI18n } from '@/lib/i18n';
 
-export default function SupportPreview({ data, lang }) {
+export default function SupportPreview({ data, lang, readOnly = true }) {
   const { t } = useI18n();
   const items = data?.support?.items || [];
   if (!items.length) return null;
@@ -43,18 +42,37 @@ export default function SupportPreview({ data, lang }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {items.map((item, index) => {
-                // ✅ Safe string conversion to prevent React error #130
-                const title = typeof item?.title === 'object' && item?.title !== null
-                  ? (typeof item.title[lang] === 'string' ? item.title[lang] : '') ||
-                    (typeof item.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                    ''
-                  : String(item?.title || '');
+                // ✅ Handle both translation key references and direct text
+                let title = '';
+                let description = '';
                 
-                const description = typeof item?.description === 'object' && item?.description !== null
-                  ? (typeof item.description[lang] === 'string' ? item.description[lang] : '') ||
+                if (typeof item?.title === 'string') {
+                  // If it's a translation key, use t() function
+                  if (item.title.endsWith('_title')) {
+                    title = t(item.title);
+                  } else {
+                    title = item.title;
+                  }
+                } else if (typeof item?.title === 'object' && item?.title !== null) {
+                  // Handle multilingual object structure
+                  title = (typeof item.title[lang] === 'string' ? item.title[lang] : '') ||
+                    (typeof item.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                    '';
+                }
+                
+                if (typeof item?.description === 'string') {
+                  // If it's a translation key, use t() function
+                  if (item.description.endsWith('_description')) {
+                    description = t(item.description);
+                  } else {
+                    description = item.description;
+                  }
+                } else if (typeof item?.description === 'object' && item?.description !== null) {
+                  // Handle multilingual object structure
+                  description = (typeof item.description[lang] === 'string' ? item.description[lang] : '') ||
                     (typeof item.description[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.description[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                    ''
-                  : String(item?.description || '');
+                    '';
+                }
                 
                 if (!title && !description) return null;
                 
@@ -76,8 +94,7 @@ export default function SupportPreview({ data, lang }) {
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-base text-white mb-2 group-hover/item:text-pink-400 transition-colors duration-300">
-                            {/* ✅ Guard against rendering objects */}
-                            {typeof title === 'string' ? title : t(typeof item?.title === 'string' ? item.title : 'support_item')}
+                            {title}
                           </h3>
                           {description && (
                             <p className="text-sm text-gray-300 leading-relaxed">

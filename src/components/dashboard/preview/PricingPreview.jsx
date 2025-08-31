@@ -6,7 +6,7 @@ import { i18nText } from '@/lib/i18nText';
 import { useI18n } from '@/lib/i18n';
 
 export default function PricingPreview({ data, lang }) {
-  const { t } = useI18n();
+  const { t, formatCurrency, formatNumber } = useI18n();
   const priceData = data?.pricing || data?.priceData;
   if (!priceData || priceData.basePrice === 0) return null;
 
@@ -28,10 +28,12 @@ export default function PricingPreview({ data, lang }) {
   };
 
   const formatPrice = (amount) => {
-    return new Intl.NumberFormat(lang === 'ar' ? 'ar-EG' : 'en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+    try {
+      return formatCurrency(amount, priceData.currency);
+    } catch (e) {
+      // Fallback to manual formatting
+      return `${selectedCurrency.symbol}${formatNumber(amount)}`;
+    }
   };
 
   return (
@@ -86,7 +88,7 @@ export default function PricingPreview({ data, lang }) {
                         {t('base_price')}
                       </h3>
                       <p className="text-2xl font-bold text-green-400">
-                        {selectedCurrency.symbol}{formatPrice(priceData.basePrice)}
+                        {formatPrice(priceData.basePrice)}
                       </p>
                     </div>
                   </div>
@@ -113,7 +115,7 @@ export default function PricingPreview({ data, lang }) {
                         {t('total_price')}
                       </h3>
                       <p className="text-3xl font-bold text-purple-400">
-                        {selectedCurrency.symbol}{formatPrice(getTotalPrice())}
+                        {formatPrice(getTotalPrice())}
                       </p>
                     </div>
                   </div>
@@ -160,7 +162,7 @@ export default function PricingPreview({ data, lang }) {
                                 {itemDesc}
                               </h3>
                               <p className="text-xl font-bold text-amber-400">
-                                {selectedCurrency.symbol}{formatPrice(item.amount || 0)}
+                                {formatPrice(item.amount || 0)}
                               </p>
                             </div>
                           </div>
