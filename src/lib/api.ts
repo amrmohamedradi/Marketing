@@ -59,7 +59,7 @@ export async function saveSpec(slug: string, specData: Record<string, unknown>):
       extraHeaders['X-Preserve-Support'] = '1';
     }
     
-    const response = await api.post(`/api/specs/${slug}`, payload, {
+    const response = await api.post(`/specs/${slug}`, payload, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
@@ -83,7 +83,7 @@ export async function saveSpec(slug: string, specData: Record<string, unknown>):
 
 export async function getSpec(slug: string): Promise<unknown> {
   try {
-    const response = await api.get(`/api/specs/${slug}`, {
+    const response = await api.get(`/specs/${slug}`, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
