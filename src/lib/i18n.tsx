@@ -173,20 +173,10 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   price_notes_placeholder: { ar: 'شروط الدفع والشروط أو معلومات تسعير إضافية...', en: 'Payment terms & conditions or additional pricing information...' },
   
   // Preview Modal
-  service_specification: { ar: 'مواصفات الخدمة', en: 'Service Specification' },
   share: { ar: 'مشاركة', en: 'Share' },
   export: { ar: 'تصدير', en: 'Export' },
   save_spec: { ar: 'حفظ', en: 'Save' },
-  saving: { ar: 'جاري الحفظ...', en: 'Saving...' },
-  save_specification: { ar: 'حفظ المواصفات', en: 'Save Specification' },
   view_saved: { ar: 'عرض المحفوظ', en: 'View Saved' },
-  view_public: { ar: 'عرض عام', en: 'View Public' },
-  save_success: { ar: 'تم الحفظ بنجاح', en: 'Saved Successfully' },
-  save_error: { ar: 'خطأ في الحفظ', en: 'Save Error' },
-  spec_saved_successfully: { ar: 'تم حفظ المواصفات بنجاح', en: 'Specification saved successfully' },
-  error_saving_spec: { ar: 'حدث خطأ أثناء حفظ المواصفات', en: 'An error occurred while saving the specification' },
-  loading_or_redirecting: { ar: 'جاري التحميل أو إعادة التوجيه...', en: 'Loading or redirecting...' },
-  comprehensive_overview: { ar: 'نظرة شاملة على خدماتنا المهنية المصممة خصيصاً لاحتياجاتك', en: 'A comprehensive overview of our professional services tailored to your needs' },
   service_proposal: { ar: 'عرض الخدمة', en: 'Service Proposal' },
   prepared_for: { ar: 'أُعد لـ', en: 'Prepared for' },
   your_client: { ar: 'عميلك', en: 'Your Client' },
@@ -335,3 +325,18 @@ export function useI18n(): I18nContextType {
 
 // Alias for compatibility
 export const useLang = useI18n;
+
+// Bilingual text utilities for handling objects with ar/en properties
+export type BiText = string | { ar?: string; en?: string } | null | undefined;
+
+export function getText(v: BiText, lang: "ar" | "en" = "ar"): string {
+  if (v == null) return "";
+  if (typeof v === "string") return v;
+  return lang === "ar" ? (v.ar ?? v.en ?? "") : (v.en ?? v.ar ?? "");
+}
+
+export function setText(current: BiText, value: string, lang: "ar" | "en" = "ar") {
+  const base: { ar?: string; en?: string } = (typeof current === "object" && current) ? { ...current } : {};
+  base[lang] = value;
+  return base;
+}

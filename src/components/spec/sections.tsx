@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { CheckCircle, Clock, Users, Code, Phone, Mail, Globe, MessageCircle } from 'lucide-react';
-import { t } from '../../lib/utils/localization';
+import { getText } from '../../lib/i18n';
 import { ClientDetails, Service, PriceData } from '@/types';
 import { deepCompact } from '@/lib/utils/deepCompact';
 
@@ -65,14 +65,14 @@ export const sectionRegistry: SectionConfig[] = [
     render: (spec) => (
       <div className="text-center mb-8">
         {spec.client?.company && (
-          <div className="text-sm text-muted-foreground mb-2">{t(spec.client.company)}</div>
+          <div className="text-sm text-muted-foreground mb-2">{getText(spec.client.company, "ar")}</div>
         )}
         {spec.client?.name && (
-          <h1 className="text-3xl font-bold mb-4">{t(spec.client.name)}</h1>
+          <h1 className="text-3xl font-bold mb-4">{getText(spec.client.name, "ar")}</h1>
         )}
         {spec.client?.description && (
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {t(spec.client.description)}
+            {getText(spec.client.description, "ar")}
           </p>
         )}
       </div>
@@ -103,18 +103,18 @@ export const sectionRegistry: SectionConfig[] = [
             <div key={service.id || index} className="border rounded-lg p-4">
               <div className="flex items-center gap-3 mb-2">
                 {service.icon && <service.icon className="h-5 w-5 text-primary" />}
-                <h3 className="font-medium">{t(service.name)}</h3>
+                <h3 className="font-medium">{getText(service.name, "ar")}</h3>
               </div>
               {service.description && (
-                <p className="text-sm text-muted-foreground mb-3">{t(service.description)}</p>
+                <p className="text-sm text-muted-foreground mb-3">{getText(service.description, "ar")}</p>
               )}
               {service.subServices && service.subServices.length > 0 && (
                 <ul className="space-y-1">
                   {service.subServices.map((sub, subIndex) => (
                     <li key={sub.id || subIndex} className="text-sm">
-                      <span className="font-medium">{t(sub.name)}</span>
+                      <span className="font-medium">{getText(sub.name, "ar")}</span>
                       {sub.description && (
-                        <span className="text-muted-foreground"> - {t(sub.description)}</span>
+                        <span className="text-muted-foreground"> - {getText(sub.description, "ar")}</span>
                       )}
                     </li>
                   ))}
