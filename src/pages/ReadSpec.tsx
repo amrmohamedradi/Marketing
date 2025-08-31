@@ -14,7 +14,7 @@ import '@/styles/space.css';
 import '@/styles/readonly-page.css';
 
 interface SpecData {
-  client?: {
+  clientDetails?: {
     name?: string;
     company?: string;
     email?: string;
@@ -76,8 +76,14 @@ const ReadSpec: React.FC = () => {
         }
 
         const data = await response.json();
+        console.log('Raw API response:', data);
+        // Extract the actual spec data from the API response
+        const specData = data.spec || data;
+        console.log('Extracted spec data:', specData);
         // Apply deepCompact to sanitize the data
-        const cleanedData = deepCompact(data) as SpecData;
+        const cleanedData = deepCompact(specData) as SpecData;
+        console.log('Cleaned data:', cleanedData);
+        console.log('Client details:', cleanedData.clientDetails);
         setSpec(cleanedData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load specification');
@@ -112,7 +118,7 @@ const ReadSpec: React.FC = () => {
           ) : spec ? (
             <div className="space-y-12">
               <Reveal>
-                <AboutClient client={spec.client || {}} isStandalone={isOnlyRoute} />
+                <AboutClient client={spec.clientDetails || {}} isStandalone={isOnlyRoute} />
               </Reveal>
               
               {!isOnlyRoute && (
@@ -135,7 +141,7 @@ const ReadSpec: React.FC = () => {
                 </>
               )}
               
-              {isOnlyRoute && spec.client && (
+              {isOnlyRoute && spec.clientDetails && (
                 <div className="text-center py-8">
                   <div className="max-w-2xl mx-auto">
                     <h3 className="text-xl font-semibold text-white mb-4">Client Information Summary</h3>

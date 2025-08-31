@@ -123,7 +123,7 @@ const PreviewPage = () => {
       
       // Map the frontend data to the new spec format
       const specData: Record<string, unknown> = {
-        client: clientDetails,
+        clientDetails: clientDetails,
         services: services,
         pricing: priceData,
         summary: clientDetails.description,
@@ -285,7 +285,7 @@ const PreviewPage = () => {
           transition={{ delay: 0.4, duration: 0.4 }}
           className="space-y-8"
         >
-          <AboutClientPreview data={{ client: clientDetails }} lang={lang} />
+          <AboutClientPreview data={{ clientDetails: clientDetails }} lang={lang} />
           <ServicesPreview data={{ services }} lang={lang} />
           <SupportPreview data={{ support: { items: supportItems } }} lang={lang} />
           <PricingPreview data={{ pricing: priceData }} lang={lang} />

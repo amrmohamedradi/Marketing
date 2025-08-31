@@ -37,10 +37,17 @@ const fieldIcons: Record<string, React.ComponentType<{ className?: string }>> = 
 export function AboutClient({ client, isStandalone = false }: AboutClientProps) {
   const { t, currentLanguage } = useI18n();
   
+  console.log('AboutClient received client data:', client);
+  
   // Apply deepCompact to sanitize data
   const sanitizedClient = deepCompact(client) as ClientData;
   
-  if (!sanitizedClient || Object.keys(sanitizedClient).length === 0) return null;
+  console.log('AboutClient sanitized client data:', sanitizedClient);
+  
+  if (!sanitizedClient || Object.keys(sanitizedClient).length === 0) {
+    console.log('AboutClient: No client data to display');
+    return null;
+  }
 
   const renderValue = (key: string, value: string) => {
     switch (key) {
