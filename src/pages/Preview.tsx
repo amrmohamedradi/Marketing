@@ -6,7 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
 import {
-  Save, ExternalLink, Sparkles, Star, ArrowLeft
+  Save, Sparkles, Star, ArrowLeft
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/AppContext";
@@ -75,7 +75,6 @@ const PreviewPage = () => {
   const { toast } = useToast();
   const { clientDetails, services, priceData, supportItems, clearFormData } = useAppContext();
   const [isSaving, setIsSaving] = useState(false);
-  const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 300], [0, -50]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.8]);
@@ -151,19 +150,9 @@ const PreviewPage = () => {
         // Navigate to your UI page, NOT the backend JSON:
         navigate(`/read/${response.id || slug}`);
         
-        // Also provide the "only" route URL for just client information
-        const onlyUrl = `${window.location.origin}/only/${response.id || slug}`;
-        
         toast({
           title: t('save_success'),
-          description: (
-            <div className="space-y-2">
-              <p>{t('spec_saved_successfully')}</p>
-              <div className="text-sm">
-                <p>Client-only view: <a href={onlyUrl} target="_blank" className="text-blue-400 underline">{onlyUrl}</a></p>
-              </div>
-            </div>
-          ),
+          description: t('spec_saved_successfully'),
           variant: 'default',
         });
         
@@ -252,7 +241,7 @@ const PreviewPage = () => {
             {t('comprehensive_overview')}
           </p>
 
-          <div className="flex flex-wrap justify-center gap-6 mt-10">
+          <div className="flex justify-center mt-10">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
                 onClick={handleSave} 
@@ -261,18 +250,6 @@ const PreviewPage = () => {
               >
                 <Save className="w-5 h-5 mr-3" />
                 {isSaving ? t('saving') : t('save_specification')}
-              </Button>
-            </motion.div>
-            
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                onClick={() => window.open(savedUrl, '_blank')}
-                disabled={!savedUrl}
-                variant="outline"
-                className="px-8 py-4 text-lg font-semibold rounded-2xl border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all duration-200 disabled:opacity-50 hover:-translate-y-1"
-              >
-                <ExternalLink className="w-5 h-5 mr-3" />
-                {t('view_public')}
               </Button>
             </motion.div>
           </div>

@@ -8,19 +8,33 @@ import { useAutoTranslateMissing } from '@/hooks/useAutoTranslateMissing';
 import { CheckCircle, LucideIcon } from 'lucide-react';
 
 interface SubService {
-  id: string;
-  name: string | { ar?: string; en?: string };
+  id?: string;
+  name?: string | { ar?: string; en?: string };
+  key?: string;  // Case B: slug/key format
   description?: string | { ar?: string; en?: string };
 }
 
+interface ServiceItem {
+  id?: string;
+  text?: string | { ar?: string; en?: string };
+  name?: string | { ar?: string; en?: string };
+  label?: string | { ar?: string; en?: string };
+  key?: string;  // Case B: slug/key format
+}
+
 interface Service {
-  id: string;
+  id?: string;
+  // Case A: raw English strings
   name?: string | { ar?: string; en?: string };
   title?: string | { ar?: string; en?: string };
   description?: string | { ar?: string; en?: string };
+  // Case A: category as raw English string
+  category?: string | { ar?: string; en?: string };
+  // Case B: categoryKey as slug/key
+  categoryKey?: string;
   icon?: LucideIcon;
   subServices?: SubService[];
-  items?: Array<{ id: string; text: string | { ar?: string; en?: string } }>;
+  items?: ServiceItem[];
 }
 
 interface ServicesProps {
@@ -33,12 +47,104 @@ export function Services({ services }: ServicesProps) {
   
   // Canonicalize language from the same source as UI labels
   const lang = canonLang(currentLanguage);
+  const loc = lang?.startsWith('ar') ? 'ar' : 'en';
+
+  // Optional tiny dictionary for common labels (extend only if needed)
+  const DICT: Record<string, { ar: string; en?: string }> = {
+    Programming: { ar: 'البرمجة' },
+    Documentation: { ar: 'التوثيق' },
+    'Frontend UI': { ar: 'واجهة المستخدم' },
+    Includes: { ar: 'ما يشمله' },
+    'Web Development': { ar: 'تطوير الويب' },
+    'Mobile Development': { ar: 'تطوير التطبيقات' },
+    'Backend Development': { ar: 'تطوير الخادم' },
+    'API Integration': { ar: 'تكامل واجهات برمجة التطبيقات' },
+    'Database Design': { ar: 'تصميم قواعد البيانات' },
+    'UI/UX Design': { ar: 'تصميم واجهة المستخدم' },
+    'Quality Assurance': { ar: 'ضمان الجودة' },
+    'Testing': { ar: 'الاختبار' },
+    'Maintenance': { ar: 'الصيانة' },
+    'Support': { ar: 'الدعم' },
+    'Security': { ar: 'الأمان' },
+    'Performance': { ar: 'الأداء' },
+  };
+
+  // Fallback token translator for unseen English phrases (zero-deps)
+  function tokenFallback(label?: string) {
+    if (!label || loc !== 'ar') return label || '';
+    const TOKEN: Record<string, string> = {
+      programming: 'البرمجة',
+      documentation: 'التوثيق',
+      'frontend': 'واجهة أمامية',
+      'ui': 'واجهة المستخدم',
+      backend: 'باك-إند',
+      integration: 'تكامل',
+      api: 'واجهات برمجة التطبيقات',
+      security: 'أمن',
+      performance: 'الأداء',
+      testing: 'اختبار',
+      support: 'دعم',
+      web: 'ويب',
+      mobile: 'محمول',
+      database: 'قاعدة بيانات',
+      design: 'تصميم',
+      maintenance: 'صيانة',
+      quality: 'جودة',
+      assurance: 'ضمان',
+      development: 'تطوير',
+    };
+    const clean = label.trim();
+
+    // exact dictionary hit
+    if (DICT[clean]) return DICT[clean].ar || clean;
+
+    // split on separators, keep them
+    return clean.split(/([\/#,&|\-+]+)/).map(seg => {
+      if (/^[\/#,&|\-+]+$/.test(seg)) return seg;
+      const spaced = seg.replace(/([a-z])([A-Z])/g, '$1 $2'); // FrontendUI -> Frontend UI
+      return spaced.split(/\s+/).map(tok => {
+        const low = tok.toLowerCase();
+        if (TOKEN[low]) return TOKEN[low];
+        if (['ui','api'].includes(low)) return TOKEN[low] || tok;
+        return tok; // unknown: keep as-is
+      }).join(' ');
+    }).join(' ');
+  }
+
+  // Main resolver that works for A/B/C
+  function L(value: any, tPrefix?: string) {
+    // C: multilingual object
+    if (value && typeof value === 'object') {
+      const v = value[loc] ?? value.en ?? '';
+      return v ? v : '';
+    }
+    // B: slug/key -> prefer i18n key, fallback tokens
+    if (typeof value === 'string' && /^[a-z0-9._-]+$/.test(value)) {
+      const key = tPrefix ? `${tPrefix}.${value}` : value;
+      const viaT = typeof t === 'function' ? t(key) : undefined;
+      if (viaT && viaT !== key) return viaT;
+      return tokenFallback(value);
+    }
+    // A: raw English label -> dict or token fallback
+    if (typeof value === 'string') {
+      // try i18n with a normalized key if provided
+      if (tPrefix) {
+        const norm = value.toLowerCase().replace(/\s+/g, '_');
+        const viaT = typeof t === 'function' ? t(`${tPrefix}.${norm}`) : undefined;
+        if (viaT && viaT !== `${tPrefix}.${norm}`) return viaT;
+      }
+      // DICT or token fallback
+      if (loc === 'ar' && DICT[value]?.ar) return DICT[value].ar;
+      return tokenFallback(value);
+    }
+    return value ?? '';
+  }
 
   // OPTIONAL: auto-translate missing sides via server endpoint (disabled - no API available)
   const data = useAutoTranslateMissing(services, lang, { enable: false });
 
   const hasValidServices = data.some(service => {
-    const serviceName = i18nText(service.name || service.title, lang);
+    const serviceName = L(service.name || service.title || service.category || service.categoryKey);
     return serviceName?.trim() || (service.subServices && service.subServices.length > 0) || (service.items && service.items.length > 0);
   });
 
@@ -48,6 +154,8 @@ export function Services({ services }: ServicesProps) {
     <section 
       key={lang}
       ref={ref}
+      dir={loc === 'ar' ? 'rtl' : 'ltr'} 
+      lang={loc}
       className={`transition-all duration-700 ease-out ${
         isVisible 
           ? 'opacity-100 translate-y-0' 
@@ -55,7 +163,9 @@ export function Services({ services }: ServicesProps) {
       }`}
     >
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-8 text-center text-white">{t('our_services')}</h2>
+        <h2 className="text-2xl font-semibold mb-8 text-center text-white">
+          {typeof t === 'function' ? t('our_services') : (loc === 'ar' ? 'خدماتنا' : 'Our Services')}
+        </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.filter(service => {
@@ -63,16 +173,8 @@ export function Services({ services }: ServicesProps) {
             const subServices = service.subServices || [];
             return items.length > 0 || subServices.length > 0; // Only show services with items
           }).map((service, index) => {
-            // ✅ Safe string conversion to prevent React error #130
-            const serviceName = typeof service.name === 'object' && service.name !== null
-              ? (typeof service.name[lang] === 'string' ? service.name[lang] : '') ||
-                (typeof service.name[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.name[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                ''
-              : typeof service.title === 'object' && service.title !== null
-              ? (typeof service.title[lang] === 'string' ? service.title[lang] : '') ||
-                (typeof service.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                ''
-              : String(service.name || service.title || '');
+            // Use unified resolver L() for service name - handles A/B/C cases
+            const serviceName = L(service.category ?? service.categoryKey ?? service.name ?? service.title, 'services.categories');
 
             const Icon = service.icon;
 
@@ -82,8 +184,8 @@ export function Services({ services }: ServicesProps) {
             }
 
             return (
-              <div
-                key={service.id || index}
+              <article
+                key={service.id || service.category || service.categoryKey || index}
                 className="service-card-neo p-6 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 hover:shadow-xl hover:-translate-y-2 hover:bg-white/5 transition-all duration-300 group"
                 tabIndex={0}
                 role="article"
@@ -109,23 +211,19 @@ export function Services({ services }: ServicesProps) {
                 {((service.items && service.items.length > 0) || (service.subServices && service.subServices.length > 0)) && (
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wide">
-                      {t('whats_included')}
+                      {L('Includes', 'services.meta') /* label if needed */}
                     </h4>
                     <ul className="mt-3 grid gap-2">
-                      {/* Prefer new items structure; render if present */}
-                      {service.items && service.items.map((item, itemIndex) => {
-                        // ✅ Safe string conversion to prevent React error #130
-                        const itemText = typeof item.text === 'object' && item.text !== null
-                          ? (typeof item.text[lang] === 'string' ? item.text[lang] : '') ||
-                            (typeof item.text[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.text[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                            ''
-                          : String(item.text || '');
+                      {/* Case A/B/C all resolved via L() */}
+                      {service.items && service.items.map((item: any, itemIndex: number) => {
+                        // Use unified resolver for item text - handles A/B/C cases
+                        const itemText = L(item.label ?? item.name ?? item.key ?? item.text ?? item, 'services.items');
                         
                         if (!itemText) return null;
                         
                         return (
                           <li
-                            key={item.id || itemIndex}
+                            key={item.id || item.key || itemIndex}
                             className="group/item relative flex items-start gap-2 rounded-lg px-3 py-2
                                      text-white/90
                                      transition-all duration-200
@@ -158,18 +256,14 @@ export function Services({ services }: ServicesProps) {
                       
                       {/* Fallback to legacy subServices structure ONLY when items are absent */}
                       {(!service.items || service.items.length === 0) && service.subServices && service.subServices.map((subService, subIndex) => {
-                        // ✅ Safe string conversion to prevent React error #130
-                        const subServiceName = typeof subService.name === 'object' && subService.name !== null
-                          ? (typeof subService.name[lang] === 'string' ? subService.name[lang] : '') ||
-                            (typeof subService.name[lang === 'ar' ? 'en' : 'ar'] === 'string' ? subService.name[lang === 'ar' ? 'en' : 'ar'] : '') ||
-                            ''
-                          : String(subService.name || '');
+                        // Use unified resolver for subService name - handles A/B/C cases
+                        const subServiceName = L(subService.name ?? subService.key ?? subService, 'services.items');
                         
                         if (!subServiceName) return null;
                         
                         return (
                         <li
-                          key={subService.id || subIndex}
+                          key={subService.id || subService.key || subIndex}
                           className="group/item relative flex items-start gap-2 rounded-lg px-3 py-2
                                    text-white/90
                                    transition-all duration-200
@@ -213,7 +307,7 @@ export function Services({ services }: ServicesProps) {
                   </div>
                 )}
 
-              </div>
+              </article>
             );
           })}
         </div>
