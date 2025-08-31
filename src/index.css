@@ -98,6 +98,31 @@ body {
 }
 
 /* Mobile responsive utilities */
+@media (max-width: 480px) {
+  .center-wrap {
+    padding-inline: clamp(8px, 3vw, 16px);
+  }
+  
+  .center-grid {
+    gap: clamp(8px, 3vw, 16px);
+  }
+  
+  .card-neo {
+    padding: clamp(12px, 3vw, 20px);
+  }
+  
+  /* Extra small text for mobile */
+  .text-xs {
+    font-size: 0.7rem;
+  }
+  
+  /* Compact buttons for mobile */
+  .btn-compact {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
 @media (max-width: 640px) {
   .center-wrap {
     padding-inline: clamp(12px, 4vw, 20px);
@@ -110,6 +135,86 @@ body {
   .card-neo {
     padding: clamp(16px, 4vw, 24px);
   }
+  
+  /* Touch-friendly sizing */
+  button {
+    min-height: 44px; /* iOS recommended touch target */
+  }
+  
+  input, textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* Tablet responsive utilities */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .center-wrap {
+    padding-inline: clamp(20px, 3vw, 32px);
+  }
+  
+  .center-grid {
+    gap: clamp(20px, 3vw, 32px);
+  }
+}
+
+/* Desktop utilities */
+@media (min-width: 1025px) {
+  .center-wrap {
+    padding-inline: clamp(24px, 2vw, 40px);
+  }
+}
+
+/* Extra responsive text utilities */
+.text-responsive-xs {
+  font-size: clamp(0.7rem, 2vw, 0.875rem);
+}
+
+.text-responsive-sm {
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(0.9rem, 3vw, 1.125rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+}
+
+/* Responsive spacing utilities */
+.space-responsive-x > * + * {
+  margin-left: clamp(0.5rem, 2vw, 1rem);
+}
+
+.space-responsive-y > * + * {
+  margin-top: clamp(0.5rem, 2vw, 1rem);
+}
+
+/* Responsive padding utilities */
+.p-responsive {
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+}
+
+.p-responsive-sm {
+  padding: clamp(0.5rem, 2vw, 1rem);
+}
+
+.p-responsive-lg {
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+/* Responsive margin utilities */
+.m-responsive {
+  margin: clamp(0.75rem, 3vw, 1.5rem);
+}
+
+.mt-responsive {
+  margin-top: clamp(0.75rem, 3vw, 1.5rem);
+}
+
+.mb-responsive {
+  margin-bottom: clamp(0.75rem, 3vw, 1.5rem);
 }
 
 [data-theme="light"] {

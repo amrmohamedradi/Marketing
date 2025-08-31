@@ -420,22 +420,22 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
             </div>
           )}
           {/* Create new main service */}
-          <div className="p-4 rounded-xl border border-border/50 bg-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
-            <div className="flex flex-col gap-3"> {/* Changed from grid to flex column */}
+          <div className="p-3 sm:p-4 rounded-xl border border-border/50 bg-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex flex-col gap-2 sm:gap-3">
               <Input
                 placeholder={t('service_name_placeholder')}
                 value={newService.name}
                 onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200"
+                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm sm:text-base"
               />
               <Input
                 placeholder={t('service_description_placeholder')}
                 value={newService.description}
                 onChange={(e) => setNewService({ ...newService, description: e.target.value })}
-                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200"
+                className="bg-input border-border text-foreground focus:ring-ring focus:border-primary transition-all duration-200 text-sm sm:text-base"
               />
-              <Button onClick={addService} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95">
-                <Plus className="w-4 h-4 mr-2" />
+              <Button onClick={addService} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95 text-sm sm:text-base py-2 sm:py-3">
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 {t('add_service')}
               </Button>
             </div>
@@ -459,40 +459,40 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                 >
                   <Card className="rounded-xl border border-border/50 bg-background p-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                     
-                    <CardHeader className="relative z-10 p-4 border-b border-border/50 bg-muted/10">
-                      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
-                            <IconComponent className="w-6 h-6 text-primary" />
+                    <CardHeader className="relative z-10 p-3 sm:p-4 border-b border-border/50 bg-muted/10">
+                      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 sm:gap-3">
+                        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-center sm:justify-start">
+                          <div className="p-2 sm:p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
+                            <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-primary" />
                           </div>
                           <div className="flex flex-col items-center sm:items-start">
-                            <h3 className="font-semibold text-sm sm:text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
+                            <h3 className="font-semibold text-sm sm:text-base lg:text-lg group-hover:text-primary transition-colors duration-200 text-foreground text-center sm:text-left">
                               {typeof service.name === 'object' && service.name !== null
                                 ? (typeof service.name?.[currentLanguage as 'ar' | 'en'] === 'string' ? service.name?.[currentLanguage as 'ar' | 'en'] : '') ||
                                   (typeof service.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? service.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
                                   ''
                                 : String(service.name || '')}
                             </h3>
-                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-2 py-0.5 mx-auto sm:mx-0">
+                            <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-2 py-0.5">
                               {service.subServices.length} {t('items')}
                             </Badge>
                           </div>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className="hover:bg-muted/50 transition-colors duration-200">
-                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          <Button size="sm" variant="ghost" onClick={() => toggleServiceExpansion(service.id)} className="hover:bg-muted/50 transition-colors duration-200 p-1 sm:p-2">
+                            {isExpanded ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" /> : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => deleteService(service.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors duration-200 p-1 sm:p-2"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center sm:text-left">
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center sm:text-left leading-relaxed">
                         {typeof service.description === 'object' && service.description !== null
                           ? (typeof service.description?.[currentLanguage as 'ar' | 'en'] === 'string' ? service.description?.[currentLanguage as 'ar' | 'en'] : '') ||
                             (typeof service.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? service.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
@@ -508,7 +508,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <CardContent className="pt-4 space-y-4">
+                      <CardContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4">
                         {/* Current Sub-services (render only when expanded) */}
                         {isExpanded && service.subServices.length > 0 && (
                           <div className="space-y-2">
@@ -535,29 +535,29 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                               <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
                               <span>{t('suggested_items')}</span>
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3">
                               {service.suggestedItems.map((item, index) => (
                                 <motion.div
                                   key={index}
                                   initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ duration: 0.15, delay: index * 0.02 }}
-                                  className="group p-3 rounded-lg bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-md cursor-pointer"
+                                  className="group p-2 sm:p-3 rounded-lg bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-md cursor-pointer"
                                   onClick={() => addSuggestedItem(service.id, item)}
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1 space-y-1">
                                       <div className="flex items-center space-x-2">
-                                        <div className="w-2 h-2 rounded-full bg-accent group-hover:scale-125 transition-transform duration-200"></div>
-                                        <span className="font-medium text-xs sm:text-sm text-foreground group-hover:text-accent transition-colors duration-200">
+                                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-accent group-hover:scale-125 transition-transform duration-200"></div>
+                                        <span className="font-medium text-xs sm:text-sm text-foreground group-hover:text-accent transition-colors duration-200 line-clamp-2">
                                           {item.name}
                                         </span>
                                       </div>
-                                      <p className="text-xs text-muted-foreground pl-4 group-hover:text-accent/80 transition-colors duration-200 leading-tight">
+                                      <p className="text-xs text-muted-foreground pl-3 sm:pl-4 group-hover:text-accent/80 transition-colors duration-200 leading-tight line-clamp-2">
                                         {item.description}
                                       </p>
                                     </div>
-                                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-accent/60 group-hover:text-accent group-hover:scale-110 transition-all duration-200" />
+                                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-accent/60 group-hover:text-accent group-hover:scale-110 transition-all duration-200 flex-shrink-0" />
                                   </div>
                                 </motion.div>
                               ))}
@@ -612,7 +612,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         )}
 
                         {/* Add Sub-service (always visible, simple) */}
-                        <div className="space-y-2 p-3 bg-muted/10 rounded-md border border-border/30">
+                        <div className="space-y-2 p-2 sm:p-3 bg-muted/10 rounded-md border border-border/30">
                           <div className="grid grid-cols-1 gap-2">
                               <Input
                               placeholder={t('subservice_name_ph')}
@@ -628,7 +628,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                               />
                             </div>
                           <div>
-                            <Button size="sm" onClick={() => stageCustomSubService(service.id)} className="mt-2 w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95">
+                            <Button size="sm" onClick={() => stageCustomSubService(service.id)} className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95 text-sm">
                                 <Plus className="w-3 h-3 mr-1" />
                                 {t('add')}
                               </Button>
@@ -637,7 +637,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
 
                         {/* Save Pending */}
                         <div className="flex justify-center">
-                          <Button size="sm" onClick={() => savePending(service.id)} disabled={pendingForService.customDrafts.length === 0} className="bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95">
+                          <Button size="sm" onClick={() => savePending(service.id)} disabled={pendingForService.customDrafts.length === 0} className="bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-md rounded-md transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-95 text-sm px-4 py-2">
                             {t('save')}
                           </Button>
                         </div>
@@ -663,7 +663,7 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {SUPPORT_ITEMS.map((item, index) => {
               // Use the icon component directly
               const IconComponent = typeof item.icon === 'function' ? item.icon : Settings;
@@ -673,14 +673,14 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
-                  className="group p-6 rounded-xl bg-gradient-to-br from-background/50 to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-150 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
+                  className="group p-4 sm:p-6 rounded-xl bg-gradient-to-br from-background/50 to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-150 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
                 >
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-150">
-                      <IconComponent className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-150" />
+                  <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
+                    <div className="p-2 sm:p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-150">
+                      <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform duration-150" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-foreground text-wrap text-xs sm:text-sm">
+                      <h3 className="font-semibold mb-1 sm:mb-2 group-hover:text-primary transition-colors duration-300 text-foreground text-wrap text-xs sm:text-sm leading-tight">
                         {item.title}
                       </h3>
                       <p className="text-xs text-muted-foreground text-wrap leading-tight">
