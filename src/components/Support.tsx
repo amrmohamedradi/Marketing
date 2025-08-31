@@ -1,19 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import { t } from '../lib/utils/localization';
+import { useI18n } from '@/lib/i18n';
 import { 
   MessageCircle, 
   Phone, 
   Mail, 
   Clock, 
-  Shield, 
+  Shield,
+  Star,
+  CheckCircle,
+  Sparkles, 
   Zap,
   Users,
   Award,
-  Headphones
+  Headphones,
+  Lock
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
 
 const Support = () => {
   const { t } = useI18n();
@@ -126,7 +128,7 @@ const Support = () => {
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-xl blur-md opacity-75`} />
                     <div className="relative bg-black/80 p-4 rounded-xl border border-gray-600/50">
-                      <item.icon className="w-8 h-8 text-white" />
+                      {React.createElement(item.icon, { className: "w-8 h-8 text-white" })}
                     </div>
                   </motion.div>
 

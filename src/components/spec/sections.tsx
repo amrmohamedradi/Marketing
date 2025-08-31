@@ -102,7 +102,7 @@ export const sectionRegistry: SectionConfig[] = [
           {spec.services?.map((service, index) => (
             <div key={service.id || index} className="border rounded-lg p-4">
               <div className="flex items-center gap-3 mb-2">
-                {service.icon && <service.icon className="h-5 w-5 text-primary" />}
+                {service.icon && React.createElement(service.icon, { className: "h-5 w-5 text-primary" })}
                 <h3 className="font-medium">{getText(service.name, "ar")}</h3>
               </div>
               {service.description && (
