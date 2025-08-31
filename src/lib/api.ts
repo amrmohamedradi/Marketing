@@ -35,6 +35,8 @@ export const HEALTH_PATH = "/health";
 // Legacy compatibility
 export interface ApiResponse {
   ok: boolean;
+  id?: string;
+  link?: string;
   slug?: string;
   error?: string;
 }
@@ -51,7 +53,7 @@ export async function saveSpec(slug: string, specData: Record<string, unknown>):
       extraHeaders['X-Preserve-Support'] = '1';
     }
     
-    const response = await api.post(`/api/specs/${slug}`, payload, {
+    const response = await api.put(`/api/specs/${slug}`, payload, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
@@ -61,8 +63,10 @@ export async function saveSpec(slug: string, specData: Record<string, unknown>):
     });
 
     return {
-      ok: response.data.ok || true,
-      slug: response.data.slug || slug
+      ok: true,
+      id: response.data.id,
+      link: response.data.link,
+      slug: response.data.id || slug
     };
   } catch (error) {
     console.error('Error saving spec:', error);
