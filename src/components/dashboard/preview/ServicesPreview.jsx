@@ -46,8 +46,22 @@ export default function ServicesPreview({ data, lang }) {
                 return items.length > 0; // Only show services with items
               }).map((service, index) => {
                 const Icon = service.icon;
-                const serviceName = i18nText(service.name || service.title, lang);
-                const serviceDesc = i18nText(service.description, lang);
+                // ✅ Safe string conversion to prevent React error #130
+                const serviceName = typeof service.name === 'object' && service.name !== null
+                  ? (typeof service.name[lang] === 'string' ? service.name[lang] : '') ||
+                    (typeof service.name[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.name[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : typeof service.title === 'object' && service.title !== null
+                  ? (typeof service.title[lang] === 'string' ? service.title[lang] : '') ||
+                    (typeof service.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : String(service.name || service.title || '');
+                
+                const serviceDesc = typeof service.description === 'object' && service.description !== null
+                  ? (typeof service.description[lang] === 'string' ? service.description[lang] : '') ||
+                    (typeof service.description[lang === 'ar' ? 'en' : 'ar'] === 'string' ? service.description[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : String(service.description || '');
                 
                 if (!serviceName) return null;
                 

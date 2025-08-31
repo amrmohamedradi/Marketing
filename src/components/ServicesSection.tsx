@@ -141,14 +141,24 @@ const SubServiceRow = memo(({ subService, isEditing, onToggleEdit, onUpdateField
           <div>
             <div className="flex items-center justify-center sm:justify-start space-x-2">
               <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="font-medium text-sm text-foreground">{i18nText(subService.name, currentLanguage)}</span>
+              <span className="font-medium text-sm text-foreground">
+                {typeof subService.name === 'object' && subService.name !== null
+                  ? (typeof subService.name?.[currentLanguage as 'ar' | 'en'] === 'string' ? subService.name?.[currentLanguage as 'ar' | 'en'] : '') ||
+                    (typeof subService.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? subService.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : String(subService.name || '')}
+              </span>
               {subService.isCustom && (
                 <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">{t('custom')}</Badge>
               )}
             </div>
             {subService.description && (
               <p className="text-xs text-muted-foreground mt-1 ml-6 text-center sm:text-left">
-                {i18nText(subService.description, currentLanguage)}
+                {typeof subService.description === 'object' && subService.description !== null
+                  ? (typeof subService.description?.[currentLanguage as 'ar' | 'en'] === 'string' ? subService.description?.[currentLanguage as 'ar' | 'en'] : '') ||
+                    (typeof subService.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? subService.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : String(subService.description || '')}
               </p>
             )}
           </div>
@@ -457,7 +467,11 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                           </div>
                           <div className="flex flex-col items-center sm:items-start">
                             <h3 className="font-semibold text-sm sm:text-lg group-hover:text-primary transition-colors duration-200 text-foreground">
-                              {i18nText(service.name, currentLanguage)}
+                              {typeof service.name === 'object' && service.name !== null
+                                ? (typeof service.name?.[currentLanguage as 'ar' | 'en'] === 'string' ? service.name?.[currentLanguage as 'ar' | 'en'] : '') ||
+                                  (typeof service.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? service.name?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
+                                  ''
+                                : String(service.name || '')}
                             </h3>
                             <Badge variant="secondary" className="mt-1 bg-accent/10 text-accent border-accent/20 text-xs px-2 py-0.5 mx-auto sm:mx-0">
                               {service.subServices.length} {t('items')}
@@ -479,7 +493,11 @@ const ServicesSection = ({ services, onUpdate }: ServicesSectionProps) => {
                         </div>
                       </div>
                       <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center sm:text-left">
-                        {i18nText(service.description, currentLanguage)}
+                        {typeof service.description === 'object' && service.description !== null
+                          ? (typeof service.description?.[currentLanguage as 'ar' | 'en'] === 'string' ? service.description?.[currentLanguage as 'ar' | 'en'] : '') ||
+                            (typeof service.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] === 'string' ? service.description?.[currentLanguage === 'ar' ? 'en' : 'ar'] : '') ||
+                            ''
+                          : String(service.description || '')}
                       </p>
                     </CardHeader>
                     

@@ -43,8 +43,19 @@ export default function SupportPreview({ data, lang }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {items.map((item, index) => {
-                const title = i18nText(item?.title, lang) || '';
-                const description = i18nText(item?.description, lang) || '';
+                // ✅ Safe string conversion to prevent React error #130
+                const title = typeof item?.title === 'object' && item?.title !== null
+                  ? (typeof item.title[lang] === 'string' ? item.title[lang] : '') ||
+                    (typeof item.title[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.title[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : String(item?.title || '');
+                
+                const description = typeof item?.description === 'object' && item?.description !== null
+                  ? (typeof item.description[lang] === 'string' ? item.description[lang] : '') ||
+                    (typeof item.description[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.description[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                    ''
+                  : String(item?.description || '');
+                
                 if (!title && !description) return null;
                 
                 return (

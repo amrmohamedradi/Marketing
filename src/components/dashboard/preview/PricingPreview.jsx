@@ -130,7 +130,13 @@ export default function PricingPreview({ data, lang }) {
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {priceData.additionalItems.map((item, index) => {
-                    const itemDesc = i18nText(item.description, lang);
+                    // ✅ Safe string conversion to prevent React error #130
+                    const itemDesc = typeof item.description === 'object' && item.description !== null
+                      ? (typeof item.description[lang] === 'string' ? item.description[lang] : '') ||
+                        (typeof item.description[lang === 'ar' ? 'en' : 'ar'] === 'string' ? item.description[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                        ''
+                      : String(item.description || '');
+                    
                     if (!itemDesc) return null;
                     
                     return (
@@ -181,7 +187,11 @@ export default function PricingPreview({ data, lang }) {
                     {t('additional_notes')}
                   </h4>
                   <p className="text-gray-300 leading-relaxed">
-                    {i18nText(priceData.notes, lang)}
+                    {typeof priceData.notes === 'object' && priceData.notes !== null
+                      ? (typeof priceData.notes[lang] === 'string' ? priceData.notes[lang] : '') ||
+                        (typeof priceData.notes[lang === 'ar' ? 'en' : 'ar'] === 'string' ? priceData.notes[lang === 'ar' ? 'en' : 'ar'] : '') ||
+                        ''
+                      : String(priceData.notes || '')}
                   </p>
                 </div>
               </motion.div>
