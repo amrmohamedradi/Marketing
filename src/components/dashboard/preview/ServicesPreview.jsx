@@ -88,7 +88,13 @@ export default function ServicesPreview({ data, lang }) {
                           </h4>
                           <div className="space-y-2">
                             {(service.subServices || service.items || []).map((subService, subIndex) => {
-                              const itemName = i18nText(subService.name || subService.text || subService, lang);
+                              // ✅ Guard against rendering objects - only use string values
+                              const itemName = i18nText(
+                                subService.name || 
+                                subService.text || 
+                                (typeof subService === 'string' ? subService : ''), 
+                                lang
+                              );
                               const itemDesc = i18nText(subService.description, lang);
                               
                               if (!itemName) return null;

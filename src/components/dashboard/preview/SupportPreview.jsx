@@ -65,7 +65,8 @@ export default function SupportPreview({ data, lang }) {
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-base text-white mb-2 group-hover/item:text-pink-400 transition-colors duration-300">
-                            {title || t(item?.title || 'support_item')}
+                            {/* ✅ Guard against rendering objects */}
+                            {typeof title === 'string' ? title : t(typeof item?.title === 'string' ? item.title : 'support_item')}
                           </h3>
                           {description && (
                             <p className="text-sm text-gray-300 leading-relaxed">

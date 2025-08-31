@@ -128,7 +128,12 @@ const Support = () => {
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-xl blur-md opacity-75`} />
                     <div className="relative bg-black/80 p-4 rounded-xl border border-gray-600/50">
-                      {React.createElement(item.icon, { className: "w-8 h-8 text-white" })}
+                      {/* ✅ Guard dynamic component rendering */}
+                      {(() => {
+                        const IconComponent = item.icon;
+                        return typeof IconComponent === 'function' ? 
+                          <IconComponent className="w-8 h-8 text-white" /> : null;
+                      })()}
                     </div>
                   </motion.div>
 

@@ -201,7 +201,11 @@ const ChartTooltipContent = React.forwardRef<
                 ) : (
                   <>
                     {itemConfig?.icon ? (
-                      React.createElement(itemConfig.icon)
+                      (() => {
+                        // ✅ Guard dynamic component rendering
+                        const IconComponent = itemConfig.icon;
+                        return typeof IconComponent === 'function' ? <IconComponent /> : null;
+                      })()
                     ) : (
                       !hideIndicator && (
                         <div
@@ -295,7 +299,11 @@ const ChartLegendContent = React.forwardRef<
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
-                React.createElement(itemConfig.icon)
+                (() => {
+                  // ✅ Guard dynamic component rendering
+                  const IconComponent = itemConfig.icon;
+                  return typeof IconComponent === 'function' ? <IconComponent /> : null;
+                })()
               ) : (
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
