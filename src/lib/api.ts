@@ -3,7 +3,7 @@ import axios from "axios";
 export const BASE_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) ||
   (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE_URL) ||
-  "https://backend-marketing-production.up.railway.app";
+  "https://backend-marketing-production-67fd.up.railway.app";
 
 export const api = axios.create({ 
   baseURL: BASE_URL, 

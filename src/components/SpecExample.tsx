@@ -22,9 +22,9 @@ export const SpecExample: React.FC = () => {
         version: '2.0.0'
       };
 
-      // ✅ Correct: Uses '/specs/...' (no '/api' prefix)
+      // ✅ Correct: Uses PUT for upsert (no '/api' prefix)
       // Browser will request: https://my-frontend.vercel.app/api/specs/client-123
-      const response = await api.post('/specs/client-123', payload);
+      const response = await api.put('/specs/client-123', payload);
       
       setResult(`Success: ${JSON.stringify(response.data, null, 2)}`);
     } catch (error) {

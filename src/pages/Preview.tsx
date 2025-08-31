@@ -148,21 +148,8 @@ const PreviewPage = () => {
       const response = await saveSpec(slug, specData);
       
       if (response && response.ok) {
-        // Handle response priority: link/url -> id -> success toast only
-        let redirectUrl = null;
-        
-        if (response.link) {
-          redirectUrl = response.link.startsWith('http') ? response.link : `${import.meta.env.VITE_API_BASE_URL || 'https://backend-marketing-production.up.railway.app'}${response.link}`;
-        } else if (response.url) {
-          redirectUrl = response.url.startsWith('http') ? response.url : `${import.meta.env.VITE_API_BASE_URL || 'https://backend-marketing-production.up.railway.app'}${response.url}`;
-        } else if (response.id) {
-          redirectUrl = `${import.meta.env.VITE_API_BASE_URL || 'https://backend-marketing-production.up.railway.app'}/api/specs/${response.id}`;
-        }
-        
-        if (redirectUrl) {
-          setSavedUrl(redirectUrl);
-          window.open(redirectUrl, '_blank');
-        }
+        // Navigate to your UI page, NOT the backend JSON:
+        navigate(`/read/${response.id || slug}`);
         
         toast({
           title: t('save_success'),

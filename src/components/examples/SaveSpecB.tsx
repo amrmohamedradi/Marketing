@@ -11,9 +11,9 @@ export default function SaveSpecB() {
     setResult("");
 
     try {
-      // ✅ Correct: Uses full '/api/specs/...' path
+      // ✅ Correct: Uses PUT for upsert with full path
       // Final URL: https://your-frontend.vercel.app/api/specs/client-456
-      const response = await api.post('/api/specs/client-456', {
+      const response = await api.put('/api/specs/client-456', {
         title: "Another Service Spec",
         name: "Payment Service",
         items: [

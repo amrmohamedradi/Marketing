@@ -11,9 +11,9 @@ export default function SaveSpecA() {
     setResult("");
 
     try {
-      // ✅ Correct: Uses '/specs/...' (no '/api' prefix)
+      // ✅ Correct: Uses PUT for upsert
       // Final URL: https://your-frontend.vercel.app/api/specs/client-123
-      const response = await api.post('/specs/client-123', {
+      const response = await api.put('/specs/client-123', {
         title: "My Service Spec",
         name: { ar: "خدمة", en: "Service" },
         items: [

@@ -36,13 +36,14 @@ export interface SaveSpecResponse {
 }
 
 /**
- * Save a specification to the backend
+ * Save a specification to the backend using PUT (upsert pattern)
+ * @param id The ID for the specification
  * @param data The specification data to save
  * @returns A promise that resolves to the response from the backend
  */
-export const saveSpecification = async (data: SpecData): Promise<SaveSpecResponse> => {
+export const saveSpecification = async (id: string, data: SpecData): Promise<SaveSpecResponse> => {
   try {
-    const response = await api.post('/api/specs', data, {
+    const response = await api.put(`/api/specs/${id}`, data, {
       headers: {
         'Content-Type': 'application/json',
       },
