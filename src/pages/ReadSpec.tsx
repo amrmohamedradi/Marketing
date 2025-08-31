@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { deepCompact } from '@/lib/utils/deepCompact';
 import { LanguageProvider } from '@/lib/i18n';
 import { PublicHeader } from '@/components/public/PublicHeader';
@@ -46,9 +46,13 @@ interface SpecData {
 
 const ReadSpec: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const [spec, setSpec] = useState<SpecData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Check if this is the "only" route - focuses primarily on client information
+  const isOnlyRoute = location.pathname.startsWith('/only/');
 
   useEffect(() => {
     const fetchSpec = async () => {
@@ -108,24 +112,45 @@ const ReadSpec: React.FC = () => {
           ) : spec ? (
             <div className="space-y-12">
               <Reveal>
-                <AboutClient client={spec.client || {}} />
+                <AboutClient client={spec.client || {}} isStandalone={isOnlyRoute} />
               </Reveal>
               
-              <Reveal>
-                <Services services={spec.services || []} />
-              </Reveal>
+              {!isOnlyRoute && (
+                <>
+                  <Reveal>
+                    <Services services={spec.services || []} />
+                  </Reveal>
+                  
+                  <Reveal>
+                    <Support />
+                  </Reveal>
+                  
+                  <Reveal>
+                    <Pricing pricing={spec.pricing || {}} />
+                  </Reveal>
+                  
+                  <Reveal>
+                    <ContactCompany />
+                  </Reveal>
+                </>
+              )}
               
-              <Reveal>
-                <Support />
-              </Reveal>
-              
-              <Reveal>
-                <Pricing pricing={spec.pricing || {}} />
-              </Reveal>
-              
-              <Reveal>
-                <ContactCompany />
-              </Reveal>
+              {isOnlyRoute && spec.client && (
+                <div className="text-center py-8">
+                  <div className="max-w-2xl mx-auto">
+                    <h3 className="text-xl font-semibold text-white mb-4">Client Information Summary</h3>
+                    <p className="text-gray-300 text-sm">
+                      This page displays the client information for this specification. 
+                      <a 
+                        href={`/read/${slug}`} 
+                        className="text-blue-400 hover:text-blue-300 underline ml-1"
+                      >
+                        View full specification
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex items-center justify-center min-h-[400px]">

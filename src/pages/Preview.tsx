@@ -151,9 +151,19 @@ const PreviewPage = () => {
         // Navigate to your UI page, NOT the backend JSON:
         navigate(`/read/${response.id || slug}`);
         
+        // Also provide the "only" route URL for just client information
+        const onlyUrl = `${window.location.origin}/only/${response.id || slug}`;
+        
         toast({
           title: t('save_success'),
-          description: t('spec_saved_successfully'),
+          description: (
+            <div className="space-y-2">
+              <p>{t('spec_saved_successfully')}</p>
+              <div className="text-sm">
+                <p>Client-only view: <a href={onlyUrl} target="_blank" className="text-blue-400 underline">{onlyUrl}</a></p>
+              </div>
+            </div>
+          ),
           variant: 'default',
         });
         

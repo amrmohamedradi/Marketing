@@ -19,6 +19,7 @@ interface ClientData {
 
 interface AboutClientProps {
   client: ClientData;
+  isStandalone?: boolean; // Whether this is displayed as the main focus
 }
 
 const fieldIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -33,7 +34,7 @@ const fieldIcons: Record<string, React.ComponentType<{ className?: string }>> = 
   description: FileText
 };
 
-export function AboutClient({ client }: AboutClientProps) {
+export function AboutClient({ client, isStandalone = false }: AboutClientProps) {
   const { t, currentLanguage } = useI18n();
   
   // Apply deepCompact to sanitize data
@@ -110,10 +111,14 @@ export function AboutClient({ client }: AboutClientProps) {
   };
 
   return (
-    <section className="card-neo p-6 no-motion-client" aria-labelledby="about-client">
-      <h2 id="about-client" className="text-lg font-semibold mb-4 text-white">{t('about_client')}</h2>
+    <section className={`card-neo p-6 no-motion-client ${isStandalone ? 'max-w-4xl mx-auto' : ''}`} aria-labelledby="about-client">
+      <h2 id="about-client" className={`font-semibold mb-4 text-white ${
+        isStandalone ? 'text-2xl text-center' : 'text-lg'
+      }`}>{t('about_client')}</h2>
 
-      <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <dl className={`gap-x-6 gap-y-4 ${
+        isStandalone ? 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3' : 'grid grid-cols-1 md:grid-cols-2'
+      }`}>
         {Object.entries(sanitizedClient).map(([key, value]) => {
           if (!value) return null;
           
@@ -129,19 +134,29 @@ export function AboutClient({ client }: AboutClientProps) {
           if (!displayValue) return null;
 
           return (
-            <div key={key} className="flex items-start gap-2">
+            <div key={key} className={`flex items-start gap-3 ${
+              isStandalone ? 'bg-gray-800/50 p-4 rounded-lg border border-gray-700/50' : ''
+            }`}>
               {Icon ? (
-                <Icon className="mt-0.5 h-4 w-4 opacity-75 text-blue-400 flex-shrink-0" aria-hidden="true" />
+                <Icon className={`mt-0.5 h-4 w-4 opacity-75 text-blue-400 flex-shrink-0 ${
+                  isStandalone ? 'h-5 w-5' : ''
+                }`} aria-hidden="true" />
               ) : (
-                <svg aria-hidden="true" className="mt-0.5 h-4 w-4 opacity-75 text-blue-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <svg aria-hidden="true" className={`mt-0.5 h-4 w-4 opacity-75 text-blue-400 flex-shrink-0 ${
+                  isStandalone ? 'h-5 w-5' : ''
+                }`} viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
               )}
               <div className="min-w-0 flex-1">
-                <dt className="text-xs tracking-wide text-gray-400 uppercase mb-1">
+                <dt className={`tracking-wide text-gray-400 uppercase mb-1 ${
+                  isStandalone ? 'text-sm font-medium' : 'text-xs'
+                }`}>
                   {label}
                 </dt>
-                <dd className="text-sm font-medium text-white">
+                <dd className={`font-medium text-white ${
+                  isStandalone ? 'text-base' : 'text-sm'
+                }`}>
                   {renderValue(key, displayValue)}
                 </dd>
               </div>
