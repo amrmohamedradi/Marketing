@@ -3,6 +3,7 @@ import { clientFieldLabels, ClientFieldKey } from '@/lib/formMetadata';
 import { deepCompact } from '@/lib/utils/deepCompact';
 import { useI18n } from '@/lib/i18n';
 import { i18nText } from '@/lib/i18nContent';
+import { canonLang } from '@/lib/lang';
 import { User, Building, Mail, Phone, FileText, MapPin, Globe, MessageCircle } from 'lucide-react';
 
 interface ClientData {
@@ -60,15 +61,30 @@ export function AboutClient({ client, isStandalone = false }: AboutClientProps) 
             {value}
           </a>
         );
-      case 'phone':
+      case 'phone': {
+        // locale from i18n (must be the same on SSR & CSR)
+        const loc = canonLang(currentLanguage);
+        const phoneLabel = loc === 'ar' ? 'الهاتف' : 'Phone';
+        
+        // Keep the raw number as a STRING (do not Intl-format phone numbers)
+        const phoneRaw = value;
+        const phoneHref = `tel:${phoneRaw.replace(/\s+/g, '')}`;
+        
         return (
-          <a 
-            href={`tel:${value}`}
-            className="underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400/40"
-          >
-            {value}
-          </a>
+          <section dir={loc === 'ar' ? 'rtl' : 'ltr'} lang={loc} className="phone-card">
+            {/* number MUST be LTR regardless of page dir */}
+            <a
+              href={phoneHref}
+              className="phone digits-ltr notranslate underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+              dir="ltr"
+              lang="en"
+              aria-label={`${phoneLabel} ${phoneRaw}`}
+            >
+              <bdi>{phoneRaw}</bdi>
+            </a>
+          </section>
         );
+      }
       case 'whatsapp':
         return (
           <a 

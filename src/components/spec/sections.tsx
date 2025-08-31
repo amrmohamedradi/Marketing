@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { CheckCircle, Clock, Users, Code, Phone, Mail, Globe, MessageCircle } from 'lucide-react';
 import { getText } from '../../lib/i18n';
+import { canonLang } from '@/lib/lang';
 import { ClientDetails, Service, PriceData } from '@/types';
 import { deepCompact } from '@/lib/utils/deepCompact';
 
@@ -257,10 +258,29 @@ export const sectionRegistry: SectionConfig[] = [
         <div className="space-y-2">
           {spec.contact?.phone && (
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Phone:</span>
-              <a href={`tel:${spec.contact.phone}`} className="text-primary hover:underline">
-                {spec.contact.phone}
-              </a>
+              {(() => {
+                // Simple locale detection for phone label - matches your implementation pattern
+                const phoneRaw = spec.contact.phone;
+                const phoneHref = `tel:${phoneRaw.replace(/\s+/g, '')}`;
+                const phoneLabel = 'Phone'; // Since we can't access i18n context here, use English
+                
+                return (
+                  <>
+                    <span className="text-sm font-medium">{phoneLabel}:</span>
+                    <a href={phoneHref} className="text-primary hover:underline">
+                      {/* number MUST be LTR regardless of page dir */}
+                      <span 
+                        className="digits-ltr notranslate"
+                        dir="ltr"
+                        lang="en"
+                        aria-label={`${phoneLabel} ${phoneRaw}`}
+                      >
+                        <bdi>{phoneRaw}</bdi>
+                      </span>
+                    </a>
+                  </>
+                );
+              })()}
             </div>
           )}
           {spec.contact?.whatsapp && (

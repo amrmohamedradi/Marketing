@@ -97,6 +97,25 @@ body {
   align-items: start;
 }
 
+/* Force LTR rendering for the digits block, keep separators in place */
+.digits-ltr{
+  direction: ltr;
+  unicode-bidi: bidi-override;  /* keeps + and numbers in correct order */
+  text-align: left;
+}
+
+/* Optional: center pill but keep LTR number inside */
+.phone-card{
+  display: grid;
+  gap: .5rem;
+  justify-items: center;
+}
+
+/* If your page is RTL and you want the number to sit visually like EN text: */
+[dir="rtl"] .phone{
+  text-align: left;             /* still left-aligned */
+}
+
 /* Mobile responsive utilities */
 /* Mobile responsive utilities - Enhanced */
 @media (max-width: 475px) {

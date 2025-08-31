@@ -3,11 +3,16 @@ import { motion } from 'framer-motion';
 import { User, Building, Mail, Phone } from 'lucide-react';
 import { i18nText } from '@/lib/i18nText';
 import { useI18n } from '@/lib/i18n';
+import { canonLang } from '@/lib/lang';
 
 export default function AboutClientPreview({ data, lang }) {
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
   const client = data?.client || data?.clientDetails;
   if (!client) return null;
+  
+  // locale from i18n (must be the same on SSR & CSR)
+  const loc = canonLang(currentLanguage);
+  const phoneLabel = t('phone'); // Uses existing i18n key
 
   // Safe text extraction with inline object-to-string conversion - prevent React error #130
   const getName = () => {
@@ -177,10 +182,16 @@ export default function AboutClientPreview({ data, lang }) {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-base text-white mb-2 group-hover/item:text-amber-400 transition-colors duration-300">
-                          {t('phone')}
+                          {phoneLabel}
                         </h3>
-                        <p className="text-sm text-gray-300 leading-relaxed">
-                          {getPhone()}
+                        {/* number MUST be LTR regardless of page dir */}
+                        <p 
+                          className="text-sm text-gray-300 leading-relaxed digits-ltr notranslate"
+                          dir="ltr"
+                          lang="en"
+                          aria-label={`${phoneLabel} ${getPhone()}`}
+                        >
+                          <bdi>{getPhone()}</bdi>
                         </p>
                       </div>
                     </div>

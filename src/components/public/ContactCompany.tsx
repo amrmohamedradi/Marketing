@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRevealOnScroll } from '@/hooks/useRevealOnScroll';
 import { useI18n } from '@/lib/i18n';
+import { canonLang } from '@/lib/lang';
 import { Mail, Phone, Facebook, Instagram, Linkedin, Twitter, ExternalLink } from 'lucide-react';
 
 interface ContactCompanyProps {
@@ -31,7 +32,11 @@ export function ContactCompany({
   social = defaultContact.social
 }: ContactCompanyProps) {
   const { ref, isVisible } = useRevealOnScroll();
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
+  
+  // locale from i18n (must be the same on SSR & CSR)
+  const loc = canonLang(currentLanguage);
+  const phoneLabel = t('phone'); // Uses existing i18n key: { ar: 'الهاتف', en: 'Phone' }
 
   const socialLinks = [
     { 
@@ -68,21 +73,31 @@ export function ContactCompany({
         <div className="flex justify-center mb-8">
           {/* Phone */}
           {phone && (
-            <a
-              href={`tel:${phone}`}
-              className="flex items-center space-x-4 p-4 bg-background/50 rounded-xl border border-border/30
-                       hover:bg-background/80 hover:border-primary/20 transition-all duration-300
-                       focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
-                <Phone className="h-5 w-5 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-muted-foreground">Phone</div>
-                <div className="text-foreground font-medium">{phone}</div>
-              </div>
-              <ExternalLink className="h-4 w-4 text-muted-foreground" />
-            </a>
+            <section dir={loc === 'ar' ? 'rtl' : 'ltr'} lang={loc}>
+              <a
+                href={`tel:${phone.replace(/\s+/g, '')}`}
+                className="flex items-center space-x-4 p-4 bg-background/50 rounded-xl border border-border/30
+                         hover:bg-background/80 hover:border-primary/20 transition-all duration-300
+                         focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
+                  <Phone className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-muted-foreground">{phoneLabel}</div>
+                  {/* number MUST be LTR regardless of page dir */}
+                  <div 
+                    className="text-foreground font-medium digits-ltr notranslate"
+                    dir="ltr"
+                    lang="en"
+                    aria-label={`${phoneLabel} ${phone}`}
+                  >
+                    <bdi>{phone}</bdi>
+                  </div>
+                </div>
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </a>
+            </section>
           )}
         </div>
 
