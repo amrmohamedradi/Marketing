@@ -266,17 +266,17 @@ export default function HealthDebug() {
 
             <div className="flex justify-between items-center">
               <span>DB Vendor:</span>
-              <span>{(ssrData || csrData)?.db.vendor || 'Not configured'}</span>
+              <span>{String((ssrData || csrData)?.db.vendor || 'Not configured')}</span>
             </div>
 
             <div className="flex justify-between items-center">
               <span>Node Environment:</span>
-              <span>{(ssrData || csrData)?.env.nodeEnv || 'Unknown'}</span>
+              <span>{String((ssrData || csrData)?.env.nodeEnv || 'Unknown')}</span>
             </div>
 
             <div className="flex justify-between items-center">
               <span>API Version:</span>
-              <span>{(ssrData || csrData)?.version || 'Unknown'}</span>
+              <span>{String((ssrData || csrData)?.version || 'Unknown')}</span>
             </div>
           </div>
         </div>

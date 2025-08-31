@@ -237,7 +237,7 @@ const ChartTooltipContent = React.forwardRef<
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
                         <span className="text-muted-foreground">
-                          {itemConfig?.label || item.name}
+                          {typeof itemConfig?.label === 'string' ? itemConfig.label : (typeof item.name === 'string' ? item.name : '')}
                         </span>
                       </div>
                       {item.value && (
@@ -312,7 +312,7 @@ const ChartLegendContent = React.forwardRef<
                   }}
                 />
               )}
-              {itemConfig?.label}
+              {typeof itemConfig?.label === 'string' ? itemConfig.label : ''}
             </div>
           )
         })}
