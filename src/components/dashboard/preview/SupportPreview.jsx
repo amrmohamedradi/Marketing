@@ -43,8 +43,8 @@ export default function SupportPreview({ data, lang }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {items.map((item, index) => {
-                const title = i18nText(item?.title, lang) || item?.title;
-                const description = i18nText(item?.description, lang) || item?.description;
+                const title = i18nText(item?.title, lang) || '';
+                const description = i18nText(item?.description, lang) || '';
                 if (!title && !description) return null;
                 
                 return (
@@ -65,11 +65,11 @@ export default function SupportPreview({ data, lang }) {
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-base text-white mb-2 group-hover/item:text-pink-400 transition-colors duration-300">
-                            {t(title)} 
+                            {title || t(item?.title || 'support_item')}
                           </h3>
                           {description && (
                             <p className="text-sm text-gray-300 leading-relaxed">
-                              {t(description)}
+                              {description}
                             </p>
                           )}
                         </div>

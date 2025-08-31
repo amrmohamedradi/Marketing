@@ -9,7 +9,14 @@ export default function AboutClientPreview({ data, lang }) {
   const client = data?.client || data?.clientDetails;
   if (!client) return null;
 
-  const hasAnyField = client.name || client.company || client.email || client.phone;
+  // Safe text extraction for conditional checks and rendering
+  const getName = () => i18nText(client.name, lang);
+  const getCompany = () => i18nText(client.company, lang);
+  const getEmail = () => i18nText(client.email, lang);
+  const getPhone = () => i18nText(client.phone, lang);
+  const getDescription = () => i18nText(client.description, lang);
+
+  const hasAnyField = getName() || getCompany() || getEmail() || getPhone();
   if (!hasAnyField) return null;
 
   return (
@@ -44,7 +51,7 @@ export default function AboutClientPreview({ data, lang }) {
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl blur-sm opacity-0 hover:opacity-100 transition-all duration-500 animate-pulse" />
           <div className="relative bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-gray-700/50 p-8 rounded-2xl h-full transform-gpu transition-all duration-500 hover:border-transparent">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {client.name && (
+              {getName() && (
                 <motion.div
                   initial={{ y: 30, opacity: 0, scale: 0.9 }}
                   whileInView={{ y: 0, opacity: 1, scale: 1 }}
@@ -64,7 +71,7 @@ export default function AboutClientPreview({ data, lang }) {
                           {t('name')}
                         </h3>
                         <p className="text-sm text-gray-300 leading-relaxed">
-                          {i18nText(client.name, lang)}
+                          {getName()}
                         </p>
                       </div>
                     </div>
@@ -72,7 +79,7 @@ export default function AboutClientPreview({ data, lang }) {
                 </motion.div>
               )}
               
-              {client.company && (
+              {getCompany() && (
                 <motion.div
                   initial={{ y: 30, opacity: 0, scale: 0.9 }}
                   whileInView={{ y: 0, opacity: 1, scale: 1 }}
@@ -92,7 +99,7 @@ export default function AboutClientPreview({ data, lang }) {
                           {t('company')}
                         </h3>
                         <p className="text-sm text-gray-300 leading-relaxed">
-                          {i18nText(client.company, lang)}
+                          {getCompany()}
                         </p>
                       </div>
                     </div>
@@ -100,7 +107,7 @@ export default function AboutClientPreview({ data, lang }) {
                 </motion.div>
               )}
               
-              {client.email && (
+              {getEmail() && (
                 <motion.div
                   initial={{ y: 30, opacity: 0, scale: 0.9 }}
                   whileInView={{ y: 0, opacity: 1, scale: 1 }}
@@ -120,7 +127,7 @@ export default function AboutClientPreview({ data, lang }) {
                           {t('email')}
                         </h3>
                         <p className="text-sm text-gray-300 leading-relaxed">
-                          {i18nText(client.email, lang)}
+                          {getEmail()}
                         </p>
                       </div>
                     </div>
@@ -128,7 +135,7 @@ export default function AboutClientPreview({ data, lang }) {
                 </motion.div>
               )}
               
-              {client.phone && (
+              {getPhone() && (
                 <motion.div
                   initial={{ y: 30, opacity: 0, scale: 0.9 }}
                   whileInView={{ y: 0, opacity: 1, scale: 1 }}
@@ -148,7 +155,7 @@ export default function AboutClientPreview({ data, lang }) {
                           {t('phone')}
                         </h3>
                         <p className="text-sm text-gray-300 leading-relaxed">
-                          {i18nText(client.phone, lang)}
+                          {getPhone()}
                         </p>
                       </div>
                     </div>
@@ -157,7 +164,7 @@ export default function AboutClientPreview({ data, lang }) {
               )}
             </div>
             
-            {client.description && (
+            {getDescription() && (
               <motion.div
                 initial={{ y: 30, opacity: 0, scale: 0.9 }}
                 whileInView={{ y: 0, opacity: 1, scale: 1 }}
@@ -171,7 +178,7 @@ export default function AboutClientPreview({ data, lang }) {
                     {t('project_description')}
                   </h4>
                   <p className="text-gray-300 leading-relaxed">
-                    {i18nText(client.description, lang)}
+                    {getDescription()}
                   </p>
                 </div>
               </motion.div>

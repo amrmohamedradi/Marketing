@@ -37,7 +37,7 @@ function getCachedTranslation(text) {
  * @returns {string} - Extracted text
  */
 export function i18nText(value, lang) {
-  if (value == null) return '';
+  if (value == null || value === undefined) return '';
   
   if (typeof value === 'string') {
     // If requesting English but have Arabic string, try to translate
@@ -49,17 +49,20 @@ export function i18nText(value, lang) {
   
   if (typeof value === 'object') {
     let v = value[lang];
-    if (!v) {
+    if (!v || typeof v !== 'string') {
       // Fallback to other language
       const fallback = value[lang === 'ar' ? 'en' : 'ar'];
-      if (fallback && lang === 'en' && isArabicText(fallback)) {
+      if (fallback && typeof fallback === 'string' && lang === 'en' && isArabicText(fallback)) {
         v = getCachedTranslation(fallback);
-      } else {
+      } else if (typeof fallback === 'string') {
         v = fallback;
+      } else {
+        v = '';
       }
     }
-    return typeof v === 'string' ? v : '';
+    return v || '';
   }
   
-  return String(value);
+  // Fallback for any other type - convert to string
+  return String(value || '');
 }

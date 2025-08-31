@@ -143,7 +143,6 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   
   // Support & Benefits
   support: { ar: 'الدعم', en: 'Support' },
-  support_benefits: { ar: 'الدعم والمزايا', en: 'Support & Benefits' },
   support_benefits_desc: { ar: 'كل ما تحصل عليه عند العمل معنا', en: 'All you get when working with us' },
   support_24_7: { ar: 'الدعم 24/7', en: '24/7 Support' },
   support_24_7_desc: { ar: 'مساعدة مستمرة طوال الوقت عندما تحتاج المساعدة', en: 'Continuous assistance whenever you need help' },
@@ -189,8 +188,6 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   total_investment: { ar: 'إجمالي الاستثمار', en: 'Total Investment' },
   all_prices_in: { ar: 'جميع الأسعار بـ', en: 'All prices in' },
   terms_conditions: { ar: 'الشروط والأحكام', en: 'Terms & Conditions' },
-  proposal_valid: { ar: 'هذا العرض صالح لمدة 30 يوماً من تاريخ الإنشاء.', en: 'This proposal is valid for 30 days from the date of creation.' },
-  generated_with: { ar: 'Marketing Corner - ماركتنج كورنر', en: 'Marketing Corner - ماركتنج كورنر' },
   marketing_corner_logo_text: { ar: 'ماركتنج كورنر', en: 'Marketing Corner' },
   go_to_dashboard: { ar: 'الذهاب إلى لوحة التحكم', en: 'Go to Dashboard' },
   
@@ -330,9 +327,13 @@ export const useLang = useI18n;
 export type BiText = string | { ar?: string; en?: string } | null | undefined;
 
 export function getText(v: BiText, lang: "ar" | "en" = "ar"): string {
-  if (v == null) return "";
+  if (v == null || v === undefined) return "";
   if (typeof v === "string") return v;
-  return lang === "ar" ? (v.ar ?? v.en ?? "") : (v.en ?? v.ar ?? "");
+  if (typeof v === "object" && v !== null) {
+    const value = lang === "ar" ? (v.ar ?? v.en ?? "") : (v.en ?? v.ar ?? "");
+    return typeof value === "string" ? value : "";
+  }
+  return String(v || "");
 }
 
 export function setText(current: BiText, value: string, lang: "ar" | "en" = "ar") {
