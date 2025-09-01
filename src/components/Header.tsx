@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { useI18n } from '@/lib/i18n';
-import { LogOut } from 'lucide-react';
+import { LogOut, LayoutDashboard, Plus } from 'lucide-react';
 import { useAppContext } from '@/lib/AppContext';
 
 const Header = () => {
@@ -16,6 +16,13 @@ const Header = () => {
     navigate('/'); // Redirect to home/login page after logout
   };
 
+  const handleDashboard = () => {
+    navigate('/dashboard');
+  };
+
+  const handleCreateNew = () => {
+    navigate('/');
+  };
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -32,6 +39,24 @@ const Header = () => {
 
         {/* Responsive Navigation */}
         <div className="flex items-center space-x-2 sm:space-x-4">
+          <Button
+            variant="ghost"
+            onClick={handleDashboard}
+            className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 px-2 sm:px-3 py-1 sm:py-2"
+          >
+            <LayoutDashboard className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">{t('dashboard')}</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={handleCreateNew}
+            className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 px-2 sm:px-3 py-1 sm:py-2"
+          >
+            <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">{t('new')}</span>
+          </Button>
+          
           <Button
             variant="ghost"
             onClick={handleLogout}

@@ -187,37 +187,19 @@ const PreviewPage = () => {
       key={lang}
     >
       {/* Starfield Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-primary/30 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0.3, 1, 0.3],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 2 + Math.random() * 3,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-        {/* Floating geometric elements */}
-        <motion.div
-          className="absolute top-20 left-10 w-20 h-20 border border-primary/20 rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute bottom-32 right-16 w-16 h-16 border border-accent/20 rounded-lg"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+      <div className="fixed inset-0 z-0">
+        <Starfield 
+          className="absolute inset-0"
+          starCount={350}
+          maxStarSize={3}
+          parallaxStrength={0.12}
+          speed={0.06}
+          moonSizeFactor={1.5}
+          moonColor="rgba(220, 220, 240, 0.9)"
+          mouseParallaxStarsFraction={0.6}
+          showShootingStars={true}
+          showNebula={true}
+          showPlanets={true}
         />
       </div>
 

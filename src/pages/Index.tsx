@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Eye, LogOut, Zap, Star, ArrowRight, CheckCircle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import LoginForm from "@/components/LoginForm";
+import AuthForm from "@/components/AuthForm";
 import ClientDetailsSection from "@/components/ClientDetailsSection";
 import ServicesSection from "@/components/ServicesSection";
 import PriceSection from "@/components/PriceSection";
@@ -21,32 +21,7 @@ const Index = () => {
   const y = useTransform(scrollY, [0, 300], [0, -50]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.8]);
 
-  // Remove local state for clientDetails, services, priceData
-  /*
-  const [clientDetails, setClientDetails] = useState({
-    name: "",
-    company: "",
-    email: "",
-    phone: "",
-    description: "",
-  });
-
-  const [services, setServices] = useState<Service[]>([]);
-
-  const [priceData, setPriceData] = useState<PriceData>({
-    basePrice: 0,
-    currency: "USD",
-    additionalItems: [],
-    notes: "",
-  });
-  */
-
-  // const handleLogin = () => {
-  //   setIsLoggedIn(true);
-  // }; // Removed, now handled by LoginForm through context
-
   const handleLogout = () => {
-    // setIsLoggedIn(false); // Removed, now handled by clearAllData
     clearAllData(); // Use clearAllData from context
   };
 
@@ -60,28 +35,41 @@ const Index = () => {
 
   const { t, changeLanguage, currentLanguage } = useI18n();
   const navigate = useNavigate();
-  // const { setPreviewData } = usePreviewData(); // Removed
 
-  if (!isLoggedIn) {
-    return <LoginForm /* onLogin={handleLogin} */ />;
-  }
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-background"
+      className="min-h-screen bg-background relative overflow-hidden"
       dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}
       key={currentLanguage}
     >
+      {/* Enhanced Space Background */}
+      <div className="fixed inset-0 z-0">
+        <Starfield 
+          className="absolute inset-0"
+          starCount={300}
+          maxStarSize={2.5}
+          parallaxStrength={0.08}
+          speed={0.04}
+          moonSizeFactor={1}
+          moonColor="rgba(200, 200, 220, 0.6)"
+          mouseParallaxStarsFraction={0.8}
+          showShootingStars={true}
+          showNebula={true}
+          showPlanets={true}
+        />
+      </div>
+
       <div className={`center-wrap ${isExtraSmall ? 'py-2 space-y-4' : isMobile ? 'py-3 space-y-5' : 'py-3 sm:py-6 lg:py-8 space-y-6 sm:space-y-8 lg:space-y-12'}`}>
         {/* Hero Section */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.2 }}
-          className="text-center space-y-3 sm:space-y-4"
+          className="text-center space-y-3 sm:space-y-4 relative z-10"
         >
           <motion.h1 
             initial={{ scale: 0.9, opacity: 0 }}
@@ -131,7 +119,7 @@ const Index = () => {
         </motion.div>
 
         {/* Form Cards */}
-        <div className={`center-grid grid-cols-1 max-w-5xl mx-auto ${isExtraSmall ? 'px-2' : 'px-3 sm:px-4'}`}>
+        <div className={`center-grid grid-cols-1 max-w-5xl mx-auto ${isExtraSmall ? 'px-2' : 'px-3 sm:px-4'} relative z-10`}>
           <motion.div
             initial={{ x: -30, opacity: 0 }}
             whileInView={{ x: 0, opacity: 1 }}
@@ -184,7 +172,7 @@ const Index = () => {
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.25, duration: 0.3 }}
-          className="text-center space-y-4 sm:space-y-6 px-3 sm:px-4"
+          className="text-center space-y-4 sm:space-y-6 px-3 sm:px-4 relative z-10"
         >
           {/* CTA Button */}
           <motion.div

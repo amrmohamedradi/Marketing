@@ -61,6 +61,50 @@ const translations: { [key: string]: { [lang: string]: string } } = {
   demo_notice: { ar: 'هذا تطبيق تجريبي. استخدم أي بريد إلكتروني وكلمة مرور للمتابعة.', en: 'This is a demo app. Use any email and password to proceed.' },
   demo_credentials: { ar: 'بيانات اعتماد العرض التوضيحي', en: 'Demo Credentials' },
   
+  // Signup Form
+  create_account: { ar: 'إنشاء حساب', en: 'Create Account' },
+  join_us: { ar: 'انضم إلينا', en: 'Join Us' },
+  signup_desc: { ar: 'أنشئ حسابك لبدء إنشاء مواصفات خدمات احترافية', en: 'Create your account to start building professional service specifications' },
+  full_name: { ar: 'الاسم الكامل', en: 'Full Name' },
+  enter_full_name: { ar: 'أدخل اسمك الكامل', en: 'Enter your full name' },
+  confirm_password: { ar: 'تأكيد كلمة المرور', en: 'Confirm Password' },
+  confirm_password_placeholder: { ar: 'أعد إدخال كلمة المرور', en: 'Re-enter your password' },
+  creating_account: { ar: 'جاري إنشاء الحساب...', en: 'Creating Account...' },
+  already_have_account: { ar: 'لديك حساب بالفعل؟', en: 'Already have an account?' },
+  dont_have_account: { ar: 'ليس لديك حساب؟', en: "Don't have an account?" },
+  
+  // Form Validation
+  name_required: { ar: 'الاسم مطلوب', en: 'Name is required' },
+  email_required: { ar: 'البريد الإلكتروني مطلوب', en: 'Email is required' },
+  email_invalid: { ar: 'البريد الإلكتروني غير صحيح', en: 'Invalid email address' },
+  password_required: { ar: 'كلمة المرور مطلوبة', en: 'Password is required' },
+  password_min_length: { ar: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل', en: 'Password must be at least 6 characters' },
+  password_mismatch: { ar: 'كلمات المرور غير متطابقة', en: 'Passwords do not match' },
+  
+  // Dashboard
+  client_dashboard: { ar: 'لوحة تحكم العملاء', en: 'Client Dashboard' },
+  manage_clients_specs: { ar: 'إدارة العملاء ومواصفات الخدمات', en: 'Manage clients and service specifications' },
+  create_new_client: { ar: 'إنشاء عميل جديد', en: 'Create New Client' },
+  total_clients: { ar: 'إجمالي العملاء', en: 'Total Clients' },
+  active_projects: { ar: 'المشاريع النشطة', en: 'Active Projects' },
+  total_value: { ar: 'القيمة الإجمالية', en: 'Total Value' },
+  search_clients: { ar: 'البحث في العملاء...', en: 'Search clients...' },
+  all: { ar: 'الكل', en: 'All' },
+  active: { ar: 'نشط', en: 'Active' },
+  pending: { ar: 'معلق', en: 'Pending' },
+  inactive: { ar: 'غير نشط', en: 'Inactive' },
+  project_value: { ar: 'قيمة المشروع', en: 'Project Value' },
+  created: { ar: 'تم الإنشاء', en: 'Created' },
+  view: { ar: 'عرض', en: 'View' },
+  no_clients_found: { ar: 'لم يتم العثور على عملاء', en: 'No clients found' },
+  no_clients_yet: { ar: 'لا يوجد عملاء بعد', en: 'No clients yet' },
+  try_different_search: { ar: 'جرب بحثاً مختلفاً أو مرشحاً', en: 'Try a different search or filter' },
+  create_first_client: { ar: 'ابدأ بإنشاء عميلك الأول', en: 'Start by creating your first client' },
+  
+  // Header Navigation
+  dashboard: { ar: 'لوحة التحكم', en: 'Dashboard' },
+  new: { ar: 'جديد', en: 'New' },
+  
   // Additional missing translations
   exit: { ar: 'خروج', en: 'Exit' },
   select_currency: { ar: 'اختر العملة', en: 'Select currency' },

@@ -51,6 +51,9 @@ interface StarfieldProps {
 	moonSizeFactor?: number; // Factor to multiply moon radius by
 	moonColor?: string; // Color of the moon
 	mouseParallaxStarsFraction?: number; // Fraction of stars that respond to mouse movement
+	showShootingStars?: boolean; // Whether to show shooting stars
+	showNebula?: boolean; // Whether to show nebula clouds
+	showPlanets?: boolean; // Whether to show planets
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -64,6 +67,9 @@ const Starfield = ({
 	moonSizeFactor = 1,
 	moonColor = "rgba(200, 200, 220, 0.7)",
 	mouseParallaxStarsFraction = 1,
+	showShootingStars = true,
+	showNebula = true,
+	showPlanets = true,
 }: StarfieldProps) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const starsRef = useRef<Star[]>([]);
@@ -75,6 +81,8 @@ const Starfield = ({
 	const moonRef = useRef<Moon | null>(null);
 
 	const dottedShapesRef = useRef<DottedShape[]>([]);
+	const nebulaRef = useRef<{ x: number; y: number; size: number; opacity: number; rotation: number }[]>([]);
+	const planetsRef = useRef<{ x: number; y: number; size: number; color: string; rotation: number }[]>([]);
 
 	// Initialize stars
 	useEffect(() => {
@@ -147,7 +155,9 @@ const Starfield = ({
 			};
 		};
 
-		shootingStarsRef.current = Array.from({ length: 8 }, makeShootingStar); // Increased number of shooting stars
+		if (showShootingStars) {
+			shootingStarsRef.current = Array.from({ length: 12 }, makeShootingStar); // More shooting stars
+		}
 
 		const makeMoon = (): Moon => ({
 			x: Math.random() * 0.8 + 0.1, // Start somewhere in the middle 80%
@@ -157,7 +167,31 @@ const Starfield = ({
 			speedX: (Math.random() - 0.5) * 0.005, // very slow drift
 			speedY: (Math.random() - 0.5) * 0.005,
 		});
-		moonRef.current = makeMoon();
+		if (showPlanets) {
+			moonRef.current = makeMoon();
+		}
+
+		// Initialize nebula clouds
+		if (showNebula) {
+			nebulaRef.current = Array.from({ length: 3 }, () => ({
+				x: Math.random(),
+				y: Math.random(),
+				size: 100 + Math.random() * 200,
+				opacity: 0.1 + Math.random() * 0.2,
+				rotation: Math.random() * 360
+			}));
+		}
+
+		// Initialize planets
+		if (showPlanets) {
+			planetsRef.current = Array.from({ length: 2 }, () => ({
+				x: Math.random(),
+				y: Math.random(),
+				size: 15 + Math.random() * 25,
+				color: `hsl(${Math.random() * 60 + 200}, 70%, 60%)`,
+				rotation: 0
+			}));
+		}
 
 		const makeDottedCube = (): DottedShape => {
 			const size = 0.1;
@@ -280,7 +314,8 @@ const Starfield = ({
 			}
 
 			// Draw shooting stars
-			for (const star of shootingStarsRef.current) {
+			if (showShootingStars) {
+				for (const star of shootingStarsRef.current) {
 				star.x += star.vx * dt * 0.1; // scale velocity for smoother movement
 				star.y += star.vy * dt * 0.1;
 				star.life -= dt;
@@ -303,10 +338,35 @@ const Starfield = ({
 				ctx.moveTo(tailX, tailY);
 				ctx.lineTo(headX, headY);
 				ctx.stroke();
+				}
+			}
+
+			// Draw nebula clouds
+			if (showNebula) {
+				for (const nebula of nebulaRef.current) {
+					nebula.rotation += 0.1 * dt;
+					
+					const nebulaX = nebula.x * width;
+					const nebulaY = nebula.y * height;
+					
+					ctx.globalAlpha = nebula.opacity;
+					const gradient = ctx.createRadialGradient(
+						nebulaX, nebulaY, 0,
+						nebulaX, nebulaY, nebula.size
+					);
+					gradient.addColorStop(0, "rgba(147, 51, 234, 0.3)");
+					gradient.addColorStop(0.5, "rgba(59, 130, 246, 0.2)");
+					gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+					
+					ctx.fillStyle = gradient;
+					ctx.beginPath();
+					ctx.arc(nebulaX, nebulaY, nebula.size, 0, Math.PI * 2);
+					ctx.fill();
+				}
 			}
 
 			// Draw moon
-			if (moonRef.current) {
+			if (showPlanets && moonRef.current) {
 				const moon = moonRef.current;
 
 				// Update moon position
@@ -331,6 +391,29 @@ const Starfield = ({
 				ctx.beginPath();
 				ctx.arc(moonPx, moonPy, moonRadius, 0, Math.PI * 2);
 				ctx.fill();
+			}
+
+			// Draw additional planets
+			if (showPlanets) {
+				for (const planet of planetsRef.current) {
+					planet.rotation += 0.02 * dt;
+					
+					const planetX = planet.x * width;
+					const planetY = planet.y * height;
+					
+					ctx.globalAlpha = 0.8;
+					const planetGrad = ctx.createRadialGradient(
+						planetX - planet.size * 0.3, planetY - planet.size * 0.3, 0,
+						planetX, planetY, planet.size
+					);
+					planetGrad.addColorStop(0, planet.color);
+					planetGrad.addColorStop(1, "rgba(0, 0, 0, 0.8)");
+					
+					ctx.fillStyle = planetGrad;
+					ctx.beginPath();
+					ctx.arc(planetX, planetY, planet.size, 0, Math.PI * 2);
+					ctx.fill();
+				}
 			}
 
 			// Draw 3D dotted shapes
@@ -395,7 +478,7 @@ const Starfield = ({
 			window.removeEventListener("mousemove", onMouseMove);
 			window.removeEventListener("resize", onResize);
 		};
-	}, [starCount, maxStarSize, parallaxStrength, speed, moonSizeFactor, moonColor, mouseParallaxStarsFraction]);
+	}, [starCount, maxStarSize, parallaxStrength, speed, moonSizeFactor, moonColor, mouseParallaxStarsFraction, showShootingStars, showNebula, showPlanets]);
 
 	return (
 		<canvas

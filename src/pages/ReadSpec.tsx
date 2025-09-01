@@ -12,6 +12,7 @@ import { Reveal } from '@/components/Reveal';
 import { LucideIcon } from 'lucide-react';
 import '@/styles/space.css';
 import '@/styles/readonly-page.css';
+import Starfield from '@/components/Starfield';
 
 interface SpecData {
   clientDetails?: {
@@ -97,10 +98,27 @@ const ReadSpec: React.FC = () => {
 
   return (
     <LanguageProvider>
-      <div className="readonly-page min-h-screen overflow-visible space-bg">
+      <div className="readonly-page min-h-screen overflow-visible relative">
+        {/* Enhanced Space Background */}
+        <div className="fixed inset-0 z-0">
+          <Starfield 
+            className="absolute inset-0"
+            starCount={200}
+            maxStarSize={2}
+            parallaxStrength={0.05}
+            speed={0.02}
+            moonSizeFactor={0.8}
+            moonColor="rgba(180, 180, 200, 0.5)"
+            mouseParallaxStarsFraction={0.3}
+            showShootingStars={true}
+            showNebula={false}
+            showPlanets={false}
+          />
+        </div>
+        
         <PublicHeader />
         
-        <main className="container mx-auto px-4 py-8 max-w-4xl overflow-visible">
+        <main className="container mx-auto px-4 py-8 max-w-4xl overflow-visible relative z-10">
           {loading ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">

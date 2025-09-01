@@ -3,36 +3,78 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, LogIn, Loader2, User, Globe } from "lucide-react";
+import { UserPlus, LogIn, Loader2, User, Globe, Mail, Lock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { useAppContext } from "@/lib/AppContext";
-
-
 import { useIsMobile, useIsExtraSmall } from "@/hooks/use-mobile";
 
-interface LoginFormProps {
-  onSwitchToSignup?: () => void;
+interface SignupFormProps {
+  onSwitchToLogin: () => void;
 }
 
-const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
+const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
   const { t, changeLanguage, currentLanguage } = useI18n();
   const { setIsLoggedIn } = useAppContext();
   const isMobile = useIsMobile();
   const isExtraSmall = useIsExtraSmall();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = t('name_required');
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = t('email_required');
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = t('email_invalid');
+    }
+    
+    if (!formData.password) {
+      newErrors.password = t('password_required');
+    } else if (formData.password.length < 6) {
+      newErrors.password = t('password_min_length');
+    }
+    
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = t('password_mismatch');
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
     setIsLoading(true);
     
-    // Simulate API call
+    // Simulate API call to backend
     setTimeout(() => {
       setIsLoading(false);
-      setIsLoggedIn(true); // Use setIsLoggedIn from context
-    }, 1000);
+      setIsLoggedIn(true);
+    }, 1500);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }));
+    }
   };
 
   return (
@@ -97,7 +139,7 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-2xl xs:rounded-3xl blur-lg animate-pulse" />
               <div className={`relative ${isExtraSmall ? 'w-16 h-16' : 'w-20 h-20'} bg-gradient-to-r from-primary to-accent rounded-2xl xs:rounded-3xl flex items-center justify-center`}>
-                <User className={`${isExtraSmall ? 'w-8 h-8' : 'w-10 h-10'} text-white`} />
+                <UserPlus className={`${isExtraSmall ? 'w-8 h-8' : 'w-10 h-10'} text-white`} />
               </div>
             </motion.div>
             <motion.h1 
@@ -106,9 +148,10 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
               transition={{ delay: 0.6, duration: 0.8 }}
               className={`${isExtraSmall ? 'text-2xl' : isMobile ? 'text-3xl' : 'text-4xl'} font-black text-foreground mb-3`}
             >
-              {t('welcome_back')}
+              {t('create_account')}
             </motion.h1>
-            {/* Enhanced Language Toggle */}
+            
+            {/* Language Toggle */}
             <motion.div
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -140,15 +183,41 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
             <Card className={`rounded-xl xs:rounded-2xl shadow-lg border border-border bg-card text-card-foreground ${isExtraSmall ? 'p-2' : isMobile ? 'p-3' : 'p-4'}`}>
               <CardHeader>
                 <CardTitle className="text-center text-foreground">
-                  {t('sign_in')}
+                  {t('join_us')}
                 </CardTitle>
                 <CardDescription className="text-center text-muted-foreground">
-                  {t('sign_in_desc_card')}
+                  {t('signup_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className={`${isExtraSmall ? 'space-y-3' : 'space-y-4'}`}>
-                {/* Enhanced Form */}
-                <form onSubmit={handleSubmit} className={`${isExtraSmall ? 'space-y-5' : 'space-y-8'}`}>
+                <form onSubmit={handleSubmit} className={`${isExtraSmall ? 'space-y-4' : 'space-y-6'}`}>
+                  {/* Name Field */}
+                  <motion.div
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                    className="relative"
+                  >
+                    <Label htmlFor="name" className={`${isExtraSmall ? 'text-sm' : 'text-base'} font-semibold text-foreground ${isExtraSmall ? 'mb-2' : 'mb-3'} block`}>
+                      {t('full_name')}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="name"
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        className={`w-full ${isExtraSmall ? 'px-4 py-3 text-base' : isMobile ? 'px-5 py-3.5 text-lg' : 'px-6 py-4 text-lg'} card-neo border-primary/30 rounded-xl xs:rounded-2xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${errors.name ? 'border-red-500' : ''}`}
+                        placeholder={t('enter_full_name')}
+                        required
+                      />
+                      {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                      )}
+                    </div>
+                  </motion.div>
+
+                  {/* Email Field */}
                   <motion.div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -162,16 +231,19 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
                       <Input
                         id="email"
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={`w-full ${isExtraSmall ? 'px-4 py-3 text-base' : isMobile ? 'px-5 py-3.5 text-lg' : 'px-6 py-4 text-lg'} card-neo border-primary/30 rounded-xl xs:rounded-2xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300`}
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        className={`w-full ${isExtraSmall ? 'px-4 py-3 text-base' : isMobile ? 'px-5 py-3.5 text-lg' : 'px-6 py-4 text-lg'} card-neo border-primary/30 rounded-xl xs:rounded-2xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${errors.email ? 'border-red-500' : ''}`}
                         placeholder={t('enter_email')}
                         required
                       />
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent rounded-t-xl xs:rounded-t-2xl opacity-0 focus-within:opacity-100 transition-opacity duration-300" />
+                      {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                      )}
                     </div>
                   </motion.div>
 
+                  {/* Password Field */}
                   <motion.div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -185,20 +257,49 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
                       <Input
                         id="password"
                         type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={`w-full ${isExtraSmall ? 'px-4 py-3 text-base' : isMobile ? 'px-5 py-3.5 text-lg' : 'px-6 py-4 text-lg'} card-neo border-primary/30 rounded-xl xs:rounded-2xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300`}
+                        value={formData.password}
+                        onChange={(e) => handleInputChange("password", e.target.value)}
+                        className={`w-full ${isExtraSmall ? 'px-4 py-3 text-base' : isMobile ? 'px-5 py-3.5 text-lg' : 'px-6 py-4 text-lg'} card-neo border-primary/30 rounded-xl xs:rounded-2xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${errors.password ? 'border-red-500' : ''}`}
                         placeholder={t('enter_password')}
                         required
                       />
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent rounded-t-xl xs:rounded-t-2xl opacity-0 focus-within:opacity-100 transition-opacity duration-300" />
+                      {errors.password && (
+                        <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                      )}
                     </div>
                   </motion.div>
 
+                  {/* Confirm Password Field */}
+                  <motion.div
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.8, duration: 0.8 }}
+                    className="relative"
+                  >
+                    <Label htmlFor="confirmPassword" className={`${isExtraSmall ? 'text-sm' : 'text-base'} font-semibold text-foreground ${isExtraSmall ? 'mb-2' : 'mb-3'} block`}>
+                      {t('confirm_password')}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                        className={`w-full ${isExtraSmall ? 'px-4 py-3 text-base' : isMobile ? 'px-5 py-3.5 text-lg' : 'px-6 py-4 text-lg'} card-neo border-primary/30 rounded-xl xs:rounded-2xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                        placeholder={t('confirm_password_placeholder')}
+                        required
+                      />
+                      {errors.confirmPassword && (
+                        <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                      )}
+                    </div>
+                  </motion.div>
+
+                  {/* Submit Button */}
                   <motion.div
                     initial={{ y: 30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.8, duration: 0.8 }}
+                    transition={{ delay: 0.9, duration: 0.8 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -212,41 +313,39 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
                         {isLoading ? (
                           <div className="flex items-center justify-center gap-2 xs:gap-3 sm:gap-4">
                             <div className={`${isExtraSmall ? 'w-5 h-5' : 'w-6 h-6'} border-3 border-white/30 border-t-white rounded-full animate-spin`} />
-                            <span className={isExtraSmall ? 'text-base' : 'text-xl'}>{t('signing_in')}</span>
+                            <span className={isExtraSmall ? 'text-base' : 'text-xl'}>{t('creating_account')}</span>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center gap-2 xs:gap-3 sm:gap-4">
-                            <LogIn className={`${isExtraSmall ? 'w-5 h-5' : 'w-6 h-6'}`} />
-                            <span className={isExtraSmall ? 'text-base' : 'text-xl'}>{t('sign_in')}</span>
+                            <UserPlus className={`${isExtraSmall ? 'w-5 h-5' : 'w-6 h-6'}`} />
+                            <span className={isExtraSmall ? 'text-base' : 'text-xl'}>{t('create_account')}</span>
                           </div>
                         )}
                       </Button>
                     </div>
                   </motion.div>
-                </form>    
-                
-                {/* Switch to Signup */}
-                {onSwitchToSignup && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1, duration: 0.5 }}
-                    className="text-center pt-4 border-t border-border/30"
+                </form>
+
+                {/* Switch to Login */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1, duration: 0.5 }}
+                  className="text-center pt-4 border-t border-border/30"
+                >
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('already_have_account')}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={onSwitchToLogin}
+                    className="text-primary hover:text-primary/80 hover:bg-primary/10 transition-all duration-300"
                   >
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {t('dont_have_account')}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={onSwitchToSignup}
-                      className="text-primary hover:text-primary/80 hover:bg-primary/10 transition-all duration-300"
-                    >
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      {t('create_account')}
-                    </Button>
-                  </motion.div>
-                )}
+                    <LogIn className="w-4 h-4 mr-2" />
+                    {t('sign_in')}
+                  </Button>
+                </motion.div>
                 
                 <p className="text-xs text-center text-muted-foreground">
                   {t('demo_notice')}
@@ -260,4 +359,4 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
   );
 };
 
-export default LoginForm;
+export default SignupForm;

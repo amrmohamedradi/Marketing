@@ -13,6 +13,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import ReadSpec from "./pages/ReadSpec";
+import Dashboard from "./components/Dashboard";
+import AuthForm from "./components/AuthForm";
 import Header from "./components/Header"; // Import the new Header component
 
 const queryClient = new QueryClient();
@@ -25,6 +27,7 @@ const AppContent = () => {
   
   // Check if current route is read-only page
   const isReadOnlyRoute = location.pathname.startsWith('/read/');
+  const isAuthRoute = location.pathname === '/auth';
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -51,13 +54,15 @@ const AppContent = () => {
           </button>
         </div>
       )}
-      {isLoggedIn && !isReadOnlyRoute && <Header />}
+      {isLoggedIn && !isReadOnlyRoute && !isAuthRoute && <Header />}
       <main className={isReadOnlyRoute ? "" : "container mx-auto py-8"}>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={isLoggedIn ? <Index /> : <AuthForm />} />
+          <Route path="/auth" element={<AuthForm />} />
+          <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <AuthForm />} />
           <Route path="/read/:slug" element={<ReadSpec />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="/preview" element={<PreviewPage />} />
+          <Route path="/preview" element={isLoggedIn ? <PreviewPage /> : <AuthForm />} />
           <Route path="/health" element={<HealthPage />} />
           <Route path="/debug/health" element={<HealthPage />} />
           <Route path="*" element={<NotFound />} />
