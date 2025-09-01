@@ -9,7 +9,7 @@ import Support from '@/components/public/Support';
 import { Pricing } from '@/components/public/Pricing';
 import { ContactCompany } from '@/components/public/ContactCompany';
 import { Reveal } from '@/components/Reveal';
-import { LucideIcon } from 'lucide-react';
+import { DivideIcon as LucideIcon } from 'lucide-react';
 import '@/styles/space.css';
 import '@/styles/readonly-page.css';
 import Starfield from '@/components/Starfield';
